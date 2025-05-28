@@ -1,4 +1,4 @@
-# Load environment variables FIRST
+# Load environment variables first
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -102,7 +102,7 @@ async def generate_recovery_story(challenge: str, experience: str, solution: str
             try:
                 logger.info(f"Trying model: {model_name}")
                 
-                generated_text = query_ollama_model(model_name, prompt, max_tokens=250)
+                generated_text = query_ollama_model(model_name, prompt, max_tokens=150)
                 
                 if generated_text and len(generated_text.strip()) > 100:
                     story = generated_text.strip()
@@ -118,6 +118,18 @@ async def generate_recovery_story(challenge: str, experience: str, solution: str
             story = create_fallback_recovery_story(challenge, experience, solution, advice)
             model_used = "fallback"
             logger.info("Used fallback recovery story")
+
+        # Extract key symptoms from the shared experience
+        try:
+            symptom_data = extract_symptoms(
+                experience=f"{challenge}. {experience}",
+                feelings=advice
+            )
+            key_symptoms = symptom_data.get("symptoms_identified", [])[:3]  # Get top 3
+            logger.info(f"Extracted key symptoms: {key_symptoms}")
+        except Exception as e:
+            logger.warning(f"Symptom extraction failed: {e}")
+            key_symptoms = []
         
         # Save to database
         try:
@@ -128,7 +140,8 @@ async def generate_recovery_story(challenge: str, experience: str, solution: str
                 solution=solution,
                 advice=advice,
                 generated_story=story,
-                model_used=model_used
+                model_used=model_used,
+                key_symptoms=key_symptoms
             )
             
             if save_result["success"]:
@@ -307,10 +320,28 @@ async def search_similar_stories(request: SearchRequest):
         }
 
 @app.get("/stories")
-async def get_stories(limit: int = 20, skip: int = 0):
-    """Get recovery stories from database"""
+async def get_stories(limit: int = 20, skip: int = 0, random: bool = True):
+    """Get recovery stories from database - returns random selection by default"""
     try:
-        stories = await StoryDatabase.get_recovery_stories(limit=limit, skip=skip)
+        # Get all available stories
+        all_stories = await StoryDatabase.get_recovery_stories(limit=100, skip=0)
+        
+        if random and len(all_stories) > limit:
+            # Randomly select stories
+            import random as rand
+            rand.shuffle(all_stories)
+            stories = all_stories[:limit]
+        else:
+            # Return stories in order (most recent first)
+            stories = await StoryDatabase.get_recovery_stories(limit=limit, skip=skip)
+        
+        # Clean up stories - remove any match percentage fields
+        for story in stories:
+            if 'match_percentage' in story:
+                del story['match_percentage']
+            if 'similarity_score' in story:
+                del story['similarity_score']
+        
         return {
             "success": True,
             "stories": stories,
@@ -326,6 +357,12 @@ async def get_story(story_id: str):
     try:
         story = await StoryDatabase.get_story_by_id(story_id)
         if story:
+            # Remove any match percentage fields
+            if 'match_percentage' in story:
+                del story['match_percentage']
+            if 'similarity_score' in story:
+                del story['similarity_score']
+            
             return {"success": True, "story": story}
         else:
             raise HTTPException(status_code=404, detail="Story not found")

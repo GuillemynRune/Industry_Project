@@ -93,7 +93,8 @@ class StoryDatabase:
         solution: str,
         advice: str,
         generated_story: str,
-        model_used: str
+        model_used: str,
+        key_symptoms: List[str] = None  # Add this line
     ) -> Dict:
         """Save a recovery story to the database"""
         
@@ -106,6 +107,7 @@ class StoryDatabase:
                 "advice": advice,
                 "generated_story": generated_story,
                 "model_used": model_used,
+                "key_symptoms": key_symptoms or [],  # Add this line
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow(),
                 "status": "active",

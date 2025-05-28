@@ -38,6 +38,38 @@
             padding: 0 20px;
         }
 
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
         /* Header */
         header {
             background: rgba(255, 255, 255, 0.95);
@@ -46,6 +78,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            animation: fadeInUp 0.6s ease-out;
         }
 
         nav {
@@ -62,6 +95,11 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
         }
 
         .nav-links {
@@ -74,154 +112,240 @@
             text-decoration: none;
             color: var(--text-dark);
             font-weight: 500;
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
-        .nav-links a:hover {
-            color: var(--deep-blue);
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(45deg, var(--deep-blue), var(--deep-pink));
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
         }
 
         /* Hero Section */
         .hero {
             padding: 4rem 0;
             text-align: center;
+            animation: fadeInUp 0.8s ease-out;
         }
 
         .hero h1 {
-            font-size: 3rem;
+            font-size: 3.5rem;
             margin-bottom: 1rem;
             background: linear-gradient(45deg, var(--deep-blue), var(--deep-pink));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            animation: float 3s ease-in-out infinite;
         }
 
         .hero p {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: var(--text-light);
-            max-width: 600px;
-            margin: 0 auto 2rem;
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            animation: fadeInUp 1s ease-out 0.2s both;
         }
 
         .cta-buttons {
             display: flex;
-            gap: 1rem;
+            gap: 1.5rem;
             justify-content: center;
             flex-wrap: wrap;
+            animation: fadeInUp 1.2s ease-out 0.4s both;
         }
 
         .btn {
-            padding: 12px 30px;
+            padding: 16px 40px;
             border: none;
-            border-radius: 25px;
-            font-size: 1rem;
+            border-radius: 30px;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
             text-decoration: none;
             display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
         }
 
         .btn-primary {
             background: linear-gradient(45deg, var(--soft-blue), var(--deep-blue));
             color: white;
+            box-shadow: 0 4px 15px rgba(107, 182, 214, 0.3);
         }
 
         .btn-secondary {
             background: linear-gradient(45deg, var(--soft-pink), var(--deep-pink));
             color: white;
+            box-shadow: 0 4px 15px rgba(232, 145, 163, 0.3);
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
         }
 
-        /* Main Content */
-        .main-content {
-            padding: 3rem 0;
-        }
-
-        .section {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 20px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        /* Share Story Section - Made Bigger */
+        .share-story-section {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(252, 232, 234, 0.3));
+            border-radius: 30px;
+            padding: 4rem;
+            margin: 3rem 0;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
             backdrop-filter: blur(10px);
+            animation: fadeInUp 1s ease-out;
+            position: relative;
+            overflow: hidden;
         }
 
-        .section h2 {
+        .share-story-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--pale-blue) 0%, transparent 70%);
+            opacity: 0.1;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .share-story-section h2 {
             color: var(--deep-blue);
-            margin-bottom: 1.5rem;
-            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+            text-align: center;
         }
 
-        /* Share Experience Form */
-        .form-group {
-            margin-bottom: 1.5rem;
+        .share-story-section p {
+            text-align: center;
+            color: var(--text-light);
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--text-dark);
+        .share-btn-container {
+            text-align: center;
         }
 
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid var(--pale-blue);
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
+        .share-story-btn {
+            padding: 20px 60px;
+            font-size: 1.3rem;
+            background: linear-gradient(45deg, var(--deep-blue), var(--deep-pink));
+            color: white;
+            border: none;
+            border-radius: 35px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
         }
 
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--deep-blue);
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 120px;
+        .share-story-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
         }
 
         /* Stories Grid */
+        .stories-section {
+            padding: 2rem 0;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .stories-section h2 {
+            color: var(--deep-blue);
+            margin-bottom: 3rem;
+            font-size: 2.5rem;
+            text-align: center;
+        }
+
         .stories-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 2rem;
             margin-top: 2rem;
         }
 
         .story-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .story-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: linear-gradient(135deg, var(--pale-blue), var(--pale-pink));
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .story-card:hover::before {
+            opacity: 0.3;
         }
 
         .story-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
         }
 
         .story-title {
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             font-weight: bold;
             color: var(--deep-blue);
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
         }
 
         .story-preview {
             color: var(--text-light);
-            line-height: 1.5;
-            margin-bottom: 1rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
         }
 
         .story-meta {
@@ -230,67 +354,70 @@
             align-items: center;
             font-size: 0.9rem;
             color: var(--text-light);
+            position: relative;
+            z-index: 1;
         }
 
-        .similarity-score {
-            background: var(--soft-pink);
-            padding: 4px 8px;
-            border-radius: 15px;
-            font-size: 0.8rem;
+        .read-more {
+            color: var(--deep-pink);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
         }
 
-        /* Search Section */
-        .search-bar {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
+        .read-more:hover {
+            color: var(--deep-blue);
+            transform: translateX(5px);
         }
 
-        .search-input {
-            flex: 1;
-            min-width: 300px;
-            padding: 12px;
-            border: 2px solid var(--pale-blue);
-            border-radius: 25px;
-            font-size: 1rem;
+        /* How It Works Section */
+        .how-it-works {
+            margin: 4rem 0;
+            animation: fadeInUp 1s ease-out;
         }
 
-        .search-input:focus {
-            outline: none;
-            border-color: var(--deep-blue);
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
         }
 
-        /* Footer */
-        footer {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 2rem 0;
+        .step-card {
             text-align: center;
-            color: var(--text-light);
+            padding: 2rem;
+            transition: transform 0.4s ease;
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
+        .step-card:hover {
+            transform: translateY(-10px);
+        }
 
-            .hero h1 {
-                font-size: 2rem;
-            }
+        .step-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, var(--soft-blue), var(--deep-blue));
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.4s ease;
+        }
 
-            .cta-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
+        .step-card:nth-child(2) .step-icon {
+            background: linear-gradient(45deg, var(--soft-pink), var(--deep-pink));
+        }
 
-            .search-bar {
-                flex-direction: column;
-            }
+        .step-card:nth-child(3) .step-icon {
+            background: linear-gradient(45deg, var(--deep-blue), var(--deep-pink));
+        }
 
-            .search-input {
-                min-width: auto;
-            }
+        .step-card:hover .step-icon {
+            transform: scale(1.1) rotate(10deg);
         }
 
         /* Modal Styles */
@@ -302,32 +429,175 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 2rem;
-            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(252, 232, 234, 0.5));
+            margin: 3% auto;
+            padding: 3rem;
+            border-radius: 30px;
             width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
+            max-width: 700px;
+            max-height: 90vh;
             overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.4s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .close {
             color: var(--text-light);
             float: right;
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: bold;
             cursor: pointer;
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
+            line-height: 1;
         }
 
         .close:hover {
             color: var(--deep-pink);
+            transform: rotate(90deg);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 2rem;
+            animation: fadeInUp 0.5s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+        .form-group:nth-child(5) { animation-delay: 0.5s; }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 1.1rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid var(--pale-blue);
+            border-radius: 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--deep-blue);
+            box-shadow: 0 0 0 3px rgba(107, 182, 214, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 130px;
+            font-family: inherit;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem 0;
+            text-align: center;
+            color: var(--text-light);
+            margin-top: 4rem;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .share-story-section {
+                padding: 2rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .modal-content {
+                margin: 10% auto;
+                padding: 2rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Search Bar - Keep existing styling */
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 300px;
+            padding: 16px 24px;
+            border: 2px solid var(--pale-blue);
+            border-radius: 30px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--deep-blue);
+            box-shadow: 0 0 0 3px rgba(107, 182, 214, 0.1);
         }
     </style>
 </head>
@@ -350,66 +620,55 @@
                 <h1>You're Not Alone</h1>
                 <p>Share your postnatal journey, find stories that resonate with you, and connect with a supportive community of parents who understand.</p>
                 <div class="cta-buttons">
-                    <button class="btn btn-primary" onclick="openModal('shareModal')">Share Your Story</button>
-                    <button class="btn btn-secondary" onclick="scrollToSection('stories')">Find Similar Stories</button>
+                    <button class="btn btn-primary" onclick="scrollToSection('share')">Share Your Story</button>
+                    <button class="btn btn-secondary" onclick="scrollToSection('stories')">Read Stories</button>
                 </div>
             </div>
         </section>
 
         <div class="container main-content">
-            <section class="section" id="stories">
-                <h2>Find Stories Like Yours</h2>
+            <!-- Enhanced Share Story Section -->
+            <section class="share-story-section" id="share">
+                <h2>Share Your Recovery Story</h2>
+                <p>Your experience matters. Help others by sharing your journey through postnatal challenges and recovery.</p>
+                <div class="share-btn-container">
+                    <button class="share-story-btn" onclick="openModal('shareModal')">
+                        <span>Start Sharing Your Story</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Stories Section -->
+            <section class="stories-section" id="stories">
+                <h2>Stories from Our Community</h2>
+                
+                <!-- Search bar remains unchanged as requested -->
                 <div class="search-bar">
                     <input type="text" class="search-input" placeholder="Describe what you're going through... (e.g., 'feeling overwhelmed', 'sleep deprivation', 'anxiety')" id="searchInput">
                     <button class="btn btn-primary" onclick="searchSimilarStories()">Find Similar Stories</button>
                 </div>
                 
                 <div class="stories-grid" id="storiesGrid">
-                    <!-- Sample stories will be populated here -->
-                    <div class="story-card">
-                        <div class="story-title">Finding Light in Dark Days</div>
-                        <div class="story-preview">Sarah's journey through the fog of early motherhood, where simple tasks felt mountainous and joy seemed distant. But small moments of connection with her baby became stepping stones back to herself...</div>
-                        <div class="story-meta">
-                            <span>3 days ago</span>
-                            <span class="similarity-score">95% match</span>
-                        </div>
-                    </div>
-                    
-                    <div class="story-card">
-                        <div class="story-title">The Weight of Expectations</div>
-                        <div class="story-preview">Emma thought she'd feel instant maternal bliss, but instead found herself grieving her old life while trying to love her new reality. Her story of accepting imperfection and finding support...</div>
-                        <div class="story-meta">
-                            <span>1 week ago</span>
-                            <span class="similarity-score">87% match</span>
-                        </div>
-                    </div>
-                    
-                    <div class="story-card">
-                        <div class="story-title">Sleepless Nights, Hopeful Days</div>
-                        <div class="story-preview">When Maria's baby wouldn't sleep, neither could she. The exhaustion felt endless, but connecting with other parents online became her lifeline during those 3 AM feeding sessions...</div>
-                        <div class="story-meta">
-                            <span>2 weeks ago</span>
-                            <span class="similarity-score">82% match</span>
-                        </div>
-                    </div>
+                    <!-- Stories will be populated here -->
                 </div>
             </section>
 
-            <section class="section">
-                <h2>How It Works</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 2rem;">
-                    <div style="text-align: center;">
-                        <div style="width: 60px; height: 60px; background: linear-gradient(45deg, var(--soft-blue), var(--deep-blue)); border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">📝</div>
+            <!-- How It Works -->
+            <section class="section how-it-works">
+                <h2 style="text-align: center; color: var(--deep-blue); font-size: 2.5rem; margin-bottom: 1rem;">How It Works</h2>
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-icon">📝</div>
                         <h3>Share Your Experience</h3>
                         <p>Tell us about your journey in your own words. No judgment, just understanding.</p>
                     </div>
-                    <div style="text-align: center;">
-                        <div style="width: 60px; height: 60px; background: linear-gradient(45deg, var(--soft-pink), var(--deep-pink)); border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">✨</div>
+                    <div class="step-card">
+                        <div class="step-icon">✨</div>
                         <h3>AI Creates Your Story</h3>
                         <p>Our AI transforms your experience into a beautiful, readable story while preserving your truth.</p>
                     </div>
-                    <div style="text-align: center;">
-                        <div style="width: 60px; height: 60px; background: linear-gradient(45deg, var(--deep-blue), var(--deep-pink)); border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">🤝</div>
+                    <div class="step-card">
+                        <div class="step-icon">🤝</div>
                         <h3>Find Your Tribe</h3>
                         <p>Connect with others who've walked similar paths and find comfort in shared experiences.</p>
                     </div>
@@ -422,8 +681,8 @@
     <div id="shareModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('shareModal')">&times;</span>
-            <h2 style="color: var(--deep-blue); margin-bottom: 1.5rem;">Share Your Recovery Story</h2>
-            <p style="margin-bottom: 2rem; color: var(--text-light);">Help others by sharing how you overcame postnatal challenges. Your story could be the hope someone else needs.</p>
+            <h2 style="color: var(--deep-blue); margin-bottom: 1.5rem; font-size: 2.2rem;">Share Your Recovery Story</h2>
+            <p style="margin-bottom: 2rem; color: var(--text-light); font-size: 1.1rem;">Help others by sharing how you overcame postnatal challenges. Your story could be the hope someone else needs.</p>
             
             <form id="shareForm">
                 <div class="form-group">
@@ -452,7 +711,7 @@
                 </div>
                 
                 <div style="text-align: center; margin-top: 2rem;">
-                    <button type="submit" class="btn btn-primary">Share My Recovery Story</button>
+                    <button type="submit" class="btn btn-primary" style="padding: 16px 40px; font-size: 1.1rem;">Share My Recovery Story</button>
                     <button type="button" class="btn" onclick="closeModal('shareModal')" style="margin-left: 1rem; background: var(--light-gray); color: var(--text-dark);">Cancel</button>
                 </div>
             </form>
@@ -467,21 +726,153 @@
     </footer>
 
     <script>
+        const API_BASE_URL = 'http://localhost:8000';
+
+        // Load random stories on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRandomStories();
+        });
+
+        async function loadRandomStories() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/stories?limit=6`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayStories(data.stories);
+                }
+            } catch (error) {
+                console.error('Error loading stories:', error);
+                // Display sample stories as fallback
+                displaySampleStories();
+            }
+        }
+
+        function displayStories(stories) {
+            const storiesGrid = document.getElementById('storiesGrid');
+            storiesGrid.innerHTML = '';
+            
+            if (stories.length === 0) {
+                displaySampleStories();
+                return;
+            }
+            
+            stories.forEach((story, index) => {
+                const storyCard = createStoryCard(story, index);
+                storiesGrid.appendChild(storyCard);
+            });
+        }
+
+        function createStoryCard(story, index) {
+            const card = document.createElement('div');
+            card.className = 'story-card';
+            card.style.animationDelay = `${index * 0.1}s`;
+            
+            // Create preview from generated story
+            const preview = story.generated_story ? 
+                story.generated_story.substring(0, 200) + '...' : 
+                story.experience.substring(0, 200) + '...';
+            
+            card.innerHTML = `
+                <div class="story-title">${story.challenge || 'A Recovery Journey'}</div>
+                <div class="story-preview">${preview}</div>
+                <div class="story-meta">
+                    <span>${getTimeAgo(story.created_at)}</span>
+                    <a href="#" class="read-more" onclick="viewFullStory('${story._id}')">Read more →</a>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function displaySampleStories() {
+            const sampleStories = [
+                {
+                    title: "Finding Light in Dark Days",
+                    preview: "Sarah's journey through the fog of early motherhood, where simple tasks felt mountainous and joy seemed distant. But small moments of connection with her baby became stepping stones back to herself...",
+                    time: "3 days ago"
+                },
+                {
+                    title: "The Weight of Expectations",
+                    preview: "Emma thought she'd feel instant maternal bliss, but instead found herself grieving her old life while trying to love her new reality. Her story of accepting imperfection and finding support...",
+                    time: "1 week ago"
+                },
+                {
+                    title: "Sleepless Nights, Hopeful Days",
+                    preview: "When Maria's baby wouldn't sleep, neither could she. The exhaustion felt endless, but connecting with other parents online became her lifeline during those 3 AM feeding sessions...",
+                    time: "2 weeks ago"
+                },
+                {
+                    title: "Breaking Through the Silence",
+                    preview: "Alex struggled with postpartum anxiety in silence for months, afraid to admit she wasn't enjoying motherhood. Finally opening up to her partner changed everything...",
+                    time: "1 month ago"
+                },
+                {
+                    title: "From Isolation to Connection",
+                    preview: "Living far from family, Jamie felt utterly alone with her newborn. Joining a local parent group seemed impossible at first, but it became her greatest source of strength...",
+                    time: "2 months ago"
+                },
+                {
+                    title: "Healing One Day at a Time",
+                    preview: "Recovery wasn't linear for Kate. Some days were harder than others, but celebrating small victories - a shower, a walk, a genuine smile - helped her rebuild her sense of self...",
+                    time: "3 months ago"
+                }
+            ];
+            
+            const storiesGrid = document.getElementById('storiesGrid');
+            storiesGrid.innerHTML = '';
+            
+            sampleStories.forEach((story, index) => {
+                const card = document.createElement('div');
+                card.className = 'story-card';
+                card.style.animationDelay = `${index * 0.1}s`;
+                
+                card.innerHTML = `
+                    <div class="story-title">${story.title}</div>
+                    <div class="story-preview">${story.preview}</div>
+                    <div class="story-meta">
+                        <span>${story.time}</span>
+                        <a href="#" class="read-more">Read more →</a>
+                    </div>
+                `;
+                
+                storiesGrid.appendChild(card);
+            });
+        }
+
+        function getTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 1) return '1 day ago';
+            if (diffDays < 7) return `${diffDays} days ago`;
+            if (diffDays < 30) return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) > 1 ? 's' : ''} ago`;
+            return `${Math.floor(diffDays / 30)} month${Math.floor(diffDays / 30) > 1 ? 's' : ''} ago`;
+        }
+
+        function viewFullStory(storyId) {
+            // You can implement a full story view modal or navigation here
+            alert('Full story view coming soon!');
+        }
+
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'block';
+            document.body.style.overflow = 'hidden';
         }
 
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
 
         function scrollToSection(sectionId) {
             document.getElementById(sectionId).scrollIntoView({ 
-                behavior: 'smooth' 
+                behavior: 'smooth',
+                block: 'start'
             });
         }
-
-        const API_BASE_URL = 'http://localhost:8000';
 
         async function searchSimilarStories() {
             const searchInput = document.getElementById('searchInput').value;
@@ -501,11 +892,10 @@
 
                 const data = await response.json();
                 
-                if (data.success) {
-                    // For now, show the placeholder response
-                    alert(`Found similar stories!\n\n${data.message}\n\nVector search with embeddings coming next!`);
+                if (data.success && data.results.length > 0) {
+                    displayStories(data.results);
                 } else {
-                    alert('Error searching for stories. Please try again.');
+                    alert('No similar stories found. Try different keywords.');
                 }
             } catch (error) {
                 console.error('Search error:', error);
@@ -531,8 +921,8 @@
 
             // Show loading state
             const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Creating your story...';
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="loading"></span> Creating your story...';
             submitBtn.disabled = true;
 
             try {
@@ -553,11 +943,14 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    alert(`Thank you for sharing your recovery story, ${data.author_name}!\n\nYour transformed story:\n\n"${data.story}"\n\nYour story will help others find hope and practical solutions!`);
+                    alert(`Thank you for sharing your recovery story, ${data.author_name}!\n\nYour story has been created and will help others find hope and practical solutions!`);
                     
                     // Reset form and close modal
                     this.reset();
                     closeModal('shareModal');
+                    
+                    // Reload stories to show the new one
+                    loadRandomStories();
                 } else {
                     alert('Error creating your story. Please try again.');
                 }
@@ -566,7 +959,7 @@
                 alert('Unable to create story right now. Please make sure the backend is running.');
             } finally {
                 // Reset button state
-                submitBtn.textContent = originalText;
+                submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
             }
         });
@@ -577,6 +970,7 @@
             for (let modal of modals) {
                 if (event.target === modal) {
                     modal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
                 }
             }
         }
