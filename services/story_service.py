@@ -11,24 +11,23 @@ logger = logging.getLogger(__name__)
 
 def create_recovery_story_prompt(challenge: str, experience: str, solution: str, advice: str = "") -> str:
     """Create a recovery story from user's input"""
-    return f"""You are a story editor helping transform recovery experiences into inspiring, helpful stories for other parents.
+    return f"""Write a concise, inspiring recovery story (150-200 words) based on this person's experience:
 
-Transform this recovery story into a well-structured, inspiring narrative that will help others facing similar challenges.
+Challenge: {challenge}
+Experience: {experience}  
+Solution: {solution}
+Advice: {advice}
 
-Challenge faced: {challenge}
-Personal experience: {experience}
-What helped/solution: {solution}
-Advice to others: {advice}
+Create a short, compelling narrative that:
+- Tells their story in a warm, relatable way
+- Highlights the key turning points
+- Includes specific, actionable solutions
+- Ends with hope and encouragement
+- Keeps it concise but emotionally resonant
 
-Create a cohesive story (100-150 words) that:
-- Starts with acknowledging the challenge
-- Describes the experience authentically
-- Explains what helped and how recovery happened
-- Ends with hope and practical advice
-- Uses a warm, encouraging tone
-- Could genuinely help someone in a similar situation
+Write in third person, make it feel authentic, and focus on the most important parts of their journey. Keep it under 200 words.
 
-Write the story in third person or first person, whichever flows better."""
+Story:"""
 
 def create_supportive_message_prompt(experience: str, feelings: str) -> str:
     """Create a supportive, encouraging response prompt"""
