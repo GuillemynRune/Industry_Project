@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Postnatal Stories - You're Not Alone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --soft-blue: #a8d8ea;
+            --pale-blue: #d4f1f9;
+            --soft-pink: #f5c6cb;
+            --pale-pink: #fce8ea;
+            --deep-blue: #6bb6d6;
+            --deep-pink: #e891a3;
+            --text-dark: #2c3e50;
+            --text-light: #5d6d7e;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: linear-gradient(135deg, var(--pale-blue) 0%, var(--pale-pink) 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--deep-blue), var(--deep-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--deep-blue);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--deep-blue), var(--deep-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--soft-blue), var(--deep-blue));
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, var(--soft-pink), var(--deep-pink));
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 3rem 0;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .section h2 {
+            color: var(--deep-blue);
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        /* Share Experience Form */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--pale-blue);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--deep-blue);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* Stories Grid */
+        .stories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .story-card {
+            background: linear-gradient(135deg, var(--pale-blue), var(--pale-pink));
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .story-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .story-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--deep-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .story-preview {
+            color: var(--text-light);
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .story-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .similarity-score {
+            background: var(--soft-pink);
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        /* Search Section */
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 300px;
+            padding: 12px;
+            border: 2px solid var(--pale-blue);
+            border-radius: 25px;
+            font-size: 1rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--deep-blue);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem 0;
+            text-align: center;
+            color: var(--text-light);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .search-bar {
+                flex-direction: column;
+            }
+
+            .search-input {
+                min-width: auto;
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            color: var(--text-light);
+            float: right;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: var(--deep-pink);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">Postnatal Stories</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#share">Share</a></li>
+                <li><a href="#stories">Stories</a></li>
+                <li><a href="#support">Support</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero" id="home">
+            <div class="container">
+                <h1>You're Not Alone</h1>
+                <p>Share your postnatal journey, find stories that resonate with you, and connect with a supportive community of parents who understand.</p>
+                <div class="cta-buttons">
+                    <button class="btn btn-primary" onclick="openModal('shareModal')">Share Your Story</button>
+                    <button class="btn btn-secondary" onclick="scrollToSection('stories')">Find Similar Stories</button>
+                </div>
+            </div>
+        </section>
+
+        <div class="container main-content">
+            <section class="section" id="stories">
+                <h2>Find Stories Like Yours</h2>
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="Describe what you're going through... (e.g., 'feeling overwhelmed', 'sleep deprivation', 'anxiety')" id="searchInput">
+                    <button class="btn btn-primary" onclick="searchSimilarStories()">Find Similar Stories</button>
+                </div>
+                
+                <div class="stories-grid" id="storiesGrid">
+                    <!-- Sample stories will be populated here -->
+                    <div class="story-card">
+                        <div class="story-title">Finding Light in Dark Days</div>
+                        <div class="story-preview">Sarah's journey through the fog of early motherhood, where simple tasks felt mountainous and joy seemed distant. But small moments of connection with her baby became stepping stones back to herself...</div>
+                        <div class="story-meta">
+                            <span>3 days ago</span>
+                            <span class="similarity-score">95% match</span>
+                        </div>
+                    </div>
+                    
+                    <div class="story-card">
+                        <div class="story-title">The Weight of Expectations</div>
+                        <div class="story-preview">Emma thought she'd feel instant maternal bliss, but instead found herself grieving her old life while trying to love her new reality. Her story of accepting imperfection and finding support...</div>
+                        <div class="story-meta">
+                            <span>1 week ago</span>
+                            <span class="similarity-score">87% match</span>
+                        </div>
+                    </div>
+                    
+                    <div class="story-card">
+                        <div class="story-title">Sleepless Nights, Hopeful Days</div>
+                        <div class="story-preview">When Maria's baby wouldn't sleep, neither could she. The exhaustion felt endless, but connecting with other parents online became her lifeline during those 3 AM feeding sessions...</div>
+                        <div class="story-meta">
+                            <span>2 weeks ago</span>
+                            <span class="similarity-score">82% match</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>How It Works</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 2rem;">
+                    <div style="text-align: center;">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(45deg, var(--soft-blue), var(--deep-blue)); border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">📝</div>
+                        <h3>Share Your Experience</h3>
+                        <p>Tell us about your journey in your own words. No judgment, just understanding.</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(45deg, var(--soft-pink), var(--deep-pink)); border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">✨</div>
+                        <h3>AI Creates Your Story</h3>
+                        <p>Our AI transforms your experience into a beautiful, readable story while preserving your truth.</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(45deg, var(--deep-blue), var(--deep-pink)); border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">🤝</div>
+                        <h3>Find Your Tribe</h3>
+                        <p>Connect with others who've walked similar paths and find comfort in shared experiences.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Share Story Modal -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('shareModal')">&times;</span>
+            <h2 style="color: var(--deep-blue); margin-bottom: 1.5rem;">Share Your Recovery Story</h2>
+            <p style="margin-bottom: 2rem; color: var(--text-light);">Help others by sharing how you overcame postnatal challenges. Your story could be the hope someone else needs.</p>
+            
+            <form id="shareForm">
+                <div class="form-group">
+                    <label for="authorName">Your Name (optional, can be anonymous)</label>
+                    <input type="text" id="authorName" placeholder="How would you like to be known?">
+                </div>
+                
+                <div class="form-group">
+                    <label for="challenge">What challenge did you face?</label>
+                    <textarea id="challenge" placeholder="Describe the postnatal challenge you experienced (e.g., postpartum depression, anxiety, sleep deprivation, bonding difficulties, etc.)" rows="4"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="experience">Tell us about your experience</label>
+                    <textarea id="experience" placeholder="What was it like? How did it affect your daily life? How long did it last? Be specific about your journey." rows="6"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="solution">What helped you recover?</label>
+                    <textarea id="solution" placeholder="What strategies, treatments, support, or changes helped you get through this? What would you recommend to others?" rows="6"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="advice">Your advice to others</label>
+                    <textarea id="advice" placeholder="What would you tell someone going through the same thing? Any words of encouragement or practical tips?" rows="4"></textarea>
+                </div>
+                
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Share My Recovery Story</button>
+                    <button type="button" class="btn" onclick="closeModal('shareModal')" style="margin-left: 1rem; background: var(--light-gray); color: var(--text-dark);">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Postnatal Stories. A safe space for shared experiences. Remember: You are not alone, and seeking help is a sign of strength.</p>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem;">If you're experiencing thoughts of self-harm, please reach out to a healthcare professional or crisis helpline immediately.</p>
+        </div>
+    </footer>
+
+    <script>
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        const API_BASE_URL = 'http://localhost:8000';
+
+        async function searchSimilarStories() {
+            const searchInput = document.getElementById('searchInput').value;
+            if (!searchInput.trim()) {
+                alert('Please describe what you\'re looking for to find similar stories.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/search-similar`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: searchInput })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    // For now, show the placeholder response
+                    alert(`Found similar stories!\n\n${data.message}\n\nVector search with embeddings coming next!`);
+                } else {
+                    alert('Error searching for stories. Please try again.');
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                alert('Unable to search right now. Please make sure the backend is running.');
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('shareForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const authorName = document.getElementById('authorName').value || 'Anonymous';
+            const challenge = document.getElementById('challenge').value;
+            const experience = document.getElementById('experience').value;
+            const solution = document.getElementById('solution').value;
+            const advice = document.getElementById('advice').value;
+            
+            // Validate required fields
+            if (!challenge.trim() || !experience.trim() || !solution.trim()) {
+                alert('Please fill in the challenge, experience, and solution fields.');
+                return;
+            }
+
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Creating your story...';
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/transform-story`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        author_name: authorName,
+                        challenge: challenge,
+                        experience: experience,
+                        solution: solution,
+                        advice: advice
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`Thank you for sharing your recovery story, ${data.author_name}!\n\nYour transformed story:\n\n"${data.story}"\n\nYour story will help others find hope and practical solutions!`);
+                    
+                    // Reset form and close modal
+                    this.reset();
+                    closeModal('shareModal');
+                } else {
+                    alert('Error creating your story. Please try again.');
+                }
+            } catch (error) {
+                console.error('Story creation error:', error);
+                alert('Unable to create story right now. Please make sure the backend is running.');
+            } finally {
+                // Reset button state
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modals = document.getElementsByClassName('modal');
+            for (let modal of modals) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
