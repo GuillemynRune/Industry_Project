@@ -7,6 +7,7 @@ from routers.auth import get_current_active_user
 from bson import ObjectId
 from datetime import datetime
 import logging
+from database.models.moderation import ModerationDatabase
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/moderation", tags=["moderation"])
@@ -40,37 +41,66 @@ async def get_pending_stories(
         logger.error(f"Error getting pending stories: {e}")
         raise HTTPException(status_code=500, detail="Failed to get pending stories")
 
+# @router.post("/approve/{story_id}")
+# async def approve_story(
+#     story_id: str,
+#     action: ModerationAction,
+#     current_user: dict = Depends(get_current_active_user)
+# ):
+#     """Approve a pending story (moderators only)"""
+    
+#     if current_user.get("role") not in ["moderator", "admin"]:
+#         raise HTTPException(status_code=403, detail="Insufficient permissions")
+    
+#     try:
+#         result = await ModerationDatabase.approve_story(
+#             story_id=story_id,
+#             moderator_id=current_user["id"],
+#             notes=action.notes
+#         )
+        
+#         if result["success"]:
+#             return {
+#                 "success": True,
+#                 "message": "Story approved and published",
+#                 "published_story_id": result["published_story_id"]
+#             }
+#         else:
+#             raise HTTPException(status_code=400, detail=result["message"])
+#     except HTTPException:
+#         raise
+#     except Exception as e:
+#         logger.error(f"Error approving story: {e}")
+#         raise HTTPException(status_code=500, detail="Failed to approve story")
+
+
 @router.post("/approve/{story_id}")
 async def approve_story(
     story_id: str,
-    action: ModerationAction,
-    current_user: dict = Depends(get_current_active_user)
+    current_user: dict = Depends(get_current_active_user),
 ):
-    """Approve a pending story (moderators only)"""
-    
+    """Approve a pending story and move it to approved_stories"""
     if current_user.get("role") not in ["moderator", "admin"]:
-        raise HTTPException(status_code=403, detail="Insufficient permissions")
-    
+        raise HTTPException(status_code=403, detail="Unauthorized")
+
+    story = await mongodb.database.pending_stories.find_one({"_id": ObjectId(story_id)})
+    if not story:
+        raise HTTPException(status_code=404, detail="Story not found")
+
+    approved_story = {
+        **story,
+        "status": "approved",
+        "approved_by": current_user["email"],
+        "approved_at": datetime.utcnow(),
+    }
+
     try:
-        result = await ModerationDatabase.approve_story(
-            story_id=story_id,
-            moderator_id=current_user["id"],
-            notes=action.notes
-        )
-        
-        if result["success"]:
-            return {
-                "success": True,
-                "message": "Story approved and published",
-                "published_story_id": result["published_story_id"]
-            }
-        else:
-            raise HTTPException(status_code=400, detail=result["message"])
-    except HTTPException:
-        raise
+        await mongodb.database.approved_stories.insert_one(approved_story)
+        await mongodb.database.pending_stories.delete_one({"_id": ObjectId(story_id)})
+        return {"message": "✅ Story approved and moved to approved_stories"}
     except Exception as e:
-        logger.error(f"Error approving story: {e}")
-        raise HTTPException(status_code=500, detail="Failed to approve story")
+        raise HTTPException(status_code=500, detail=f"Failed to approve story: {str(e)}")
+
 
 @router.post("/reject/{story_id}")
 async def reject_story(
