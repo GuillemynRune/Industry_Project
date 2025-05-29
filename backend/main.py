@@ -15,6 +15,12 @@ import logging
 import os
 import secrets
 
+import sys
+import os
+
+# Add the parent directory of backend/ to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 # Import our modular services
 from services.story_service import create_recovery_story_prompt
 from services.symptom_service import extract_symptoms, get_symptom_insights
@@ -27,6 +33,8 @@ from backend.database.database import connect_to_mongo, close_mongo_connection, 
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+
+from routers.health import (router as health_router)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -266,21 +274,6 @@ async def root():
         "ollama_required": "Make sure Ollama is running with phi4 model"
     }
 
-@app.get("/health")
-async def health_check():
-    from backend.database.database import check_database_health
-    
-    ollama_connected, ollama_info = validate_ollama_connection()
-    db_healthy = await check_database_health()
-    
-    return {
-        "status": "healthy" if (ollama_connected and db_healthy) else "degraded",
-        "ollama_connected": ollama_connected,
-        "ollama_info": ollama_info,
-        "database_connected": db_healthy,
-        "available_models": len(MODELS),
-        "features_enabled": ["recovery_story_generation", "symptom_extraction", "database_storage", "authentication", "moderation"]
-    }
 
 # Authentication endpoints
 @app.post("/auth/register")
@@ -763,6 +756,9 @@ async def reject_story(
     except Exception as e:
         logger.error(f"Error rejecting story: {e}")
         return {"success": False, "message": "Failed to reject story"}
+
+app.include_router(health_router)
+
 
 if __name__ == "__main__":
     uvicorn.run(
