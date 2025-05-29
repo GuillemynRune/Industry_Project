@@ -22,6 +22,8 @@
             --text-light: #5d6d7e;
             --white: #ffffff;
             --light-gray: #f8f9fa;
+            --crisis-red: #dc3545;
+            --success-green: #28a745;
         }
 
         body {
@@ -38,11 +40,93 @@
             padding: 0 20px;
         }
 
-        /* Animations */
+        /* Crisis Banner - New but styled to match */
+        .crisis-banner {
+            background: linear-gradient(45deg, var(--crisis-red), #e74c3c);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        .crisis-banner a {
+            color: white;
+            text-decoration: underline;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .crisis-banner a:hover {
+            transform: scale(1.05);
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Status Messages - New but matching design */
+        .status-message {
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+            font-weight: 500;
+            animation: slideIn 0.5s ease-out;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-message::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .status-message:hover::before {
+            left: 100%;
+        }
+
+        .status-success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border-left: 4px solid var(--success-green);
+        }
+
+        .status-error {
+            background: linear-gradient(135deg, #f8d7da, #f1b0b7);
+            color: #721c24;
+            border-left: 4px solid var(--crisis-red);
+        }
+
+        .status-warning {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        /* Animations - Original ones preserved */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
                 transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
             }
             to {
                 opacity: 1;
@@ -70,13 +154,33 @@
             }
         }
 
-        /* Header */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Header - Original styling preserved, auth added */
         header {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
             position: sticky;
-            top: 0;
+            top: 48px; /* Adjusted for crisis banner */
             z-index: 100;
             animation: fadeInUp 0.6s ease-out;
         }
@@ -86,6 +190,12 @@
             justify-content: space-between;
             align-items: center;
             padding: 1rem 0;
+        }
+
+        .nav-section {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
         }
 
         .logo {
@@ -131,7 +241,33 @@
             width: 100%;
         }
 
-        /* Hero Section */
+        /* User section - New but matching nav style */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--deep-blue), var(--deep-pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        /* Hero Section - Original preserved */
         .hero {
             padding: 4rem 0;
             text-align: center;
@@ -213,7 +349,83 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
         }
 
-        /* Share Story Section - Made Bigger */
+        /* Auth Section - New but matching overall design */
+        .auth-section {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(252, 232, 234, 0.3));
+            border-radius: 30px;
+            padding: 3rem;
+            margin: 2rem 0;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 1s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--pale-blue) 0%, transparent 70%);
+            opacity: 0.1;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .auth-toggle {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-toggle button {
+            padding: 0.8rem 2rem;
+            border: none;
+            background: var(--light-gray);
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-toggle button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: linear-gradient(45deg, var(--deep-blue), var(--deep-pink));
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .auth-toggle button:first-child {
+            border-radius: 25px 0 0 25px;
+        }
+
+        .auth-toggle button:last-child {
+            border-radius: 0 25px 25px 0;
+        }
+
+        .auth-toggle button.active {
+            color: white;
+        }
+
+        .auth-toggle button.active::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        /* Share Story Section - Original preserved */
         .share-story-section {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(252, 232, 234, 0.3));
             border-radius: 30px;
@@ -278,7 +490,7 @@
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
         }
 
-        /* Stories Grid */
+        /* Stories Grid - Original preserved */
         .stories-section {
             padding: 2rem 0;
             animation: fadeInUp 1s ease-out;
@@ -370,7 +582,7 @@
             transform: translateX(5px);
         }
 
-        /* How It Works Section */
+        /* How It Works - Original preserved */
         .how-it-works {
             margin: 4rem 0;
             animation: fadeInUp 1s ease-out;
@@ -420,7 +632,7 @@
             transform: scale(1.1) rotate(10deg);
         }
 
-        /* Modal Styles */
+        /* Modal Styles - Original preserved, crisis modal enhanced */
         .modal {
             display: none;
             position: fixed;
@@ -432,11 +644,6 @@
             background-color: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(5px);
             animation: fadeIn 0.3s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
 
         .modal-content {
@@ -452,15 +659,44 @@
             animation: slideDown 0.4s ease-out;
         }
 
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .crisis-modal {
+            background: linear-gradient(135deg, #fff, #ffe6e6);
+        }
+
+        .crisis-modal h2 {
+            color: var(--crisis-red);
+            margin-bottom: 1rem;
+        }
+
+        .crisis-resources {
+            display: grid;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .crisis-resource {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            border-left: 4px solid var(--crisis-red);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .crisis-resource:hover {
+            transform: translateX(5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .crisis-resource h4 {
+            color: var(--crisis-red);
+            margin-bottom: 0.5rem;
+        }
+
+        .crisis-resource .phone {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-dark);
         }
 
         .close {
@@ -478,7 +714,7 @@
             transform: rotate(90deg);
         }
 
-        /* Form Styles */
+        /* Form Styles - Original preserved */
         .form-group {
             margin-bottom: 2rem;
             animation: fadeInUp 0.5s ease-out;
@@ -524,57 +760,7 @@
             font-family: inherit;
         }
 
-        /* Footer */
-        footer {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 3rem 0;
-            text-align: center;
-            color: var(--text-light);
-            margin-top: 4rem;
-            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-
-            .share-story-section {
-                padding: 2rem;
-            }
-
-            .cta-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .modal-content {
-                margin: 10% auto;
-                padding: 2rem;
-            }
-        }
-
-        /* Loading Animation */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Search Bar - Keep existing styling */
+        /* Search Bar - Original preserved */
         .search-bar {
             display: flex;
             gap: 1rem;
@@ -599,18 +785,322 @@
             border-color: var(--deep-blue);
             box-shadow: 0 0 0 3px rgba(107, 182, 214, 0.1);
         }
+
+        /* Footer - Original preserved */
+        footer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem 0;
+            text-align: center;
+            color: var(--text-light);
+            margin-top: 4rem;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        footer a {
+            color: var(--deep-blue);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        footer a:hover {
+            color: var(--deep-pink);
+            transform: scale(1.05);
+        }
+
+        /* Loading Animation - Original preserved */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        /* Responsive Design - Original preserved */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .nav-section {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .share-story-section {
+                padding: 2rem;
+            }
+
+            .auth-section {
+                padding: 2rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .modal-content {
+                margin: 10% auto;
+                padding: 2rem;
+            }
+
+            .crisis-banner {
+                font-size: 0.9rem;
+                padding: 0.8rem;
+            }
+        }
+        .moderation-section {
+            padding: 4rem 0;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(252, 232, 234, 0.3));
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--pale-blue) 0%, transparent 70%);
+            opacity: 0.1;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--deep-blue), var(--deep-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-weight: 500;
+            margin-top: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .pending-stories-grid {
+            display: grid;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .pending-story-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .pending-story-card.high-risk {
+            border-left: 4px solid var(--crisis-red);
+        }
+
+        .pending-story-card.medium-risk {
+            border-left: 4px solid #ffc107;
+        }
+
+        .pending-story-card.low-risk {
+            border-left: 4px solid var(--success-green);
+        }
+
+        .pending-story-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--pale-blue), var(--pale-pink));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .pending-story-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .pending-story-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .story-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .story-risk-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .risk-high { background: var(--crisis-red); }
+        .risk-medium { background: #ffc107; }
+        .risk-low { background: var(--success-green); }
+        .risk-minimal { background: var(--text-light); }
+
+        .story-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .story-field {
+            margin-bottom: 1rem;
+        }
+
+        .story-field-label {
+            font-weight: 600;
+            color: var(--deep-blue);
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+
+        .story-field-content {
+            color: var(--text-dark);
+            line-height: 1.6;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 0.8rem;
+            border-radius: 10px;
+            border-left: 3px solid var(--pale-blue);
+        }
+
+        .story-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .approve-btn {
+            background: linear-gradient(45deg, var(--success-green), #20c997);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reject-btn {
+            background: linear-gradient(45deg, var(--crisis-red), #e74c3c);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .approve-btn:hover, .reject-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .flagged-keywords {
+            margin-top: 1rem;
+            padding: 0.8rem;
+            background: rgba(220, 53, 69, 0.1);
+            border-radius: 10px;
+            border-left: 3px solid var(--crisis-red);
+        }
+
+        .flagged-keywords-label {
+            font-weight: 600;
+            color: var(--crisis-red);
+            margin-bottom: 0.3rem;
+        }
+
+        .keyword-tag {
+            display: inline-block;
+            background: var(--crisis-red);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin: 0.2rem;
+        }
+
+        .no-stories-message {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-light);
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(252, 232, 234, 0.3));
+            border-radius: 20px;
+            animation: fadeInUp 0.8s ease-out;
+        }
     </style>
 </head>
 <body>
+    <!-- Crisis Support Banner -->
+    <div class="crisis-banner">
+        <strong>Need immediate help?</strong> Call 988 (Suicide & Crisis Lifeline) or 
+        <a href="tel:1-800-944-4773">1-800-944-4773 (Postpartum Support)</a> | 
+        <a href="#" onclick="showCrisisResources()">More Resources</a>
+    </div>
+
     <header>
         <nav class="container">
             <div class="logo">Postnatal Stories</div>
-            <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#share">Share</a></li>
-                <li><a href="#stories">Stories</a></li>
-                <li><a href="#support">Support</a></li>
-            </ul>
+            <div class="nav-section">
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#share">Share</a></li>
+                    <li><a href="#stories">Stories</a></li>
+                    <li><a href="#support">Support</a></li>
+                </ul>
+                <div class="user-section" id="userSection">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
         </nav>
     </header>
 
@@ -620,19 +1110,75 @@
                 <h1>You're Not Alone</h1>
                 <p>Share your postnatal journey, find stories that resonate with you, and connect with a supportive community of parents who understand.</p>
                 <div class="cta-buttons">
-                    <button class="btn btn-primary" onclick="scrollToSection('share')">Share Your Story</button>
+                    <button class="btn btn-primary" onclick="handleShareStoryClick()">Share Your Story</button>
                     <button class="btn btn-secondary" onclick="scrollToSection('stories')">Read Stories</button>
                 </div>
             </div>
         </section>
 
         <div class="container main-content">
+            <!-- Authentication Section (shown when not logged in) -->
+            <section class="auth-section" id="authSection" style="display: none;">
+                <div class="auth-toggle">
+                    <button onclick="switchAuth('login')" id="loginTab" class="active">Login</button>
+                    <button onclick="switchAuth('register')" id="registerTab">Sign Up</button>
+                </div>
+
+                <!-- Login Form -->
+                <form id="loginForm" style="display: block;">
+                    <h2 style="text-align: center; margin-bottom: 1.5rem; color: var(--deep-blue);">Welcome Back</h2>
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <div style="text-align: center;">
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </div>
+                </form>
+
+                <!-- Registration Form -->
+                <form id="registerForm" style="display: none;">
+                    <h2 style="text-align: center; margin-bottom: 1.5rem; color: var(--deep-blue);">Join Our Community</h2>
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password (min 8 characters)</label>
+                        <input type="password" id="registerPassword" required minlength="8">
+                    </div>
+                    <div class="form-group">
+                        <label for="displayName">Display Name (optional)</label>
+                        <input type="text" id="displayName" placeholder="How you'd like to be known">
+                    </div>
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="ageVerification" required>
+                            I confirm that I am 18 years of age or older
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="termsAgreement" required>
+                            I agree to the <a href="#" onclick="showTerms()">Terms of Service</a> and <a href="#" onclick="showPrivacy()">Privacy Policy</a>
+                        </label>
+                    </div>
+                    <div style="text-align: center;">
+                        <button type="submit" class="btn btn-primary">Create Account</button>
+                    </div>
+                </form>
+            </section>
+
             <!-- Enhanced Share Story Section -->
             <section class="share-story-section" id="share">
                 <h2>Share Your Recovery Story</h2>
                 <p>Your experience matters. Help others by sharing your journey through postnatal challenges and recovery.</p>
                 <div class="share-btn-container">
-                    <button class="share-story-btn" onclick="openModal('shareModal')">
+                    <button class="share-story-btn" onclick="handleShareStoryClick()">
                         <span>Start Sharing Your Story</span>
                     </button>
                 </div>
@@ -642,7 +1188,6 @@
             <section class="stories-section" id="stories">
                 <h2>Stories from Our Community</h2>
                 
-                <!-- Search bar remains unchanged as requested -->
                 <div class="search-bar">
                     <input type="text" class="search-input" placeholder="Describe what you're going through... (e.g., 'feeling overwhelmed', 'sleep deprivation', 'anxiety')" id="searchInput">
                     <button class="btn btn-primary" onclick="searchSimilarStories()">Find Similar Stories</button>
@@ -660,7 +1205,7 @@
                     <div class="step-card">
                         <div class="step-icon">📝</div>
                         <h3>Share Your Experience</h3>
-                        <p>Tell us about your journey in your own words. No judgment, just understanding.</p>
+                        <p>Create an account and tell us about your journey in your own words. All stories are reviewed before publication.</p>
                     </div>
                     <div class="step-card">
                         <div class="step-icon">✨</div>
@@ -675,14 +1220,76 @@
                 </div>
             </section>
         </div>
+        <section class="moderation-section" id="moderationSection" style="display: none;">
+            <h2 style="text-align: center; color: var(--deep-blue); font-size: 2.5rem; margin-bottom: 2rem;">Story Moderation</h2>
+            
+            <div class="moderation-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                <div class="stat-card">
+                    <div class="stat-number" id="pendingCount">0</div>
+                    <div class="stat-label">Pending Stories</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="highRiskCount">0</div>
+                    <div class="stat-label">High Risk</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalApproved">0</div>
+                    <div class="stat-label">Total Approved</div>
+                </div>
+            </div>
+
+            <div class="pending-stories-grid" id="pendingStoriesGrid">
+                <!-- Pending stories will be populated here -->
+            </div>
+        </section>
     </main>
+
+    <!-- Crisis Resources Modal -->
+    <div id="crisisModal" class="modal">
+        <div class="modal-content crisis-modal">
+            <span class="close" onclick="closeModal('crisisModal')">&times;</span>
+            <h2>🚨 Immediate Crisis Support</h2>
+            <p><strong>If you're in immediate danger, call 911 or go to your nearest emergency room.</strong></p>
+            
+            <div class="crisis-resources">
+                <div class="crisis-resource">
+                    <h4>National Suicide Prevention Lifeline</h4>
+                    <div class="phone">988</div>
+                    <p>24/7 crisis support and suicide prevention</p>
+                </div>
+                
+                <div class="crisis-resource">
+                    <h4>Postpartum Support International</h4>
+                    <div class="phone">1-800-944-4773</div>
+                    <p>24/7 helpline for perinatal mental health</p>
+                </div>
+                
+                <div class="crisis-resource">
+                    <h4>Crisis Text Line</h4>
+                    <div class="phone">Text HOME to 741741</div>
+                    <p>24/7 crisis support via text message</p>
+                </div>
+            </div>
+            
+            <h3 style="color: var(--crisis-red); margin-top: 2rem;">Warning Signs That Need Immediate Attention:</h3>
+            <ul style="margin: 1rem 0; padding-left: 1.5rem; color: var(--text-dark);">
+                <li>Thoughts of harming yourself or your baby</li>
+                <li>Feeling like you might hurt yourself</li>
+                <li>Thoughts of suicide or death</li>
+                <li>Severe anxiety or panic attacks</li>
+                <li>Feeling completely unable to cope</li>
+            </ul>
+            
+            <p style="margin-top: 1rem; font-style: italic; color: var(--text-light);">Remember: Seeking help is a sign of strength, not weakness.</p>
+        </div>
+    </div>
 
     <!-- Share Story Modal -->
     <div id="shareModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('shareModal')">&times;</span>
             <h2 style="color: var(--deep-blue); margin-bottom: 1.5rem; font-size: 2.2rem;">Share Your Recovery Story</h2>
-            <p style="margin-bottom: 2rem; color: var(--text-light); font-size: 1.1rem;">Help others by sharing how you overcame postnatal challenges. Your story could be the hope someone else needs.</p>
+            <p style="margin-bottom: 2rem; color: var(--text-light); font-size: 1.1rem;">Your story will be reviewed by our team before publication to ensure it's supportive and appropriate for our community.</p>
             
             <form id="shareForm">
                 <div class="form-group">
@@ -711,7 +1318,7 @@
                 </div>
                 
                 <div style="text-align: center; margin-top: 2rem;">
-                    <button type="submit" class="btn btn-primary" style="padding: 16px 40px; font-size: 1.1rem;">Share My Recovery Story</button>
+                    <button type="submit" class="btn btn-primary" style="padding: 16px 40px; font-size: 1.1rem;">Submit Story for Review</button>
                     <button type="button" class="btn" onclick="closeModal('shareModal')" style="margin-left: 1rem; background: var(--light-gray); color: var(--text-dark);">Cancel</button>
                 </div>
             </form>
@@ -721,21 +1328,290 @@
     <footer>
         <div class="container">
             <p>&copy; 2025 Postnatal Stories. A safe space for shared experiences. Remember: You are not alone, and seeking help is a sign of strength.</p>
-            <p style="margin-top: 0.5rem; font-size: 0.9rem;">If you're experiencing thoughts of self-harm, please reach out to a healthcare professional or crisis helpline immediately.</p>
+            <p style="margin-top: 1rem;">
+                <a href="#" onclick="showTerms()">Terms of Service</a> | 
+                <a href="#" onclick="showPrivacy()">Privacy Policy</a> | 
+                <a href="#" onclick="showCrisisResources()">Crisis Resources</a>
+            </p>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem; font-style: italic;">
+                This platform provides peer support and shared experiences. It is not a substitute for professional medical advice, diagnosis, or treatment.
+            </p>
         </div>
     </footer>
 
     <script>
         const API_BASE_URL = 'http://localhost:8000';
+        let currentUser = null;
+        let authToken = null;
 
-        // Load random stories on page load
+        // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
-            loadRandomStories();
+            initializeAuth();
+            loadApprovedStories();
         });
 
-        async function loadRandomStories() {
+        // Authentication functions
+        function initializeAuth() {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                authToken = token;
+                fetchUserInfo();
+            } else {
+                showAuthSection();
+            }
+        }
+
+        async function fetchUserInfo() {
             try {
-                const response = await fetch(`${API_BASE_URL}/stories?limit=6`);
+                const response = await fetch(`${API_BASE_URL}/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    currentUser = await response.json();
+                    showUserSection();
+                } else {
+                    localStorage.removeItem('authToken');
+                    authToken = null;
+                    showAuthSection();
+                }
+            } catch (error) {
+                console.error('Error fetching user info:', error);
+                showAuthSection();
+            }
+        }
+
+        function showAuthSection() {
+            document.getElementById('authSection').style.display = 'block';
+            updateUserSection();
+        }
+
+        function showUserSection() {
+            document.getElementById('authSection').style.display = 'none';
+            updateUserSection();
+        }
+
+        function updateUserSection() {
+            const userSection = document.getElementById('userSection');
+            
+            if (currentUser) {
+                userSection.innerHTML = `
+                    <div class="user-info">
+                        <div class="user-avatar">${currentUser.display_name.charAt(0).toUpperCase()}</div>
+                        <span>Welcome, ${currentUser.display_name}</span>
+                        <button class="btn" onclick="logout()" style="margin-left: 1rem; padding: 0.5rem 1rem; background: var(--light-gray); color: var(--text-dark);">Logout</button>
+                    </div>
+                `;
+            } else {
+                userSection.innerHTML = `
+                    <button class="btn btn-primary" onclick="scrollToSection('authSection')">Login / Sign Up</button>
+                `;
+            }
+        }
+
+        function switchAuth(type) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const loginTab = document.getElementById('loginTab');
+            const registerTab = document.getElementById('registerTab');
+
+            if (type === 'login') {
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+                loginTab.classList.add('active');
+                registerTab.classList.remove('active');
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+                loginTab.classList.remove('active');
+                registerTab.classList.add('active');
+            }
+        }
+
+        // Handle login
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    authToken = data.access_token;
+                    currentUser = data.user;
+                    localStorage.setItem('authToken', authToken);
+                    
+                    showStatusMessage('Login successful! Welcome back.', 'success');
+                    showUserSection();
+                    this.reset();
+                } else {
+                    showStatusMessage(data.detail || 'Login failed', 'error');
+                }
+            } catch (error) {
+                showStatusMessage('Login failed. Please try again.', 'error');
+            }
+        });
+
+        // Handle registration
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const displayName = document.getElementById('displayName').value;
+            const ageVerified = document.getElementById('ageVerification').checked;
+            const termsAgreed = document.getElementById('termsAgreement').checked;
+            
+            if (!ageVerified || !termsAgreed) {
+                showStatusMessage('Please confirm your age and agree to the terms.', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email,
+                        password,
+                        display_name: displayName || null,
+                        age_verified: ageVerified,
+                        agrees_to_terms: termsAgreed
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showStatusMessage('Account created! Please login with your credentials.', 'success');
+                    switchAuth('login');
+                    this.reset();
+                } else {
+                    showStatusMessage(data.detail || 'Registration failed', 'error');
+                }
+            } catch (error) {
+                showStatusMessage('Registration failed. Please try again.', 'error');
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('authToken');
+            authToken = null;
+            currentUser = null;
+            showAuthSection();
+            showStatusMessage('Logged out successfully.', 'success');
+        }
+
+        function showStatusMessage(message, type) {
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status-message status-${type}`;
+            statusDiv.textContent = message;
+            
+            const mainContent = document.querySelector('.main-content');
+            mainContent.insertBefore(statusDiv, mainContent.firstChild);
+            
+            setTimeout(() => {
+                statusDiv.remove();
+            }, 5000);
+        }
+
+        function handleShareStoryClick() {
+            if (!currentUser) {
+                showStatusMessage('Please login or create an account to share your story.', 'warning');
+                scrollToSection('authSection');
+                return;
+            }
+            openModal('shareModal');
+        }
+
+        // Enhanced story submission
+        document.getElementById('shareForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!currentUser) {
+                showStatusMessage('Please login to share your story.', 'error');
+                return;
+            }
+            
+            const authorName = document.getElementById('authorName').value;
+            const challenge = document.getElementById('challenge').value;
+            const experience = document.getElementById('experience').value;
+            const solution = document.getElementById('solution').value;
+            const advice = document.getElementById('advice').value;
+            
+            if (!challenge.trim() || !experience.trim() || !solution.trim()) {
+                showStatusMessage('Please fill in the challenge, experience, and solution fields.', 'error');
+                return;
+            }
+
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="loading"></span> Submitting...';
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/stories/submit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        author_name: authorName,
+                        challenge: challenge,
+                        experience: experience,
+                        solution: solution,
+                        advice: advice
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (data.requires_immediate_support) {
+                        closeModal('shareModal');
+                        showCrisisResourcesModal(data.crisis_resources);
+                    } else {
+                        showStatusMessage('Thank you for sharing! Your story has been submitted for review and will be published within 24-48 hours.', 'success');
+                        this.reset();
+                        closeModal('shareModal');
+                    }
+                } else {
+                    showStatusMessage(data.message || 'Error submitting story', 'error');
+                }
+            } catch (error) {
+                showStatusMessage('Unable to submit story. Please try again.', 'error');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        function showCrisisResources() {
+            openModal('crisisModal');
+        }
+
+        function showCrisisResourcesModal(resources) {
+            openModal('crisisModal');
+        }
+
+        async function loadApprovedStories() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/stories?limit=6&random=true`);
                 const data = await response.json();
                 
                 if (data.success) {
@@ -743,7 +1619,6 @@
                 }
             } catch (error) {
                 console.error('Error loading stories:', error);
-                // Display sample stories as fallback
                 displaySampleStories();
             }
         }
@@ -768,7 +1643,6 @@
             card.className = 'story-card';
             card.style.animationDelay = `${index * 0.1}s`;
             
-            // Create preview from generated story
             const preview = story.generated_story ? 
                 story.generated_story.substring(0, 200) + '...' : 
                 story.experience.substring(0, 200) + '...';
@@ -777,7 +1651,7 @@
                 <div class="story-title">${story.challenge || 'A Recovery Journey'}</div>
                 <div class="story-preview">${preview}</div>
                 <div class="story-meta">
-                    <span>${getTimeAgo(story.created_at)}</span>
+                    <span>By ${story.author_name} • ${getTimeAgo(story.created_at)}</span>
                     <a href="#" class="read-more" onclick="viewFullStory('${story._id}')">Read more →</a>
                 </div>
             `;
@@ -853,25 +1727,7 @@
         }
 
         function viewFullStory(storyId) {
-            // You can implement a full story view modal or navigation here
             alert('Full story view coming soon!');
-        }
-
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-
-        function scrollToSection(sectionId) {
-            document.getElementById(sectionId).scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'start'
-            });
         }
 
         async function searchSimilarStories() {
@@ -903,66 +1759,31 @@
             }
         }
 
-        // Handle form submission
-        document.getElementById('shareForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const authorName = document.getElementById('authorName').value || 'Anonymous';
-            const challenge = document.getElementById('challenge').value;
-            const experience = document.getElementById('experience').value;
-            const solution = document.getElementById('solution').value;
-            const advice = document.getElementById('advice').value;
-            
-            // Validate required fields
-            if (!challenge.trim() || !experience.trim() || !solution.trim()) {
-                alert('Please fill in the challenge, experience, and solution fields.');
-                return;
-            }
+        // Utility functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
 
-            // Show loading state
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<span class="loading"></span> Creating your story...';
-            submitBtn.disabled = true;
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/transform-story`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        author_name: authorName,
-                        challenge: challenge,
-                        experience: experience,
-                        solution: solution,
-                        advice: advice
-                    })
-                });
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
 
-                const data = await response.json();
-                
-                if (data.success) {
-                    alert(`Thank you for sharing your recovery story, ${data.author_name}!\n\nYour story has been created and will help others find hope and practical solutions!`);
-                    
-                    // Reset form and close modal
-                    this.reset();
-                    closeModal('shareModal');
-                    
-                    // Reload stories to show the new one
-                    loadRandomStories();
-                } else {
-                    alert('Error creating your story. Please try again.');
-                }
-            } catch (error) {
-                console.error('Story creation error:', error);
-                alert('Unable to create story right now. Please make sure the backend is running.');
-            } finally {
-                // Reset button state
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            }
-        });
+        function showTerms() {
+            alert('Terms of Service: By using this platform, you agree to use it respectfully and understand that content is user-generated and not professional medical advice. You must be 18 or older to use this service.');
+        }
+
+        function showPrivacy() {
+            alert('Privacy Policy: We protect your personal information and only use it to provide our services. Stories are anonymous by default. We do not share personal data with third parties.');
+        }
 
         // Close modal when clicking outside
         window.onclick = function(event) {
@@ -974,6 +1795,221 @@
                 }
             }
         }
+        // Check if current user is admin and show moderation section
+        function checkAdminAccess() {
+            if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'moderator')) {
+                document.getElementById('moderationSection').style.display = 'block';
+                
+                // Add moderation tab to navigation
+                const navLinks = document.querySelector('.nav-links');
+                if (!document.getElementById('moderationLink')) {
+                    const moderationLi = document.createElement('li');
+                    moderationLi.innerHTML = '<a href="#moderation" id="moderationLink">Moderation</a>';
+                    navLinks.appendChild(moderationLi);
+                    
+                    // Add click handler
+                    document.getElementById('moderationLink').addEventListener('click', () => {
+                        scrollToSection('moderationSection');
+                        loadPendingStories();
+                    });
+                }
+                
+                loadPendingStories();
+            }
+        }
+
+        // Load pending stories for admin review
+        async function loadPendingStories() {
+            if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'moderator')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/moderation/pending`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayPendingStories(data.pending_stories);
+                    updateModerationStats(data.pending_stories);
+                } else {
+                    console.error('Failed to load pending stories:', data);
+                }
+            } catch (error) {
+                console.error('Error loading pending stories:', error);
+                showStatusMessage('Error loading pending stories', 'error');
+            }
+        }
+
+        function displayPendingStories(stories) {
+            const grid = document.getElementById('pendingStoriesGrid');
+            
+            if (stories.length === 0) {
+                grid.innerHTML = `
+                    <div class="no-stories-message">
+                        <h3>🎉 All caught up!</h3>
+                        <p>No stories pending review at the moment.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = '';
+            
+            stories.forEach((story, index) => {
+                const card = createPendingStoryCard(story, index);
+                grid.appendChild(card);
+            });
+        }
+
+        function createPendingStoryCard(story, index) {
+            const card = document.createElement('div');
+            card.className = `pending-story-card ${story.risk_level}-risk`;
+            card.style.animationDelay = `${index * 0.1}s`;
+            
+            const riskColor = {
+                'high': 'risk-high',
+                'medium': 'risk-medium', 
+                'low': 'risk-low',
+                'minimal': 'risk-minimal'
+            }[story.risk_level] || 'risk-minimal';
+            
+            const flaggedKeywordsHtml = story.flagged_keywords && story.flagged_keywords.length > 0 ? `
+                <div class="flagged-keywords">
+                    <div class="flagged-keywords-label">🚨 Flagged Keywords:</div>
+                    ${story.flagged_keywords.map(keyword => `<span class="keyword-tag">${keyword}</span>`).join('')}
+                </div>
+            ` : '';
+            
+            card.innerHTML = `
+                <div class="story-header">
+                    <div>
+                        <strong>By ${story.author_name}</strong><br>
+                        <small style="color: var(--text-light);">${new Date(story.created_at).toLocaleDateString()}</small>
+                    </div>
+                    <span class="story-risk-badge ${riskColor}">${story.risk_level.toUpperCase()} RISK</span>
+                </div>
+                
+                <div class="story-content">
+                    <div class="story-field">
+                        <span class="story-field-label">Challenge:</span>
+                        <div class="story-field-content">${story.challenge}</div>
+                    </div>
+                    
+                    <div class="story-field">
+                        <span class="story-field-label">Experience:</span>
+                        <div class="story-field-content">${story.experience.substring(0, 200)}${story.experience.length > 200 ? '...' : ''}</div>
+                    </div>
+                    
+                    <div class="story-field">
+                        <span class="story-field-label">Solution:</span>
+                        <div class="story-field-content">${story.solution.substring(0, 200)}${story.solution.length > 200 ? '...' : ''}</div>
+                    </div>
+                    
+                    <div class="story-field">
+                        <span class="story-field-label">Generated Story Preview:</span>
+                        <div class="story-field-content">${story.generated_story.substring(0, 300)}${story.generated_story.length > 300 ? '...' : ''}</div>
+                    </div>
+                    
+                    ${flaggedKeywordsHtml}
+                </div>
+                
+                <div class="story-actions">
+                    <button class="approve-btn" onclick="approveStory('${story._id}')">
+                        ✅ Approve & Publish
+                    </button>
+                    <button class="reject-btn" onclick="rejectStory('${story._id}')">
+                        ❌ Reject
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function updateModerationStats(stories) {
+            document.getElementById('pendingCount').textContent = stories.length;
+            
+            const highRiskCount = stories.filter(s => s.risk_level === 'high').length;
+            document.getElementById('highRiskCount').textContent = highRiskCount;
+            
+            // You can add total approved count from database if needed
+            document.getElementById('totalApproved').textContent = '—';
+        }
+
+        // Approve a story
+        async function approveStory(storyId) {
+            if (!confirm('Are you sure you want to approve and publish this story?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/moderation/approve/${storyId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        notes: "Approved via admin interface"
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showStatusMessage('Story approved and published successfully!', 'success');
+                    loadPendingStories(); // Refresh the list
+                } else {
+                    showStatusMessage('Failed to approve story: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error approving story:', error);
+                showStatusMessage('Error approving story', 'error');
+            }
+        }
+
+        // Reject a story (you'll need to implement this endpoint)
+        async function rejectStory(storyId) {
+            const reason = prompt('Reason for rejection (optional):');
+            if (reason === null) return; // User cancelled
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/moderation/reject/${storyId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        reason: reason || "Does not meet community guidelines"
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showStatusMessage('Story rejected', 'success');
+                    loadPendingStories(); // Refresh the list
+                } else {
+                    showStatusMessage('Failed to reject story: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error rejecting story:', error);
+                showStatusMessage('Error rejecting story', 'error');
+            }
+        }
+
+        // Update the existing showUserSection function to check admin access
+        const originalShowUserSection = showUserSection;
+        showUserSection = function() {
+            originalShowUserSection();
+            checkAdminAccess();
+        };
     </script>
 </body>
 </html>
