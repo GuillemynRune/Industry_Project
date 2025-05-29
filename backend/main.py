@@ -11,6 +11,17 @@ import logging
 
 # Import routers
 from routers import auth, stories, moderation, health
+import sys
+import os
+
+# 👇 Adds the root directory (where /backend lives) to sys.path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+
+# Import our modular services
+from services.story_service import create_recovery_story_prompt
+from services.symptom_service import extract_symptoms, get_symptom_insights
+from services.ollama_client import validate_ollama_connection, test_model_connection, MODELS, query_ollama_model
 
 # Import database functionality
 from database import connect_to_mongo, close_mongo_connection, StoryDatabase, SymptomDatabase, CrisisSupport
