@@ -15,6 +15,13 @@ import logging
 import os
 import secrets
 
+import sys
+import os
+
+# 👇 Adds the root directory (where /backend lives) to sys.path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+
 # Import our modular services
 from services.story_service import create_recovery_story_prompt
 from services.symptom_service import extract_symptoms, get_symptom_insights
