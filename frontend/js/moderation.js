@@ -27,28 +27,53 @@ async function loadPendingStories() {
     }
     
     try {
+        console.log('Loading pending stories...'); // Debug log
         const response = await fetch(`${API_BASE_URL}/moderation/pending`, {
             headers: {
                 'Authorization': `Bearer ${authToken}`
             }
         });
         
-        const data = await response.json();
+        console.log('Response status:', response.status); // Debug log
         
-        if (data.success) {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Response data:', data); // Debug log
+        
+        // Check if the response has the expected structure
+        if (data.success && Array.isArray(data.pending_stories)) {
+            displayPendingStories(data.pending_stories);
+            updateModerationStats(data.pending_stories);
+        } else if (Array.isArray(data.pending_stories)) {
+            // Handle case where success field might be missing but data is valid
             displayPendingStories(data.pending_stories);
             updateModerationStats(data.pending_stories);
         } else {
-            console.error('Failed to load pending stories:', data);
+            console.error('Unexpected data structure:', data);
+            showStatusMessage('Error: Unexpected data format from server', 'error');
         }
     } catch (error) {
         console.error('Error loading pending stories:', error);
-        showStatusMessage('Error loading pending stories', 'error');
+        showStatusMessage('Error loading pending stories: ' + error.message, 'error');
     }
 }
 
 function displayPendingStories(stories) {
     const grid = document.getElementById('pendingStoriesGrid');
+    
+    if (!grid) {
+        console.error('pendingStoriesGrid element not found');
+        return;
+    }
+    
+    if (!Array.isArray(stories)) {
+        console.error('Stories is not an array:', stories);
+        showStatusMessage('Error: Invalid stories data', 'error');
+        return;
+    }
     
     if (stories.length === 0) {
         grid.innerHTML = `
@@ -63,22 +88,27 @@ function displayPendingStories(stories) {
     grid.innerHTML = '';
     
     stories.forEach((story, index) => {
-        const card = createPendingStoryCard(story, index);
-        grid.appendChild(card);
+        try {
+            const card = createPendingStoryCard(story, index);
+            grid.appendChild(card);
+        } catch (error) {
+            console.error('Error creating story card:', error, story);
+        }
     });
 }
 
 function createPendingStoryCard(story, index) {
     const card = document.createElement('div');
-    card.className = `pending-story-card ${story.risk_level}-risk`;
+    card.className = `pending-story-card ${story.risk_level || 'minimal'}-risk`;
     card.style.animationDelay = `${index * 0.1}s`;
     
+    const riskLevel = story.risk_level || 'minimal';
     const riskColor = {
         'high': 'risk-high',
         'medium': 'risk-medium', 
         'low': 'risk-low',
         'minimal': 'risk-minimal'
-    }[story.risk_level] || 'risk-minimal';
+    }[riskLevel] || 'risk-minimal';
     
     const flaggedKeywordsHtml = story.flagged_keywords && story.flagged_keywords.length > 0 ? `
         <div class="flagged-keywords">
@@ -87,44 +117,53 @@ function createPendingStoryCard(story, index) {
         </div>
     ` : '';
     
+    // Handle potentially missing fields gracefully
+    const authorName = story.author_name || 'Anonymous';
+    const challenge = story.challenge || 'No challenge specified';
+    const experience = story.experience || 'No experience details';
+    const solution = story.solution || 'No solution specified';
+    const generatedStory = story.generated_story || 'No generated story available';
+    const createdAt = story.created_at ? new Date(story.created_at).toLocaleDateString() : 'Unknown date';
+    const storyId = story._id || story.id;
+    
     card.innerHTML = `
         <div class="story-header">
             <div>
-                <strong>By ${story.author_name}</strong><br>
-                <small style="color: var(--text-light);">${new Date(story.created_at).toLocaleDateString()}</small>
+                <strong>By ${authorName}</strong><br>
+                <small style="color: var(--text-light);">${createdAt}</small>
             </div>
-            <span class="story-risk-badge ${riskColor}">${story.risk_level.toUpperCase()} RISK</span>
+            <span class="story-risk-badge ${riskColor}">${riskLevel.toUpperCase()} RISK</span>
         </div>
         
         <div class="story-content">
             <div class="story-field">
                 <span class="story-field-label">Challenge:</span>
-                <div class="story-field-content">${story.challenge}</div>
+                <div class="story-field-content">${challenge}</div>
             </div>
             
             <div class="story-field">
                 <span class="story-field-label">Experience:</span>
-                <div class="story-field-content">${story.experience.substring(0, 200)}${story.experience.length > 200 ? '...' : ''}</div>
+                <div class="story-field-content">${experience.substring(0, 200)}${experience.length > 200 ? '...' : ''}</div>
             </div>
             
             <div class="story-field">
                 <span class="story-field-label">Solution:</span>
-                <div class="story-field-content">${story.solution.substring(0, 200)}${story.solution.length > 200 ? '...' : ''}</div>
+                <div class="story-field-content">${solution.substring(0, 200)}${solution.length > 200 ? '...' : ''}</div>
             </div>
             
             <div class="story-field">
                 <span class="story-field-label">Generated Story Preview:</span>
-                <div class="story-field-content">${story.generated_story.substring(0, 300)}${story.generated_story.length > 300 ? '...' : ''}</div>
+                <div class="story-field-content">${generatedStory.substring(0, 300)}${generatedStory.length > 300 ? '...' : ''}</div>
             </div>
             
             ${flaggedKeywordsHtml}
         </div>
         
         <div class="story-actions">
-            <button class="approve-btn" onclick="approveStory('${story._id}')">
+            <button class="approve-btn" onclick="approveStory('${storyId}')">
                 ✅ Approve & Publish
             </button>
-            <button class="reject-btn" onclick="rejectStory('${story._id}')">
+            <button class="reject-btn" onclick="rejectStory('${storyId}')">
                 ❌ Reject
             </button>
         </div>
@@ -134,13 +173,23 @@ function createPendingStoryCard(story, index) {
 }
 
 function updateModerationStats(stories) {
-    document.getElementById('pendingCount').textContent = stories.length;
+    const pendingCountEl = document.getElementById('pendingCount');
+    const highRiskCountEl = document.getElementById('highRiskCount');
+    const totalApprovedEl = document.getElementById('totalApproved');
     
-    const highRiskCount = stories.filter(s => s.risk_level === 'high').length;
-    document.getElementById('highRiskCount').textContent = highRiskCount;
+    if (pendingCountEl) {
+        pendingCountEl.textContent = stories.length;
+    }
+    
+    if (highRiskCountEl) {
+        const highRiskCount = stories.filter(s => s.risk_level === 'high').length;
+        highRiskCountEl.textContent = highRiskCount;
+    }
     
     // You can add total approved count from database if needed
-    document.getElementById('totalApproved').textContent = '—';
+    if (totalApprovedEl) {
+        totalApprovedEl.textContent = '—';
+    }
 }
 
 async function approveStory(storyId) {
@@ -160,17 +209,21 @@ async function approveStory(storyId) {
             })
         });
         
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
         
         if (data.success) {
             showStatusMessage('Story approved and published successfully!', 'success');
             loadPendingStories(); // Refresh the list
         } else {
-            showStatusMessage('Failed to approve story: ' + data.message, 'error');
+            showStatusMessage('Failed to approve story: ' + (data.message || 'Unknown error'), 'error');
         }
     } catch (error) {
         console.error('Error approving story:', error);
-        showStatusMessage('Error approving story', 'error');
+        showStatusMessage('Error approving story: ' + error.message, 'error');
     }
 }
 
@@ -190,16 +243,20 @@ async function rejectStory(storyId) {
             })
         });
         
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
         
         if (data.success) {
             showStatusMessage('Story rejected', 'success');
             loadPendingStories(); // Refresh the list
         } else {
-            showStatusMessage('Failed to reject story: ' + data.message, 'error');
+            showStatusMessage('Failed to reject story: ' + (data.message || 'Unknown error'), 'error');
         }
     } catch (error) {
         console.error('Error rejecting story:', error);
-        showStatusMessage('Error rejecting story', 'error');
+        showStatusMessage('Error rejecting story: ' + error.message, 'error');
     }
 }
