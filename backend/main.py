@@ -21,7 +21,7 @@ from services.symptom_service import extract_symptoms, get_symptom_insights
 from services.ollama_client import validate_ollama_connection, test_model_connection, MODELS, query_ollama_model
 
 # Import database functionality
-from database import connect_to_mongo, close_mongo_connection, StoryDatabase, SymptomDatabase, UserDatabase, ModerationDatabase, CrisisSupport, ContentFilter
+from backend.database.database import connect_to_mongo, close_mongo_connection, StoryDatabase, SymptomDatabase, UserDatabase, ModerationDatabase, CrisisSupport, ContentFilter
 
 # Rate limiting
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -268,7 +268,7 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    from database import check_database_health
+    from backend.database.database import check_database_health
     
     ollama_connected, ollama_info = validate_ollama_connection()
     db_healthy = await check_database_health()
