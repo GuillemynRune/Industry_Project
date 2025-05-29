@@ -75,7 +75,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         raise credentials_exception
     
     # Get user from database
-    from database import UserDatabase
+    from backend.database.database import UserDatabase
     user = await UserDatabase.get_user_by_email(user_email)
     if user is None:
         raise credentials_exception
