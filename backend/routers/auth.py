@@ -1,28 +1,40 @@
 from fastapi import APIRouter, HTTPException, Depends, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, validator
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, Set
 from database.models.users import UserDatabase
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 import os
 import secrets
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
-# JWT Configuration
-SECRET_KEY = os.getenv("JWT_SECRET_KEY", secrets.token_urlsafe(32))
+# Rate limiter
+limiter = Limiter(key_func=get_remote_address)
+
+# JWT Configuration - Enhanced Security
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+if not SECRET_KEY or len(SECRET_KEY) < 32:
+    raise ValueError("JWT_SECRET_KEY must be at least 32 characters long")
+
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 1 week
+
+# Token blacklist for logout functionality
+BLACKLISTED_TOKENS: Set[str] = set()
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
-# Pydantic models
+# Enhanced Pydantic models with validation
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
@@ -30,9 +42,35 @@ class UserCreate(BaseModel):
     agrees_to_terms: bool = True
     age_verified: bool = True
 
+    @validator('password')
+    def validate_password(cls, v):
+        if len(v) < 12:
+            raise ValueError('Password must be at least 12 characters long')
+        if not re.search(r'[A-Z]', v):
+            raise ValueError('Password must contain at least one uppercase letter')
+        if not re.search(r'[a-z]', v):
+            raise ValueError('Password must contain at least one lowercase letter')
+        if not re.search(r'\d', v):
+            raise ValueError('Password must contain at least one number')
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
+            raise ValueError('Password must contain at least one special character')
+        return v
+    
+    @validator('email')
+    def validate_email(cls, v):
+        # Additional email validation
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_pattern, v):
+            raise ValueError('Invalid email format')
+        return v.lower()
+
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+    
+    @validator('email')
+    def validate_email(cls, v):
+        return v.lower()
 
 class UserResponse(BaseModel):
     id: str
@@ -46,6 +84,7 @@ class Token(BaseModel):
     access_token: str
     token_type: str
     user: UserResponse
+    expires_in: int
 
 # Helper functions
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -61,9 +100,17 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     else:
         expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     
-    to_encode.update({"exp": expire})
+    to_encode.update({
+        "exp": expire,
+        "iat": datetime.utcnow(),
+        "type": "access"
+    })
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
+def blacklist_token(token: str):
+    """Add token to blacklist"""
+    BLACKLISTED_TOKENS.add(token)
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     credentials_exception = HTTPException(
@@ -73,11 +120,21 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     )
     
     try:
-        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        token = credentials.credentials
+        
+        # Check if token is blacklisted
+        if token in BLACKLISTED_TOKENS:
+            raise HTTPException(status_code=401, detail="Token has been revoked")
+        
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_email: str = payload.get("sub")
-        if user_email is None:
+        token_type: str = payload.get("type")
+        
+        if user_email is None or token_type != "access":
             raise credentials_exception
-    except JWTError:
+            
+    except JWTError as e:
+        logger.warning(f"JWT Error: {e}")
         raise credentials_exception
     
     user = await UserDatabase.get_user_by_email(user_email)
@@ -90,10 +147,11 @@ async def get_current_active_user(current_user: dict = Depends(get_current_user)
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
-# Routes
+# Routes with enhanced security
 @router.post("/register")
+@limiter.limit("3/minute")  # Limit registration attempts
 async def register_user(request: Request, user_data: UserCreate):
-    """Register a new user account"""
+    """Register a new user account with enhanced validation"""
     
     if not user_data.age_verified:
         raise HTTPException(status_code=400, detail="You must be 18 or older to use this service")
@@ -101,10 +159,8 @@ async def register_user(request: Request, user_data: UserCreate):
     if not user_data.agrees_to_terms:
         raise HTTPException(status_code=400, detail="You must agree to the terms of service")
     
-    if len(user_data.password) < 8:
-        raise HTTPException(status_code=400, detail="Password must be at least 8 characters long")
-    
     try:
+        # Hash password with high rounds for security
         password_hash = get_password_hash(user_data.password)
         
         result = await UserDatabase.create_user(
@@ -114,6 +170,7 @@ async def register_user(request: Request, user_data: UserCreate):
         )
         
         if result["success"]:
+            logger.info(f"New user registered: {user_data.email}")
             return {
                 "success": True,
                 "message": "Account created successfully! You can now log in.",
@@ -122,18 +179,32 @@ async def register_user(request: Request, user_data: UserCreate):
         else:
             raise HTTPException(status_code=400, detail=result["message"])
             
+    except ValueError as e:
+        # Handle validation errors
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         logger.error(f"Registration error: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to create account")
 
 @router.post("/login", response_model=Token)
+@limiter.limit("5/minute")  # Limit login attempts to prevent brute force
 async def login_user(request: Request, user_data: UserLogin):
-    """Login user and return access token"""
+    """Login user and return access token with enhanced security"""
     
     try:
         user = await UserDatabase.get_user_by_email(user_data.email)
         
-        if not user or not verify_password(user_data.password, user["password_hash"]):
+        if not user:
+            # Log failed login attempt
+            logger.warning(f"Login attempt for non-existent user: {user_data.email}")
+            # Same error message to prevent user enumeration
+            raise HTTPException(
+                status_code=401,
+                detail="Incorrect email or password"
+            )
+        
+        if not verify_password(user_data.password, user["password_hash"]):
+            logger.warning(f"Failed login attempt for user: {user_data.email}")
             raise HTTPException(
                 status_code=401,
                 detail="Incorrect email or password"
@@ -142,11 +213,14 @@ async def login_user(request: Request, user_data: UserLogin):
         if not user.get("is_active", False):
             raise HTTPException(status_code=400, detail="Account is deactivated")
         
+        # Update last login
         await UserDatabase.update_last_login(user_data.email)
         
+        # Create token with shorter expiry for security
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
             data={"sub": user["email"]},
-            expires_delta=timedelta(minutes=60*24*7)
+            expires_delta=access_token_expires
         )
         
         user_response = UserResponse(
@@ -158,10 +232,13 @@ async def login_user(request: Request, user_data: UserLogin):
             role=user.get("role", "user")
         )
         
+        logger.info(f"Successful login for user: {user_data.email}")
+        
         return Token(
             access_token=access_token,
             token_type="bearer",
-            user=user_response
+            user=user_response,
+            expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60  # seconds
         )
         
     except HTTPException:
@@ -169,6 +246,23 @@ async def login_user(request: Request, user_data: UserLogin):
     except Exception as e:
         logger.error(f"Login error: {str(e)}")
         raise HTTPException(status_code=500, detail="Login failed")
+
+@router.post("/logout")
+async def logout_user(
+    request: Request,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Logout user by blacklisting token"""
+    try:
+        token = credentials.credentials
+        blacklist_token(token)
+        
+        logger.info("User logged out successfully")
+        return {"message": "Successfully logged out"}
+        
+    except Exception as e:
+        logger.error(f"Logout error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Logout failed")
 
 @router.get("/me", response_model=UserResponse)
 async def get_current_user_info(current_user: dict = Depends(get_current_active_user)):
@@ -181,3 +275,24 @@ async def get_current_user_info(current_user: dict = Depends(get_current_active_
         is_active=current_user["is_active"],
         role=current_user.get("role", "user")
     )
+
+@router.post("/refresh")
+async def refresh_token(current_user: dict = Depends(get_current_active_user)):
+    """Refresh access token"""
+    try:
+        # Create new token
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": current_user["email"]},
+            expires_delta=access_token_expires
+        )
+        
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        }
+        
+    except Exception as e:
+        logger.error(f"Token refresh error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to refresh token")

@@ -2,21 +2,20 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
 import uvicorn
 import logging
+import os
 
 # Import routers
 from routers import auth, stories, moderation, health
 import sys
-import os
 
 # 👇 Adds the root directory (where /backend lives) to sys.path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Import our modular services
 from services.story_service import create_recovery_story_prompt
@@ -35,6 +34,10 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
+# Input validation
+from html import escape
+import re
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -45,19 +48,42 @@ app = FastAPI(
     version="2.1.0"
 )
 
-# Configure CORS
+# Security: Specific CORS origins (replace with your actual domains)
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8080").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,  # Only specific domains
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["Authorization", "Content-Type"],
 )
+
+# Security headers middleware
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
+    return response
 
 # Rate limiting setup
 limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Input sanitization function
+def sanitize_user_input(text: str) -> str:
+    """Sanitize user input to prevent XSS"""
+    if not text:
+        return ""
+    # Remove potentially dangerous HTML/script tags
+    text = re.sub(r'<script[^>]*>.*?</script>', '', text, flags=re.IGNORECASE | re.DOTALL)
+    text = re.sub(r'<[^>]+>', '', text)  # Remove all HTML tags
+    return escape(text).strip()
 
 # Include routers
 app.include_router(auth.router)
@@ -69,6 +95,10 @@ app.include_router(health.router)
 class SymptomRequest(BaseModel):
     experience: str
     feelings: str
+    
+    def sanitize_fields(self):
+        self.experience = sanitize_user_input(self.experience)
+        self.feelings = sanitize_user_input(self.feelings)
 
 class SymptomResponse(BaseModel):
     success: bool
@@ -82,6 +112,9 @@ class SymptomResponse(BaseModel):
 
 class SearchRequest(BaseModel):
     query: str
+    
+    def sanitize_fields(self):
+        self.query = sanitize_user_input(self.query)
 
 # Database connection events
 @app.on_event("startup")
@@ -89,6 +122,14 @@ async def startup_event():
     try:
         await connect_to_mongo()
         logger.info("Database connected successfully on startup")
+        
+        # Validate required environment variables
+        required_vars = ["JWT_SECRET_KEY", "MONGODB_URI"]
+        missing_vars = [var for var in required_vars if not os.getenv(var)]
+        if missing_vars:
+            logger.error(f"Missing required environment variables: {missing_vars}")
+            raise ValueError(f"Missing environment variables: {missing_vars}")
+            
     except Exception as e:
         logger.error(f"Failed to connect to database on startup: {e}")
 
@@ -114,29 +155,34 @@ async def root():
             "Crisis support",
             "MongoDB database storage"
         ],
-        "ollama_required": "Make sure Ollama is running with phi4 model"
+        "ollama_required": "Make sure Ollama is running with phi4 model",
+        "security": "Enhanced security enabled"
     }
 
-# Symptom extraction endpoint
+# Symptom extraction endpoint with rate limiting
 @app.post("/extract-symptoms", response_model=SymptomResponse)
-async def extract_postnatal_symptoms(request: SymptomRequest):
+@limiter.limit("10/minute")
+async def extract_postnatal_symptoms(request: Request, symptom_request: SymptomRequest):
     """Extract symptoms using Ollama and save to database"""
     
-    if not request.experience.strip():
+    # Sanitize input
+    symptom_request.sanitize_fields()
+    
+    if not symptom_request.experience.strip():
         raise HTTPException(status_code=400, detail="Experience cannot be empty")
     
     try:
         symptom_data = extract_symptoms(
-            experience=request.experience,
-            feelings=request.feelings
+            experience=symptom_request.experience,
+            feelings=symptom_request.feelings
         )
         
         insights = get_symptom_insights(symptom_data)
         
         try:
             save_result = await SymptomDatabase.save_symptom_extraction(
-                experience=request.experience,
-                feelings=request.feelings,
+                experience=symptom_request.experience,
+                feelings=symptom_request.feelings,
                 symptoms_identified=symptom_data.get("symptoms_identified", []),
                 severity_indicators=symptom_data.get("severity_indicators", []),
                 categories_affected=symptom_data.get("categories_affected", []),
@@ -168,16 +214,21 @@ async def extract_postnatal_symptoms(request: SymptomRequest):
         logger.error(f"Symptom extraction error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to extract symptoms: {str(e)}")
 
-# Search endpoint
+# Search endpoint with rate limiting
 @app.post("/search-similar")
-async def search_similar_stories(request: SearchRequest):
+@limiter.limit("20/minute")
+async def search_similar_stories(request: Request, search_request: SearchRequest):
     """Search for similar recovery stories"""
+    
+    # Sanitize input
+    search_request.sanitize_fields()
+    
     try:
-        stories = await StoryDatabase.search_recovery_stories(request.query, limit=10)
+        stories = await StoryDatabase.search_recovery_stories(search_request.query, limit=10)
         
         return {
             "success": True,
-            "message": f"Found {len(stories)} recovery stories similar to: '{request.query}'",
+            "message": f"Found {len(stories)} recovery stories similar to: '{search_request.query}'",
             "results": stories
         }
         
