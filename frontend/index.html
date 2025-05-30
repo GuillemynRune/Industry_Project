@@ -113,8 +113,18 @@
                     <button class="btn btn-primary" onclick="searchSimilarStories()">Find Similar Stories</button>
                 </div>
                 
-                <div class="stories-grid" id="storiesGrid">
-                    <!-- Stories will be populated here -->
+                <div class="stories-carousel" id="storiesCarousel">
+                    <div class="stories-track" id="storiesTrack">
+                        <!-- Slides will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="carousel-controls">
+                    <button class="carousel-btn" id="prevBtn">‹</button>
+                    <div class="carousel-dots" id="dotsContainer">
+                        <!-- Dots will be populated by JavaScript -->
+                    </div>
+                    <button class="carousel-btn" id="nextBtn">›</button>
                 </div>
             </section>
 
