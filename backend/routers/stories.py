@@ -29,6 +29,9 @@ class StoryResponse(BaseModel):
     message: str
     model_used: Optional[str] = None
     story_id: Optional[str] = None
+    
+    class Config:
+        protected_namespaces = ()
 
 # Helper functions
 async def generate_recovery_story(challenge: str, experience: str, solution: str, advice: str = "", author_name: str = "Anonymous") -> dict:

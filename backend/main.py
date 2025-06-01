@@ -4,11 +4,12 @@ load_dotenv()
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from typing import List
 import uvicorn
 import logging
 import os
+from datetime import datetime
 
 # Import routers
 from routers import auth, stories, moderation, health
@@ -23,7 +24,7 @@ from services.symptom_service import extract_symptoms, get_symptom_insights
 from services.ollama_client import validate_ollama_connection, test_model_connection, MODELS, query_ollama_model
 
 # Import database functionality
-from database import connect_to_mongo, close_mongo_connection, StoryDatabase, SymptomDatabase, CrisisSupport
+from database import connect_to_mongo, close_mongo_connection, StoryDatabase, SymptomDatabase, CrisisSupport, mongodb
 
 # Import services
 from services.symptom_service import extract_symptoms, get_symptom_insights
@@ -95,6 +96,14 @@ app.include_router(health.router)
 class SymptomRequest(BaseModel):
     experience: str
     feelings: str
+    
+    @validator('experience', 'feelings')
+    def validate_length(cls, v):
+        if len(v) > 5000:
+            raise ValueError('Input too long (max 5000 characters)')
+        if len(v.strip()) < 10:
+            raise ValueError('Input too short (min 10 characters)')
+        return v.strip()
     
     def sanitize_fields(self):
         self.experience = sanitize_user_input(self.experience)
@@ -277,6 +286,32 @@ async def get_database_stats():
     except Exception as e:
         logger.error(f"Error getting stats: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to get stats: {str(e)}")
+    
+@app.get("/metrics")
+async def get_metrics():
+    try:
+        # Simple metrics that actually work
+        stats = await StoryDatabase.get_database_stats()
+        
+        # Count pending stories
+        pending_stories = await mongodb.database.pending_stories.count_documents({"status": "pending_review"})
+        
+        # Count total users
+        total_users = await mongodb.database.users.count_documents({})
+        
+        return {
+            "total_stories": stats.get("total_stories", 0),
+            "pending_stories": pending_stories,
+            "total_users": total_users,
+            "database_connected": stats.get("database_connected", False),
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Error getting metrics: {e}")
+        return {
+            "error": "Metrics unavailable",
+            "timestamp": datetime.utcnow().isoformat()
+        }
 
 if __name__ == "__main__":
     uvicorn.run(

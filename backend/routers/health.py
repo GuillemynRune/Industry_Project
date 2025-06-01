@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 from services.ollama_client import validate_ollama_connection, test_model_connection, MODELS
 from database import check_database_health
+import psutil
+from datetime import datetime
 
 router = APIRouter(tags=["health"])
 
@@ -18,6 +20,21 @@ async def health_check():
         "available_models": len(MODELS),
         "features_enabled": ["recovery_story_generation", "symptom_extraction", "database_storage", "authentication", "moderation"]
     }
+
+@router.get("/health/detailed")
+async def detailed_health_check():
+    checks = {
+        "database": await check_database_health(),
+        "timestamp": datetime.utcnow().isoformat(),
+        "system": {
+            "memory_percent": psutil.virtual_memory().percent,
+            "disk_percent": psutil.disk_usage('/').percent,
+            "cpu_percent": psutil.cpu_percent()
+        }
+    }
+    
+    status = "healthy" if checks["database"] else "unhealthy"
+    return {"status": status, "checks": checks}
 
 @router.get("/models/test")
 async def test_models():

@@ -3,6 +3,7 @@ from .models.users import UserDatabase
 from .models.story import StoryDatabase
 from .models.symptom import SymptomDatabase, CrisisSupport
 from .models.moderation import ModerationDatabase
+from .connection import mongodb
 
 __all__ = [
     'connect_to_mongo',
