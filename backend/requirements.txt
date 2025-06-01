@@ -52,12 +52,6 @@ html5lib==1.1
 # CORS handling (already included in FastAPI but listed for clarity)
 starlette==0.27.0
 
-# Optional: For enhanced security monitoring
-# sentry-sdk[fastapi]==1.38.0
-
-# Optional: For email functionality (future feature)
-# aiosmtplib==3.0.0
-# jinja2==3.1.2
-
 # Development tools
 pre-commit==3.6.0
+redis==5.0.1
