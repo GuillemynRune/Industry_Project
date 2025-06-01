@@ -319,7 +319,7 @@ async function searchSimilarStories() {
 
 function handleShareStoryClick() {
     if (!currentUser) {
-        showStatusMessage('Please login or create an account to share your story.', 'warning');
+        showToast('Please create an account or login to share your story with our community.', 'warning', 'Login Required');
         scrollToSection('authSection');
         return;
     }
@@ -331,7 +331,7 @@ document.getElementById('shareForm').addEventListener('submit', async function(e
     e.preventDefault();
     
     if (!currentUser) {
-        showStatusMessage('Please login to share your story.', 'error');
+        showToast('Please login to share your story with our supportive community.', 'warning', 'Login Required');
         return;
     }
     
@@ -342,7 +342,7 @@ document.getElementById('shareForm').addEventListener('submit', async function(e
     const advice = document.getElementById('advice').value;
     
     if (!challenge.trim() || !experience.trim() || !solution.trim()) {
-        showStatusMessage('Please fill in the challenge, experience, and solution fields.', 'error');
+        showToast('Please fill in your challenge, experience, and solution to help others understand your journey.', 'warning', 'More Details Needed');
         return;
     }
 
@@ -374,15 +374,15 @@ document.getElementById('shareForm').addEventListener('submit', async function(e
                 closeModal('shareModal');
                 showCrisisResourcesModal(data.crisis_resources);
             } else {
-                showStatusMessage('Thank you for sharing! Your story has been submitted for review and will be published within 24-48 hours.', 'success');
+                showToast('Thank you for sharing your journey! Your story has been submitted and will be reviewed within 24-48 hours before being shared with our community.', 'success', 'Story Submitted!');
                 this.reset();
                 closeModal('shareModal');
             }
         } else {
-            showStatusMessage(data.message || 'Error submitting story', 'error');
+            showToast(data.message || 'We couldn\'t submit your story right now. Please try again in a moment.', 'error', 'Submission Error');
         }
     } catch (error) {
-        showStatusMessage('Unable to submit story. Please try again.', 'error');
+        showToast('Connection error. Please check your internet and try submitting again.', 'error', 'Connection Problem');
     } finally {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;

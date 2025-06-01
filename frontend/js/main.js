@@ -9,6 +9,76 @@ document.addEventListener('DOMContentLoaded', function() {
     loadApprovedStories();
 });
 
+// Enhanced Toast Notification System
+function showToast(message, type = 'success', title = '') {
+    // Create toast container if it doesn't exist
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
+
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    
+    // Set default titles and icons based on type
+    const configs = {
+        success: { 
+            title: title || 'Success!', 
+            icon: '✓',
+            duration: 4000 
+        },
+        error: { 
+            title: title || 'Oops!', 
+            icon: '!',
+            duration: 6000 
+        },
+        warning: { 
+            title: title || 'Heads up!', 
+            icon: '⚠',
+            duration: 5000 
+        }
+    };
+    
+    const config = configs[type] || configs.success;
+    
+    toast.innerHTML = `
+        <div class="toast-icon">${config.icon}</div>
+        <div class="toast-content">
+            <div class="toast-title">${config.title}</div>
+            <div class="toast-message">${message}</div>
+        </div>
+        <button class="toast-close" onclick="closeToast(this)">×</button>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Auto-remove toast after duration
+    setTimeout(() => {
+        if (toast.parentNode) {
+            closeToast(toast.querySelector('.toast-close'));
+        }
+    }, config.duration);
+}
+
+function closeToast(closeBtn) {
+    const toast = closeBtn.closest('.toast');
+    toast.classList.add('toast-exit');
+    
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.remove();
+        }
+    }, 400);
+}
+
+// Legacy function for backward compatibility
+function showStatusMessage(message, type) {
+    showToast(message, type);
+}
+
 // Utility functions
 function openModal(modalId) {
     document.getElementById(modalId).style.display = 'block';
@@ -25,19 +95,6 @@ function scrollToSection(sectionId) {
         behavior: 'smooth',
         block: 'start'
     });
-}
-
-function showStatusMessage(message, type) {
-    const statusDiv = document.createElement('div');
-    statusDiv.className = `status-message status-${type}`;
-    statusDiv.textContent = message;
-    
-    const mainContent = document.querySelector('.main-content');
-    mainContent.insertBefore(statusDiv, mainContent.firstChild);
-    
-    setTimeout(() => {
-        statusDiv.remove();
-    }, 5000);
 }
 
 function showTerms() {

@@ -77,7 +77,7 @@ function handleTokenExpiry() {
     authToken = null;
     currentUser = null;
     showAuthSection();
-    showStatusMessage('Session expired. Please login again.', 'warning');
+    showToast('Your session has expired. Please login again to continue.', 'warning', 'Session Expired');
 }
 
 async function makeAuthenticatedRequest(url, options = {}) {
@@ -143,13 +143,13 @@ function updateUserSection() {
         userSection.innerHTML = `
             <div class="user-info">
                 <div class="user-avatar">${currentUser.display_name.charAt(0).toUpperCase()}</div>
-                <span>Welcome, ${escapeHtml(currentUser.display_name)}</span>
-                <button class="btn" onclick="logout()" style="margin-left: 1rem; padding: 0.5rem 1rem; background: var(--light-gray); color: var(--text-dark);">Logout</button>
+                <span class="user-welcome">Welcome, ${escapeHtml(currentUser.display_name)}</span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
         `;
     } else {
         userSection.innerHTML = `
-            <button class="btn btn-primary" onclick="scrollToSection('authSection')">Login / Sign Up</button>
+            <button class="auth-prompt-btn" onclick="scrollToSection('authSection')">Login / Sign Up</button>
         `;
     }
 }
@@ -198,7 +198,7 @@ async function logout() {
     authToken = null;
     currentUser = null;
     showAuthSection();
-    showStatusMessage('Logged out successfully.', 'success');
+    showToast('You\'ve been safely logged out. Thanks for visiting!', 'success', 'See You Soon!');
 }
 
 // Input validation and sanitization
@@ -258,12 +258,12 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     
     // Client-side validation
     if (!validateEmail(email)) {
-        showStatusMessage('Please enter a valid email address.', 'error');
+        showToast('Please enter a valid email address to continue.', 'error', 'Invalid Email');
         return;
     }
     
     if (!password) {
-        showStatusMessage('Please enter your password.', 'error');
+        showToast('Please enter your password to login.', 'error', 'Password Required');
         return;
     }
     
@@ -293,15 +293,21 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             
             setupTokenExpiryTimer(data.expires_in * 1000);
             
-            showStatusMessage('Login successful! Welcome back.', 'success');
+            showToast(`Welcome back, ${data.user.display_name || 'there'}! Great to see you again.`, 'success', 'Login Successful!');
             showUserSection();
             this.reset();
         } else {
-            showStatusMessage(data.detail || 'Login failed', 'error');
+            const errorMessages = {
+                401: 'Invalid email or password. Please check your credentials and try again.',
+                404: 'Account not found. Please check your email or create a new account.',
+                429: 'Too many login attempts. Please wait a moment before trying again.',
+                500: 'Server error. Please try again in a moment.'
+            };
+            showToast(errorMessages[response.status] || data.detail || 'Unable to login right now. Please try again.', 'error', 'Login Failed');
         }
     } catch (error) {
         console.error('Login error:', error);
-        showStatusMessage('Login failed. Please try again.', 'error');
+        showToast('Connection error. Please check your internet and try again.', 'error', 'Connection Problem');
     } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
@@ -320,17 +326,17 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     
     // Enhanced validation
     if (!validateEmail(email)) {
-        showStatusMessage('Please enter a valid email address.', 'error');
+        showToast('Please enter a valid email address to create your account.', 'error', 'Invalid Email');
         return;
     }
     
     if (!validatePassword(password)) {
-        showStatusMessage('Password must be at least 12 characters with uppercase, lowercase, number, and special character.', 'error');
+        showToast('Password must be at least 12 characters and include uppercase, lowercase, numbers, and special characters for your security.', 'error', 'Password Too Weak');
         return;
     }
     
     if (!ageVerified || !termsAgreed) {
-        showStatusMessage('Please confirm your age and agree to the terms.', 'error');
+        showToast('Please confirm your age and agree to our terms to continue.', 'warning', 'Agreement Required');
         return;
     }
     
@@ -357,15 +363,20 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         const data = await response.json();
         
         if (response.ok) {
-            showStatusMessage('Account created! Please login with your credentials.', 'success');
+            showToast('Welcome to our community! Your account has been created successfully. Please login with your new credentials.', 'success', 'Account Created!');
             switchAuth('login');
             this.reset();
         } else {
-            showStatusMessage(data.detail || 'Registration failed', 'error');
+            const errorMessages = {
+                409: 'An account with this email already exists. Try logging in instead.',
+                400: 'Please check your information and try again.',
+                500: 'Server error. Please try again in a moment.'
+            };
+            showToast(errorMessages[response.status] || data.detail || 'Unable to create account right now. Please try again.', 'error', 'Registration Failed');
         }
     } catch (error) {
         console.error('Registration error:', error);
-        showStatusMessage('Registration failed. Please try again.', 'error');
+        showToast('Connection error. Please check your internet and try again.', 'error', 'Connection Problem');
     } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
