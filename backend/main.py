@@ -1,46 +1,36 @@
-# Load environment variables first
 from dotenv import load_dotenv
 load_dotenv()
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Depends, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, validator
-from typing import List
+from pydantic import BaseModel
 import uvicorn
 import logging
-import os
 from datetime import datetime
+from html import escape
+import re
 
-# Import configuration and logging
+# Configuration and logging
 from config import get_settings
 from logging_config import setup_logging, add_request_id_middleware
 
-# Import routers
+# Routers
 from routers import auth, stories, moderation, health
-import sys
+from routers.auth import get_current_active_user
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-from services.story_service import create_recovery_story_prompt
-from services.symptom_service import extract_symptoms, get_symptom_insights
-from services.ollama_client import validate_ollama_connection, test_model_connection, MODELS, query_ollama_model
-
-from database import connect_to_mongo, close_mongo_connection, CrisisSupport, mongodb
+# Services and database
+from database.connection import connect_to_mongo, close_mongo_connection, mongodb
 from database.models.story import StoryDatabase
+from database.utils import CrisisSupport
+from backup_manager import BackupManager
 
-from services.ollama_client import query_ollama_model, MODELS
-
+# Rate limiting
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
-from html import escape
-import re
-
-# Get settings
+# Initialize
 settings = get_settings()
-
-# Setup logging
 setup_logging(settings.log_level, settings.log_file)
 logger = logging.getLogger(__name__)
 
@@ -52,10 +42,9 @@ app = FastAPI(
     redoc_url="/redoc" if settings.debug else None
 )
 
-# Add request ID middleware for tracing
+# Middleware
 app.middleware("http")(add_request_id_middleware)
 
-# CORS configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins,
@@ -64,15 +53,16 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
 )
 
-# Security headers middleware
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
     response = await call_next(request)
-    response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["X-Frame-Options"] = "DENY"
-    response.headers["X-XSS-Protection"] = "1; mode=block"
-    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
-    response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
+    response.headers.update({
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY", 
+        "X-XSS-Protection": "1; mode=block",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
+    })
     return response
 
 # Rate limiting
@@ -88,68 +78,57 @@ def sanitize_user_input(text: str) -> str:
     text = re.sub(r'<[^>]+>', '', text)
     return escape(text).strip()
 
-# Include routers
-app.include_router(auth.router)
-app.include_router(stories.router)
-app.include_router(moderation.router)
-app.include_router(health.router)
-
-# Add backup router
-from backup_manager import BackupManager
-from fastapi import APIRouter, Depends
-from routers.auth import get_current_active_user
-
-backup_router = APIRouter(prefix="/admin/backup", tags=["admin"])
-backup_manager = BackupManager(settings.mongodb_uri)
-
-@backup_router.post("/create")
-async def create_backup(current_user: dict = Depends(get_current_active_user)):
-    if current_user.get("role") not in ["admin"]:
-        raise HTTPException(status_code=403, detail="Admin access required")
-    result = await backup_manager.create_backup()
-    return result
-
-@backup_router.get("/list")
-async def list_backups(current_user: dict = Depends(get_current_active_user)):
-    if current_user.get("role") not in ["admin"]:
-        raise HTTPException(status_code=403, detail="Admin access required")
-    return {"backups": backup_manager.list_backups()}
-
-app.include_router(backup_router)
-
+# Models
 class SearchRequest(BaseModel):
     query: str
     
     def sanitize_fields(self):
         self.query = sanitize_user_input(self.query)
 
-# Database events
+# Include routers
+app.include_router(auth.router)
+app.include_router(stories.router)
+app.include_router(moderation.router)
+app.include_router(health.router)
+
+# Backup router
+backup_router = APIRouter(prefix="/admin/backup", tags=["admin"])
+backup_manager = BackupManager(settings.mongodb_uri)
+
+@backup_router.post("/create")
+async def create_backup(current_user: dict = Depends(get_current_active_user)):
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return await backup_manager.create_backup()
+
+@backup_router.get("/list")
+async def list_backups(current_user: dict = Depends(get_current_active_user)):
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return {"backups": backup_manager.list_backups()}
+
+app.include_router(backup_router)
+
+# Events
 @app.on_event("startup")
 async def startup_event():
-    try:
-        await connect_to_mongo()
-        logger.info("Database connected successfully on startup")
-        
-        required_vars = ["JWT_SECRET_KEY", "MONGODB_URI"]
-        missing_vars = [var for var in required_vars if not getattr(settings, var.lower(), None)]
-        if missing_vars:
-            logger.error(f"Missing required environment variables: {missing_vars}")
-            raise ValueError(f"Missing environment variables: {missing_vars}")
-        
-        logger.info(f"Starting Postnatal Stories API v3.0.0 in {settings.environment} mode")
-        
-    except Exception as e:
-        logger.error(f"Failed to connect to database on startup: {e}")
+    await connect_to_mongo()
+    logger.info("Database connected successfully")
+    
+    required_vars = ["jwt_secret_key", "mongodb_uri"]
+    missing_vars = [var for var in required_vars if not getattr(settings, var, None)]
+    if missing_vars:
+        logger.error(f"Missing required environment variables: {missing_vars}")
+        raise ValueError(f"Missing environment variables: {missing_vars}")
+    
+    logger.info(f"Starting Postnatal Stories API v3.0.0 in {settings.environment} mode")
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    try:
-        await close_mongo_connection()
-        logger.info("Database connection closed")
-    except Exception as e:
-        logger.error(f"Error closing database connection: {e}")
+    await close_mongo_connection()
+    logger.info("Database connection closed")
 
-# Root endpoint
+# Routes
 @app.get("/")
 async def root():
     return {
@@ -170,23 +149,19 @@ async def root():
         "documentation": "/docs" if settings.debug else "Contact admin for API documentation"
     }
 
-# Search endpoint
 @app.post("/search-similar")
 @limiter.limit("20/minute")
 async def search_similar_stories(request: Request, search_request: SearchRequest):
     """Search for similar recovery stories"""
-    
     search_request.sanitize_fields()
     
     try:
         stories = await StoryDatabase.search_recovery_stories(search_request.query, limit=10)
-        
         return {
             "success": True,
             "message": f"Found {len(stories)} stories",
             "results": stories
         }
-        
     except Exception as e:
         logger.error(f"Search error: {str(e)}")
         return {
@@ -195,21 +170,16 @@ async def search_similar_stories(request: Request, search_request: SearchRequest
             "results": []
         }
 
-# Crisis resources
 @app.get("/crisis-resources")
 async def get_crisis_resources():
     """Get crisis support resources"""
     try:
-        await CrisisSupport.log_crisis_interaction(
-            interaction_type="crisis_resources_accessed"
-        )
-        
+        await CrisisSupport.log_crisis_interaction(interaction_type="crisis_resources_accessed")
         return {
             "success": True,
             "resources": CrisisSupport.get_crisis_resources(),
             "message": "If you're in immediate danger, call emergency services (911)"
         }
-        
     except Exception as e:
         logger.error(f"Error getting crisis resources: {e}")
         return {
@@ -217,16 +187,11 @@ async def get_crisis_resources():
             "resources": CrisisSupport.get_crisis_resources()
         }
 
-# Stats endpoint
 @app.get("/stats")
 async def get_database_stats():
     """Get database statistics"""
     try:
-        stats = await StoryDatabase.get_database_stats()
-        
-        return {
-            "database_stats": stats
-        }
+        return {"database_stats": await StoryDatabase.get_database_stats()}
     except Exception as e:
         logger.error(f"Error getting stats: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to get stats: {str(e)}")

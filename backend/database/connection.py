@@ -16,22 +16,17 @@ mongodb = MongoDB()
 
 async def connect_to_mongo():
     """Create database connection"""
-    try:
-        if not MONGODB_URI:
-            raise ValueError("MONGODB_URI environment variable not set")
-            
-        mongodb.client = AsyncIOMotorClient(MONGODB_URI)
-        mongodb.database = mongodb.client[DATABASE_NAME]
+    if not MONGODB_URI:
+        raise ValueError("MONGODB_URI environment variable not set")
         
-        await mongodb.client.admin.command('ping')
-        logger.info("Connected to MongoDB successfully!")
-        
-        await create_indexes()
-        return True
-        
-    except ConnectionFailure as e:
-        logger.error(f"Failed to connect to MongoDB: {e}")
-        return False
+    mongodb.client = AsyncIOMotorClient(MONGODB_URI)
+    mongodb.database = mongodb.client[DATABASE_NAME]
+    
+    await mongodb.client.admin.command('ping')
+    logger.info("Connected to MongoDB successfully!")
+    
+    await create_indexes()
+    return True
 
 async def close_mongo_connection():
     """Close database connection"""
@@ -42,23 +37,24 @@ async def close_mongo_connection():
 async def create_indexes():
     """Create database indexes"""
     try:        
-        # User indexes
         await mongodb.database.users.create_index([("email", 1)], unique=True)
-        
-        # Moderation indexes
         await mongodb.database.pending_stories.create_index([("status", 1), ("created_at", 1)])
+        await mongodb.database.approved_stories.create_index([
+            ("challenge", "text"), ("experience", "text"), 
+            ("solution", "text"), ("generated_story", "text")
+        ])
+        await mongodb.database.approved_stories.create_index([("created_at", -1)])
         
         logger.info("Database indexes created successfully")
     except Exception as e:
         logger.warning(f"Could not create indexes: {e}")
 
 async def check_database_health() -> bool:
-    """Check if database connection is healthy"""
+    """Check database connection health"""
     try:
         if mongodb.client is None:
             return False
         await mongodb.client.admin.command('ping')
         return True
-    except Exception as e:
-        logger.error(f"Database health check failed: {e}")
+    except Exception:
         return False

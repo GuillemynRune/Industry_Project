@@ -1,11 +1,9 @@
 """
-Story transformation service
-Handles converting user experiences into supportive messages using Ollama
+Story transformation service using Ollama models
 """
 
 import logging
-from typing import Optional, List
-from .ollama_client import query_ollama_model, OLLAMA_MODEL, MODELS
+from .ollama_client import query_ollama_model, MODELS
 
 logger = logging.getLogger(__name__)
 
@@ -48,56 +46,40 @@ Feelings: {feelings}
 Write a compassionate response that acknowledges their struggle, normalizes their experience, and offers gentle encouragement."""
 
 def generate_supportive_message(experience: str, feelings: str, author_name: str = "Anonymous") -> dict:
-    """Generate a supportive message from user's experience using Ollama"""
+    """Generate supportive message from user's experience using Ollama"""
     
-    try:
-        prompt = create_supportive_message_prompt(experience, feelings)
-        
-        # Try models in order of preference
-        story = None
-        model_used = None
-        
-        for model_name in MODELS:
-            try:
-                logger.info(f"Trying model: {model_name}")
-                
-                generated_text = query_ollama_model(model_name, prompt, max_tokens=300)
-                
-                if generated_text and len(generated_text.strip()) > 50:
-                    story = generated_text.strip()
-                    model_used = model_name
-                    break
+    prompt = create_supportive_message_prompt(experience, feelings)
+    
+    # Try models in order
+    for model_name in MODELS:
+        try:
+            generated_text = query_ollama_model(model_name, prompt, max_tokens=300)
+            
+            if generated_text and len(generated_text.strip()) > 50:
+                return {
+                    "success": True,
+                    "story": generated_text.strip(),
+                    "author_name": author_name,
+                    "model_used": model_name,
+                    "message": f"Supportive message created using {model_name}"
+                }
                         
-            except Exception as e:
-                logger.warning(f"Model {model_name} failed: {str(e)}")
-                continue
-        
-        # Fallback response if no model worked
-        if not story or len(story.strip()) < 50:
-            story = create_fallback_supportive_message(experience, feelings)
-            model_used = "fallback"
-            logger.info("Used fallback supportive response")
-        
-        return {
-            "success": True,
-            "story": story,
-            "author_name": author_name,
-            "model_used": model_used,
-            "message": f"Supportive message created using {model_used}"
-        }
-        
-    except Exception as e:
-        logger.error(f"Error generating supportive message: {str(e)}")
-        return {
-            "success": False,
-            "error": str(e),
-            "story": create_fallback_supportive_message(experience, feelings),
-            "author_name": author_name,
-            "model_used": "fallback"
-        }
+        except Exception as e:
+            logger.warning(f"Model {model_name} failed: {str(e)}")
+            continue
+    
+    # Fallback if all models fail
+    story = create_fallback_supportive_message(experience, feelings)
+    return {
+        "success": True,
+        "story": story,
+        "author_name": author_name,
+        "model_used": "fallback",
+        "message": "Supportive message created using fallback"
+    }
 
 def create_fallback_supportive_message(experience: str, feelings: str) -> str:
-    """Create a supportive message when AI models fail"""
+    """Create supportive message when AI models fail"""
     message = f"What you're experiencing is completely valid and more common than you might think. "
     message += f"The challenges you're facing - {experience[:80]}{'...' if len(experience) > 80 else ''} - are part of the intense reality of early parenthood that many don't talk openly about. "
     message += f"Your feelings of {feelings[:60]}{'...' if len(feelings) > 60 else ''} make perfect sense given what you're going through. "
