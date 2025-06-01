@@ -47,9 +47,18 @@ class StoryDatabase:
     
     @staticmethod
     async def get_story_by_id(story_id: str) -> Optional[Dict[str, Any]]:
-        """Get story by ID"""
+        """Get story by ID from approved stories collection"""
         try:
-            story = await mongodb.database.recovery_stories.find_one({"_id": ObjectId(story_id)})
+            # First try approved_stories collection (where published stories are)
+            story = await mongodb.database.approved_stories.find_one({"_id": ObjectId(story_id)})
+            
+            # If not found, try recovery_stories collection (for backwards compatibility)
+            if not story:
+                story = await mongodb.database.recovery_stories.find_one({
+                    "_id": ObjectId(story_id),
+                    "status": "approved"
+                })
+            
             if story:
                 story["id"] = str(story["_id"])
                 del story["_id"]
@@ -62,8 +71,9 @@ class StoryDatabase:
     async def get_recovery_stories(limit: int = 20, skip: int = 0) -> List[Dict[str, Any]]:
         """Get approved recovery stories with pagination"""
         try:
-            cursor = mongodb.database.recovery_stories.find(
-                {"status": "approved"}
+            # Look in approved_stories collection instead of recovery_stories
+            cursor = mongodb.database.approved_stories.find(
+                {}  # Remove status filter since all stories in approved_stories are approved
             ).skip(skip).limit(limit).sort("created_at", -1)
             
             stories = []
@@ -81,12 +91,8 @@ class StoryDatabase:
     async def search_recovery_stories(query: str, limit: int = 10) -> List[Dict[str, Any]]:
         """Search recovery stories using text search"""
         try:
-            # Text search across multiple fields
-            cursor = mongodb.database.recovery_stories.find(
-                {
-                    "$text": {"$search": query},
-                    "status": "approved"
-                }
+            cursor = mongodb.database.approved_stories.find(
+                {"$text": {"$search": query}}  # Remove status filter
             ).limit(limit).sort("created_at", -1)
             
             stories = []
@@ -99,13 +105,13 @@ class StoryDatabase:
         except Exception as e:
             logger.error(f"Error searching stories: {e}")
             return []
-    
+
     @staticmethod
     async def get_recent_stories(limit: int = 20) -> List[Dict[str, Any]]:
         """Get recent approved stories"""
         try:
-            cursor = mongodb.database.recovery_stories.find(
-                {"status": "approved"}
+            cursor = mongodb.database.approved_stories.find(
+                {}  # Remove status filter
             ).limit(limit).sort("created_at", -1)
             
             stories = []

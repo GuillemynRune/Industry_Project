@@ -109,12 +109,17 @@ class StoryCarousel {
         const time = story.created_at ? getTimeAgo(story.created_at) : story.time || 'Recently';
         const storyId = story._id || story.id || '';
         
+        // Fixed: Use javascript:void(0) and pass event parameter
+        const readMoreLink = storyId ? 
+            `<a href="javascript:void(0)" class="read-more" onclick="viewFullStory('${storyId}', event)">Read more →</a>` :
+            `<a href="javascript:void(0)" class="read-more" onclick="showSampleStoryMessage()">Read more →</a>`;
+        
         card.innerHTML = `
             <div class="story-title">${title}</div>
             <div class="story-preview">${preview}</div>
             <div class="story-meta">
                 <span>By ${author} • ${time}</span>
-                <a href="#" class="read-more" onclick="viewFullStory('${storyId}')">Read more →</a>
+                ${readMoreLink}
             </div>
         `;
         
@@ -284,8 +289,126 @@ function displaySampleStories() {
     displayStories(sampleStories);
 }
 
-function viewFullStory(storyId) {
-    alert('Full story view coming soon!');
+async function viewFullStory(storyId, event) {
+    if (event) {
+        event.preventDefault();
+    }
+    
+    if (!storyId) {
+        showToast('Story not found', 'error', 'Error');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/stories/${storyId}`);
+        
+        if (!response.ok) {
+            if (response.status === 404) {
+                showToast('This story is no longer available.', 'error', 'Story Not Found');
+            } else if (response.status === 500) {
+                showToast('Server error loading story. Our team has been notified.', 'error', 'Server Error');
+                console.error(`Server error loading story ${storyId}:`, response.status);
+            } else {
+                showToast(`Error loading story (${response.status}). Please try again.`, 'error', 'Loading Error');
+            }
+            return;
+        }
+
+        const data = await response.json();
+        
+        if (data.success && data.story) {
+            showFullStoryModal(data.story);
+        } else {
+            showToast('Story not found', 'error', 'Story Not Found');
+        }
+    } catch (error) {
+        console.error('Error loading story:', error);
+        
+        if (error instanceof TypeError && error.message.includes('fetch')) {
+            showToast('Connection error. Please check your internet and try again.', 'error', 'Connection Error');
+        } else {
+            showToast('Unable to load story. Please try again.', 'error', 'Loading Error');
+        }
+    }
+}
+
+function showFullStoryModal(story) {
+    const modal = document.getElementById('fullStoryModal') || createFullStoryModal();
+    
+    const title = story.challenge || story.title || 'Recovery Story';
+    const authorName = story.author_name || story.author || 'Anonymous';
+    const generatedStory = story.generated_story || story.story || 'Story content not available';
+    const createdAt = story.created_at ? new Date(story.created_at).toLocaleDateString() : 'Recently';
+    const experience = story.experience || '';
+    const solution = story.solution || '';
+    const advice = story.advice || '';
+
+    modal.querySelector('.modal-content').innerHTML = `
+        <span class="close" onclick="closeModal('fullStoryModal')">&times;</span>
+        
+        <div class="story-detail-header">
+            <div class="story-title-section">
+                <h2>${title}</h2>
+                <div class="story-meta">
+                    <span>By ${authorName} • ${createdAt}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="story-detail-content">
+            <div class="story-section">
+                <h3>Recovery Story</h3>
+                <div class="generated-story-preview">
+                    ${generatedStory}
+                </div>
+            </div>
+
+            ${experience ? `
+            <div class="story-section">
+                <h3>Original Experience</h3>
+                <div class="story-field">
+                    <div class="field-content">${experience}</div>
+                </div>
+            </div>
+            ` : ''}
+
+            ${solution ? `
+            <div class="story-section">
+                <h3>What Helped</h3>
+                <div class="story-field">
+                    <div class="field-content">${solution}</div>
+                </div>
+            </div>
+            ` : ''}
+
+            ${advice ? `
+            <div class="story-section">
+                <h3>Advice to Others</h3>
+                <div class="story-field">
+                    <div class="field-content">${advice}</div>
+                </div>
+            </div>
+            ` : ''}
+        </div>
+
+        <div class="story-viewer-actions">
+            <button class="btn btn-secondary" onclick="closeModal('fullStoryModal')">
+                Close Story
+            </button>
+        </div>
+    `;
+
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function createFullStoryModal() {
+    const modal = document.createElement('div');
+    modal.id = 'fullStoryModal';
+    modal.className = 'modal story-detail-modal';
+    modal.innerHTML = `<div class="modal-content story-detail-modal-content"></div>`;
+    document.body.appendChild(modal);
+    return modal;
 }
 
 async function searchSimilarStories() {
@@ -391,4 +514,8 @@ document.getElementById('shareForm').addEventListener('submit', async function(e
 
 function showCrisisResourcesModal(resources) {
     openModal('crisisModal');
+}
+
+function showSampleStoryMessage() {
+    showToast('This is a sample story for demonstration. Real community stories will be available once members start sharing their experiences!', 'warning', 'Sample Story');
 }

@@ -1525,3 +1525,388 @@ footer a:hover {
         margin-bottom: 2rem;
     }
 }
+
+/* Moderation Interface - Compact Cards */
+.pending-stories-grid-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.pending-story-card-compact {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(252, 232, 234, 0.3));
+    border-radius: 25px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    animation: slideIn 0.6s ease-out;
+    border-left: 4px solid transparent;
+}
+
+.pending-story-card-compact::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at top right, var(--pale-blue) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    border-radius: 25px;
+}
+
+.pending-story-card-compact:hover::before {
+    opacity: 0.3;
+}
+
+.pending-story-card-compact:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.pending-story-card-compact.high-risk {
+    border-left-color: var(--crisis-red);
+}
+
+.pending-story-card-compact.medium-risk {
+    border-left-color: #ffc107;
+}
+
+.pending-story-card-compact.low-risk {
+    border-left-color: var(--success-green);
+}
+
+.pending-story-card-compact.minimal-risk {
+    border-left-color: var(--deep-blue);
+}
+
+.story-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.story-meta-info h4.story-title {
+    color: var(--deep-blue);
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.story-author {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.story-preview-text {
+    color: var(--text-dark);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+    font-size: 1rem;
+}
+
+.story-card-actions {
+    display: flex;
+    justify-content: flex-end;
+    position: relative;
+    z-index: 1;
+}
+
+.read-more-btn {
+    background: linear-gradient(45deg, var(--deep-blue), var(--deep-pink));
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.read-more-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.read-more-btn:hover::before {
+    width: 200px;
+    height: 200px;
+}
+
+.read-more-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Story Detail Modal */
+.story-detail-modal .modal-content {
+    max-width: 1000px;
+    width: 95%;
+    max-height: 95vh;
+    padding: 3rem;
+}
+
+.story-detail-header {
+    margin-bottom: 3rem;
+    position: relative;
+    z-index: 1;
+}
+
+.story-title-section h2 {
+    color: var(--deep-blue);
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(45deg, var(--deep-blue), var(--deep-pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.story-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.story-meta span:first-child {
+    color: var(--text-light);
+    font-size: 1.1rem;
+}
+
+.story-detail-content {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 3rem;
+}
+
+.story-section {
+    margin-bottom: 3rem;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.story-section h3 {
+    color: var(--deep-blue);
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.story-field {
+    margin-bottom: 1.5rem;
+}
+
+.story-field label {
+    display: block;
+    font-weight: 600;
+    color: var(--deep-blue);
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.story-field .field-content {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 1.2rem;
+    border-radius: 15px;
+    line-height: 1.6;
+    color: var(--text-dark);
+    border-left: 3px solid var(--pale-blue);
+    font-size: 1rem;
+}
+
+.generated-story-preview {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 18px;
+    line-height: 1.7;
+    color: var(--text-dark);
+    font-size: 1.05rem;
+    border-left: 4px solid var(--deep-pink);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.flagged-keywords-section {
+    background: rgba(220, 53, 69, 0.1);
+    border: 2px solid rgba(220, 53, 69, 0.3);
+    border-radius: 18px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+.flagged-keywords-section h4 {
+    color: var(--crisis-red);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.keyword-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.keyword-tag {
+    background: var(--crisis-red);
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* Modern Action Buttons */
+.story-detail-actions {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(168, 216, 234, 0.3);
+}
+
+.approve-btn-modern,
+.reject-btn-modern {
+    padding: 16px 32px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 200px;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.approve-btn-modern {
+    background: linear-gradient(45deg, var(--success-green), #20c997);
+    color: white;
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+}
+
+.reject-btn-modern {
+    background: linear-gradient(45deg, var(--crisis-red), #e74c3c);
+    color: white;
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.3);
+}
+
+.approve-btn-modern::before,
+.reject-btn-modern::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.approve-btn-modern:hover::before,
+.reject-btn-modern:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.approve-btn-modern:hover,
+.reject-btn-modern:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+}
+
+.btn-icon {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* Responsive Design for Moderation */
+@media (max-width: 768px) {
+    .pending-stories-grid-cards {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .pending-story-card-compact {
+        padding: 1.5rem;
+    }
+
+    .story-detail-modal .modal-content {
+        padding: 2rem;
+        margin: 5% auto;
+    }
+
+    .story-title-section h2 {
+        font-size: 2rem;
+    }
+
+    .story-section {
+        padding: 1.5rem;
+    }
+
+    .story-detail-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .approve-btn-modern,
+    .reject-btn-modern {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+/* Story Viewer Actions */
+.story-viewer-actions {
+    display: flex;
+    justify-content: center;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(168, 216, 234, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+.story-viewer-actions .btn {
+    padding: 16px 32px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 25px;
+    transition: all 0.4s ease;
+    min-width: 200px;
+    position: relative;
+    overflow: hidden;
+}
