@@ -1,16 +1,15 @@
-// Moderation functionality - Redesigned
+// Moderation functionality
 function checkAdminAccess() {
     if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'moderator')) {
         document.getElementById('moderationSection').style.display = 'block';
 
-        // Add moderation tab to navigation
-        const navLinks = document.querySelector('.nav-links');
+        // Add moderation tab to navigation if not exists
         if (!document.getElementById('moderationLink')) {
+            const navLinks = document.querySelector('.nav-links');
             const moderationLi = document.createElement('li');
             moderationLi.innerHTML = '<a href="#moderation" id="moderationLink">Moderation</a>';
             navLinks.appendChild(moderationLi);
 
-            // Add click handler
             document.getElementById('moderationLink').addEventListener('click', () => {
                 scrollToSection('moderationSection');
                 loadPendingStories();
@@ -28,9 +27,7 @@ async function loadPendingStories() {
 
     try {
         const response = await fetch(`${API_BASE_URL}/moderation/pending`, {
-            headers: {
-                'Authorization': `Bearer ${authToken}`
-            }
+            headers: { 'Authorization': `Bearer ${authToken}` }
         });
 
         if (!response.ok) {
@@ -38,17 +35,10 @@ async function loadPendingStories() {
         }
 
         const data = await response.json();
-
-        if (data.success && Array.isArray(data.pending_stories)) {
-            displayPendingStories(data.pending_stories);
-            updateModerationStats(data.pending_stories);
-        } else if (Array.isArray(data.pending_stories)) {
-            displayPendingStories(data.pending_stories);
-            updateModerationStats(data.pending_stories);
-        } else {
-            console.error('Unexpected data structure:', data);
-            showToast('Error: Unexpected data format from server', 'error', 'Data Error');
-        }
+        const stories = (data.success ? data.pending_stories : data.pending_stories) || [];
+        
+        displayPendingStories(stories);
+        updateModerationStats(stories);
     } catch (error) {
         console.error('Error loading pending stories:', error);
         showToast('Error loading pending stories: ' + error.message, 'error', 'Loading Error');
@@ -57,19 +47,12 @@ async function loadPendingStories() {
 
 function displayPendingStories(stories) {
     const grid = document.getElementById('pendingStoriesGrid');
-
     if (!grid) {
         console.error('pendingStoriesGrid element not found');
         return;
     }
 
-    if (!Array.isArray(stories)) {
-        console.error('Stories is not an array:', stories);
-        showToast('Error: Invalid stories data', 'error', 'Data Error');
-        return;
-    }
-
-    if (stories.length === 0) {
+    if (!Array.isArray(stories) || stories.length === 0) {
         grid.innerHTML = `
             <div class="no-stories-message">
                 <h3>🎉 All caught up!</h3>
@@ -84,8 +67,7 @@ function displayPendingStories(stories) {
 
     stories.forEach((story, index) => {
         try {
-            const card = createCompactStoryCard(story, index);
-            grid.appendChild(card);
+            grid.appendChild(createCompactStoryCard(story, index));
         } catch (error) {
             console.error('Error creating story card:', error, story);
         }
@@ -94,38 +76,39 @@ function displayPendingStories(stories) {
 
 function createCompactStoryCard(story, index) {
     const card = document.createElement('div');
-    card.className = `pending-story-card-compact ${story.risk_level || 'minimal'}-risk`;
+    const riskLevel = story.risk_level || 'minimal';
+    
+    card.className = `pending-story-card-compact ${riskLevel}-risk`;
     card.style.animationDelay = `${index * 0.1}s`;
 
-    const riskLevel = story.risk_level || 'minimal';
-    const riskColor = {
+    const storyData = {
+        id: story._id || story.id,
+        author: story.author_name || 'Anonymous',
+        challenge: story.challenge || 'No challenge specified',
+        date: story.created_at ? new Date(story.created_at).toLocaleDateString() : 'Unknown date',
+        preview: story.experience ? story.experience.substring(0, 150) + '...' : 'No experience details'
+    };
+
+    const riskColors = {
         'high': 'risk-high',
         'medium': 'risk-medium', 
         'low': 'risk-low',
         'minimal': 'risk-minimal'
-    }[riskLevel] || 'risk-minimal';
-
-    const authorName = story.author_name || 'Anonymous';
-    const challenge = story.challenge || 'No challenge specified';
-    const createdAt = story.created_at ? new Date(story.created_at).toLocaleDateString() : 'Unknown date';
-    const storyId = story._id || story.id;
-    const preview = story.experience ? story.experience.substring(0, 150) + '...' : 'No experience details';
+    };
 
     card.innerHTML = `
         <div class="story-card-header">
             <div class="story-meta-info">
-                <h4 class="story-title">${challenge}</h4>
-                <p class="story-author">By ${authorName} • ${createdAt}</p>
+                <h4 class="story-title">${storyData.challenge}</h4>
+                <p class="story-author">By ${storyData.author} • ${storyData.date}</p>
             </div>
-            <span class="story-risk-badge ${riskColor}">${riskLevel.toUpperCase()}</span>
+            <span class="story-risk-badge ${riskColors[riskLevel]}">${riskLevel.toUpperCase()}</span>
         </div>
         
-        <div class="story-preview-text">
-            ${preview}
-        </div>
+        <div class="story-preview-text">${storyData.preview}</div>
         
         <div class="story-card-actions">
-            <button class="read-more-btn" onclick="openStoryDetailModal('${storyId}')">
+            <button class="read-more-btn" onclick="openStoryDetailModal('${storyData.id}')">
                 Read Full Story →
             </button>
         </div>
@@ -135,30 +118,28 @@ function createCompactStoryCard(story, index) {
 }
 
 function updateModerationStats(stories) {
-    const pendingCountEl = document.getElementById('pendingCount');
-    const highRiskCountEl = document.getElementById('highRiskCount');
-    const totalApprovedEl = document.getElementById('totalApproved');
+    const stats = {
+        pending: stories.length,
+        highRisk: stories.filter(s => s.risk_level === 'high').length,
+        totalApproved: '—' // Placeholder
+    };
 
-    if (pendingCountEl) {
-        pendingCountEl.textContent = stories.length;
-    }
+    const elements = {
+        pendingCount: document.getElementById('pendingCount'),
+        highRiskCount: document.getElementById('highRiskCount'),
+        totalApproved: document.getElementById('totalApproved')
+    };
 
-    if (highRiskCountEl) {
-        const highRiskCount = stories.filter(s => s.risk_level === 'high').length;
-        highRiskCountEl.textContent = highRiskCount;
-    }
-
-    if (totalApprovedEl) {
-        totalApprovedEl.textContent = '—';
-    }
+    Object.entries(stats).forEach(([key, value]) => {
+        const element = elements[key + (key === 'totalApproved' ? '' : 'Count')];
+        if (element) element.textContent = value;
+    });
 }
 
 async function openStoryDetailModal(storyId) {
     try {
         const response = await fetch(`${API_BASE_URL}/moderation/story/${storyId}`, {
-            headers: {
-                'Authorization': `Bearer ${authToken}`
-            }
+            headers: { 'Authorization': `Bearer ${authToken}` }
         });
 
         if (!response.ok) {
@@ -181,41 +162,50 @@ async function openStoryDetailModal(storyId) {
 function showStoryDetailModal(story) {
     const modal = document.getElementById('storyDetailModal') || createStoryDetailModal();
     
-    const riskLevel = story.risk_level || 'minimal';
-    const riskColor = {
+    const storyData = {
+        id: story._id || story.id,
+        author: story.author_name || 'Anonymous',
+        challenge: story.challenge || 'No challenge specified',
+        experience: story.experience || 'No experience details',
+        solution: story.solution || 'No solution specified',
+        advice: story.advice || 'No advice provided',
+        generatedStory: story.generated_story || 'No generated story available',
+        date: story.created_at ? new Date(story.created_at).toLocaleDateString() : 'Unknown date',
+        riskLevel: story.risk_level || 'minimal',
+        flaggedKeywords: story.flagged_keywords || []
+    };
+
+    const riskColors = {
         'high': 'risk-high',
         'medium': 'risk-medium',
         'low': 'risk-low', 
         'minimal': 'risk-minimal'
-    }[riskLevel] || 'risk-minimal';
+    };
 
-    const authorName = story.author_name || 'Anonymous';
-    const challenge = story.challenge || 'No challenge specified';
-    const experience = story.experience || 'No experience details';
-    const solution = story.solution || 'No solution specified';
-    const advice = story.advice || 'No advice provided';
-    const generatedStory = story.generated_story || 'No generated story available';
-    const createdAt = story.created_at ? new Date(story.created_at).toLocaleDateString() : 'Unknown date';
-    const storyId = story._id || story.id;
-
-    const flaggedKeywordsHtml = story.flagged_keywords && story.flagged_keywords.length > 0 ? `
+    const flaggedKeywordsSection = storyData.flaggedKeywords.length > 0 ? `
         <div class="flagged-keywords-section">
             <h4>🚨 Flagged Keywords</h4>
             <div class="keyword-tags">
-                ${story.flagged_keywords.map(keyword => `<span class="keyword-tag">${keyword}</span>`).join('')}
+                ${storyData.flaggedKeywords.map(keyword => `<span class="keyword-tag">${keyword}</span>`).join('')}
             </div>
         </div>
     ` : '';
+
+    const sections = [
+        { label: 'Experience:', content: storyData.experience },
+        { label: 'Solution:', content: storyData.solution },
+        storyData.advice && { label: 'Advice to Others:', content: storyData.advice }
+    ].filter(Boolean);
 
     modal.querySelector('.modal-content').innerHTML = `
         <span class="close" onclick="closeModal('storyDetailModal')">&times;</span>
         
         <div class="story-detail-header">
             <div class="story-title-section">
-                <h2>${challenge}</h2>
+                <h2>${storyData.challenge}</h2>
                 <div class="story-meta">
-                    <span>By ${authorName} • ${createdAt}</span>
-                    <span class="story-risk-badge ${riskColor}">${riskLevel.toUpperCase()} RISK</span>
+                    <span>By ${storyData.author} • ${storyData.date}</span>
+                    <span class="story-risk-badge ${riskColors[storyData.riskLevel]}">${storyData.riskLevel.toUpperCase()} RISK</span>
                 </div>
             </div>
         </div>
@@ -223,48 +213,35 @@ function showStoryDetailModal(story) {
         <div class="story-detail-content">
             <div class="story-section">
                 <h3>Original Submission</h3>
-                <div class="story-field">
-                    <label>Experience:</label>
-                    <div class="field-content">${experience}</div>
-                </div>
-                
-                <div class="story-field">
-                    <label>Solution:</label>
-                    <div class="field-content">${solution}</div>
-                </div>
-                
-                ${advice ? `
-                <div class="story-field">
-                    <label>Advice to Others:</label>
-                    <div class="field-content">${advice}</div>
-                </div>
-                ` : ''}
+                ${sections.map(section => `
+                    <div class="story-field">
+                        <label>${section.label}</label>
+                        <div class="field-content">${section.content}</div>
+                    </div>
+                `).join('')}
             </div>
 
             <div class="story-section">
                 <h3>Generated Story Preview</h3>
-                <div class="generated-story-preview">
-                    ${generatedStory}
-                </div>
+                <div class="generated-story-preview">${storyData.generatedStory}</div>
             </div>
 
-            ${flaggedKeywordsHtml}
+            ${flaggedKeywordsSection}
         </div>
 
         <div class="story-detail-actions">
-            <button class="approve-btn-modern" onclick="approveStory('${storyId}')">
+            <button class="approve-btn-modern" onclick="moderateStory('${storyData.id}', 'approve')">
                 <span class="btn-icon">✓</span>
                 Approve & Publish
             </button>
-            <button class="reject-btn-modern" onclick="rejectStory('${storyId}')">
+            <button class="reject-btn-modern" onclick="moderateStory('${storyData.id}', 'reject')">
                 <span class="btn-icon">✗</span>
                 Reject Story
             </button>
         </div>
     `;
 
-    modal.style.display = 'block';
-    document.body.style.overflow = 'hidden';
+    openModal('storyDetailModal');
 }
 
 function createStoryDetailModal() {
@@ -276,20 +253,26 @@ function createStoryDetailModal() {
     return modal;
 }
 
-async function approveStory(storyId) {
-    if (!confirm('Are you sure you want to approve and publish this story?')) {
-        return;
-    }
+async function moderateStory(storyId, action) {
+    const confirmMessages = {
+        approve: 'Are you sure you want to approve and publish this story?',
+        reject: 'Are you sure you want to reject this story?'
+    };
+
+    if (!confirm(confirmMessages[action])) return;
+
+    const reason = action === 'reject' ? prompt('Reason for rejection (optional):') : null;
+    if (action === 'reject' && reason === null) return;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/moderation/approve/${storyId}`, {
+        const response = await fetch(`${API_BASE_URL}/moderation/${action}/${storyId}`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${authToken}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                notes: "Approved via admin interface"
+                ...(action === 'approve' ? { notes: "Approved via admin interface" } : { reason: reason || "Does not meet community guidelines" })
             })
         });
 
@@ -300,49 +283,27 @@ async function approveStory(storyId) {
         const data = await response.json();
 
         if (data.success) {
-            showToast('Story approved and published successfully! It\'s now live for the community to see.', 'success', 'Story Published!');
+            const messages = {
+                approve: 'Story approved and published successfully! It\'s now live for the community to see.',
+                reject: 'Story has been rejected and removed from the review queue.'
+            };
+            showToast(messages[action], 'success', action === 'approve' ? 'Story Published!' : 'Story Rejected');
             closeModal('storyDetailModal');
             loadPendingStories();
         } else {
-            showToast('Failed to approve story: ' + (data.message || 'Unknown error'), 'error', 'Approval Failed');
+            showToast(`Failed to ${action} story: ${data.message || 'Unknown error'}`, 'error', `${action.charAt(0).toUpperCase() + action.slice(1)} Failed`);
         }
     } catch (error) {
-        console.error('Error approving story:', error);
-        showToast('Error approving story: ' + error.message, 'error', 'Approval Error');
+        console.error(`Error ${action}ing story:`, error);
+        showToast(`Error ${action}ing story: ${error.message}`, 'error', `${action.charAt(0).toUpperCase() + action.slice(1)} Error`);
     }
 }
 
+// Backwards compatibility
+async function approveStory(storyId) {
+    return moderateStory(storyId, 'approve');
+}
+
 async function rejectStory(storyId) {
-    const reason = prompt('Reason for rejection (optional):');
-    if (reason === null) return;
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/moderation/reject/${storyId}`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${authToken}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                reason: reason || "Does not meet community guidelines"
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        if (data.success) {
-            showToast('Story has been rejected and removed from the review queue.', 'success', 'Story Rejected');
-            closeModal('storyDetailModal');
-            loadPendingStories();
-        } else {
-            showToast('Failed to reject story: ' + (data.message || 'Unknown error'), 'error', 'Rejection Failed');
-        }
-    } catch (error) {
-        console.error('Error rejecting story:', error);
-        showToast('Error rejecting story: ' + error.message, 'error', 'Rejection Error');
-    }
+    return moderateStory(storyId, 'reject');
 }

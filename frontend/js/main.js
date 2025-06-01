@@ -9,9 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
     loadApprovedStories();
 });
 
-// Enhanced Toast Notification System
+// Toast Notification System
 function showToast(message, type = 'success', title = '') {
-    // Create toast container if it doesn't exist
     let container = document.querySelector('.toast-container');
     if (!container) {
         container = document.createElement('div');
@@ -19,30 +18,15 @@ function showToast(message, type = 'success', title = '') {
         document.body.appendChild(container);
     }
 
-    // Create toast element
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    
-    // Set default titles and icons based on type
     const configs = {
-        success: { 
-            title: title || 'Success!', 
-            icon: '✓',
-            duration: 4000 
-        },
-        error: { 
-            title: title || 'Oops!', 
-            icon: '!',
-            duration: 6000 
-        },
-        warning: { 
-            title: title || 'Heads up!', 
-            icon: '⚠',
-            duration: 5000 
-        }
+        success: { title: title || 'Success!', icon: '✓', duration: 4000 },
+        error: { title: title || 'Oops!', icon: '!', duration: 6000 },
+        warning: { title: title || 'Heads up!', icon: '⚠', duration: 5000 }
     };
     
     const config = configs[type] || configs.success;
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
     
     toast.innerHTML = `
         <div class="toast-icon">${config.icon}</div>
@@ -54,32 +38,16 @@ function showToast(message, type = 'success', title = '') {
     `;
     
     container.appendChild(toast);
-    
-    // Auto-remove toast after duration
-    setTimeout(() => {
-        if (toast.parentNode) {
-            closeToast(toast.querySelector('.toast-close'));
-        }
-    }, config.duration);
+    setTimeout(() => toast.parentNode && closeToast(toast.querySelector('.toast-close')), config.duration);
 }
 
 function closeToast(closeBtn) {
     const toast = closeBtn.closest('.toast');
     toast.classList.add('toast-exit');
-    
-    setTimeout(() => {
-        if (toast.parentNode) {
-            toast.remove();
-        }
-    }, 400);
+    setTimeout(() => toast.parentNode && toast.remove(), 400);
 }
 
-// Legacy function for backward compatibility
-function showStatusMessage(message, type) {
-    showToast(message, type);
-}
-
-// Utility functions
+// Modal utilities
 function openModal(modalId) {
     document.getElementById(modalId).style.display = 'block';
     document.body.style.overflow = 'hidden';
@@ -90,6 +58,7 @@ function closeModal(modalId) {
     document.body.style.overflow = 'auto';
 }
 
+// Navigation utilities
 function scrollToSection(sectionId) {
     document.getElementById(sectionId).scrollIntoView({ 
         behavior: 'smooth',
@@ -97,6 +66,7 @@ function scrollToSection(sectionId) {
     });
 }
 
+// Info modals
 function showTerms() {
     alert('Terms of Service: By using this platform, you agree to use it respectfully and understand that content is user-generated and not professional medical advice. You must be 18 or older to use this service.');
 }
@@ -109,6 +79,7 @@ function showCrisisResources() {
     openModal('crisisModal');
 }
 
+// Date utility
 function getTimeAgo(dateString) {
     const date = new Date(dateString);
     const now = new Date();

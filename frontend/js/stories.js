@@ -8,62 +8,37 @@ class StoryCarousel {
         this.prevBtn = document.getElementById('prevBtn');
         this.nextBtn = document.getElementById('nextBtn');
         this.dotsContainer = document.getElementById('dotsContainer');
-        
-        // Options
         this.autoPlayInterval = options.autoPlayInterval || 5000;
         this.storiesPerSlide = 3;
-        
-        // State
         this.currentSlide = 0;
         this.totalSlides = 0;
         this.isPlaying = true;
         this.autoPlayTimer = null;
         this.stories = [];
-        
         this.bindEvents();
     }
     
     bindEvents() {
-        this.prevBtn.addEventListener('click', () => {
-            this.previousSlide();
-            this.resetAutoPlay();
-        });
+        this.prevBtn.addEventListener('click', () => this.navigate('prev'));
+        this.nextBtn.addEventListener('click', () => this.navigate('next'));
+        this.container.addEventListener('mouseenter', () => this.pauseAutoPlay());
+        this.container.addEventListener('mouseleave', () => this.resumeAutoPlay());
         
-        this.nextBtn.addEventListener('click', () => {
-            this.nextSlide();
-            this.resetAutoPlay();
-        });
-        
-        // Hover to pause
-        this.container.addEventListener('mouseenter', () => {
-            this.pauseAutoPlay();
-        });
-        
-        this.container.addEventListener('mouseleave', () => {
-            this.resumeAutoPlay();
-        });
-        
-        // Touch/swipe support
+        // Touch support
         let startX = 0;
-        let endX = 0;
-        
-        this.track.addEventListener('touchstart', (e) => {
-            startX = e.touches[0].clientX;
-        });
-        
+        this.track.addEventListener('touchstart', (e) => startX = e.touches[0].clientX);
         this.track.addEventListener('touchend', (e) => {
-            endX = e.changedTouches[0].clientX;
-            const diff = startX - endX;
-            
+            const diff = startX - e.changedTouches[0].clientX;
             if (Math.abs(diff) > 50) {
-                if (diff > 0) {
-                    this.nextSlide();
-                } else {
-                    this.previousSlide();
-                }
-                this.resetAutoPlay();
+                this.navigate(diff > 0 ? 'next' : 'prev');
             }
         });
+    }
+    
+    navigate(direction) {
+        if (direction === 'next') this.nextSlide();
+        else this.previousSlide();
+        this.resetAutoPlay();
     }
     
     loadStories(stories) {
@@ -83,12 +58,10 @@ class StoryCarousel {
             slide.className = 'stories-slide';
             
             const startIndex = i * this.storiesPerSlide;
-            const endIndex = Math.min(startIndex + this.storiesPerSlide, this.stories.length);
-            const slideStories = this.stories.slice(startIndex, endIndex);
+            const slideStories = this.stories.slice(startIndex, startIndex + this.storiesPerSlide);
             
             slideStories.forEach((story, index) => {
-                const card = this.createStoryCard(story, startIndex + index);
-                slide.appendChild(card);
+                slide.appendChild(this.createStoryCard(story, startIndex + index));
             });
             
             this.track.appendChild(slide);
@@ -100,26 +73,26 @@ class StoryCarousel {
         card.className = 'story-card';
         card.style.animationDelay = `${(index % this.storiesPerSlide) * 0.1}s`;
         
-        const preview = story.generated_story ? 
-            story.generated_story.substring(0, 200) + '...' : 
-            (story.preview || story.experience?.substring(0, 200) + '...' || 'A recovery story...');
+        const preview = story.generated_story?.substring(0, 200) + '...' || 
+                       story.preview || 
+                       story.experience?.substring(0, 200) + '...' || 
+                       'A recovery story...';
         
         const title = story.challenge || story.title || 'A Recovery Journey';
         const author = story.author_name || story.author || 'Anonymous';
         const time = story.created_at ? getTimeAgo(story.created_at) : story.time || 'Recently';
         const storyId = story._id || story.id || '';
         
-        // Fixed: Use javascript:void(0) and pass event parameter
-        const readMoreLink = storyId ? 
-            `<a href="javascript:void(0)" class="read-more" onclick="viewFullStory('${storyId}', event)">Read more →</a>` :
-            `<a href="javascript:void(0)" class="read-more" onclick="showSampleStoryMessage()">Read more →</a>`;
+        const readMoreAction = storyId ? 
+            `onclick="viewFullStory('${storyId}', event)"` :
+            `onclick="showSampleStoryMessage()"`;
         
         card.innerHTML = `
             <div class="story-title">${title}</div>
             <div class="story-preview">${preview}</div>
             <div class="story-meta">
                 <span>By ${author} • ${time}</span>
-                ${readMoreLink}
+                <a href="javascript:void(0)" class="read-more" ${readMoreAction}>Read more →</a>
             </div>
         `;
         
@@ -128,48 +101,40 @@ class StoryCarousel {
     
     createDots() {
         this.dotsContainer.innerHTML = '';
-        
         for (let i = 0; i < this.totalSlides; i++) {
             const dot = document.createElement('div');
             dot.className = 'dot';
             if (i === 0) dot.classList.add('active');
-            
             dot.addEventListener('click', () => {
                 this.goToSlide(i);
                 this.resetAutoPlay();
             });
-            
             this.dotsContainer.appendChild(dot);
         }
     }
     
     goToSlide(index) {
         this.currentSlide = index;
-        const translateX = -index * 100;
-        this.track.style.transform = `translateX(${translateX}%)`;
+        this.track.style.transform = `translateX(${-index * 100}%)`;
         this.updateControls();
     }
     
     nextSlide() {
-        const nextIndex = (this.currentSlide + 1) % this.totalSlides;
-        this.goToSlide(nextIndex);
+        this.goToSlide((this.currentSlide + 1) % this.totalSlides);
     }
     
     previousSlide() {
-        const prevIndex = this.currentSlide === 0 ? this.totalSlides - 1 : this.currentSlide - 1;
-        this.goToSlide(prevIndex);
+        this.goToSlide(this.currentSlide === 0 ? this.totalSlides - 1 : this.currentSlide - 1);
     }
     
     updateControls() {
-        const dots = this.dotsContainer.querySelectorAll('.dot');
-        dots.forEach((dot, index) => {
+        this.dotsContainer.querySelectorAll('.dot').forEach((dot, index) => {
             dot.classList.toggle('active', index === this.currentSlide);
         });
     }
     
     startAutoPlay() {
         if (!this.isPlaying || this.totalSlides <= 1) return;
-        
         this.autoPlayTimer = setTimeout(() => {
             this.nextSlide();
             this.startAutoPlay();
@@ -195,12 +160,11 @@ class StoryCarousel {
     
     resetAutoPlay() {
         this.stopAutoPlay();
-        if (this.isPlaying) {
-            this.startAutoPlay();
-        }
+        if (this.isPlaying) this.startAutoPlay();
     }
 }
 
+// Story loading functions
 async function loadApprovedStories() {
     try {
         const response = await fetch(`${API_BASE_URL}/stories?limit=9&random=true`);
@@ -224,7 +188,6 @@ function displayStories(stories) {
     if (!storyCarousel) {
         storyCarousel = new StoryCarousel(carousel);
     }
-    
     storyCarousel.loadStories(stories);
 }
 
@@ -233,67 +196,55 @@ function displaySampleStories() {
         {
             title: "Finding Light in Dark Days",
             preview: "Sarah's journey through the fog of early motherhood, where simple tasks felt mountainous and joy seemed distant. But small moments of connection with her baby became stepping stones back to herself...",
-            author: "Sarah",
-            time: "3 days ago"
+            author: "Sarah", time: "3 days ago"
         },
         {
             title: "The Weight of Expectations",
             preview: "Emma thought she'd feel instant maternal bliss, but instead found herself grieving her old life while trying to love her new reality. Her story of accepting imperfection and finding support...",
-            author: "Emma",
-            time: "1 week ago"
+            author: "Emma", time: "1 week ago"
         },
         {
             title: "Sleepless Nights, Hopeful Days",
             preview: "When Maria's baby wouldn't sleep, neither could she. The exhaustion felt endless, but connecting with other parents online became her lifeline during those 3 AM feeding sessions...",
-            author: "Maria",
-            time: "2 weeks ago"
+            author: "Maria", time: "2 weeks ago"
         },
         {
             title: "Breaking Through the Silence",
             preview: "Alex struggled with postpartum anxiety in silence for months, afraid to admit she wasn't enjoying motherhood. Finally opening up to her partner changed everything...",
-            author: "Alex",
-            time: "1 month ago"
+            author: "Alex", time: "1 month ago"
         },
         {
             title: "From Isolation to Connection",
             preview: "Living far from family, Jamie felt utterly alone with her newborn. Joining a local parent group seemed impossible at first, but it became her greatest source of strength...",
-            author: "Jamie",
-            time: "2 months ago"
+            author: "Jamie", time: "2 months ago"
         },
         {
             title: "Healing One Day at a Time",
             preview: "Recovery wasn't linear for Kate. Some days were harder than others, but celebrating small victories - a shower, a walk, a genuine smile - helped her rebuild her sense of self...",
-            author: "Kate",
-            time: "3 months ago"
+            author: "Kate", time: "3 months ago"
         },
         {
             title: "The Power of Professional Help",
             preview: "David was hesitant to seek therapy, thinking he should be able to handle everything himself. But working with a counselor gave him tools he never knew he needed...",
-            author: "David",
-            time: "4 months ago"
+            author: "David", time: "4 months ago"
         },
         {
             title: "Rebuilding My Identity",
             preview: "After becoming a mother, Lisa felt like she'd lost herself completely. Through small daily practices and self-compassion, she learned to honor both her old and new selves...",
-            author: "Lisa",
-            time: "5 months ago"
+            author: "Lisa", time: "5 months ago"
         },
         {
             title: "Finding Strength in Vulnerability",
             preview: "When Rachel finally shared her struggles with her family, she was surprised by how much support was waiting for her. Sometimes the first step is just saying 'I need help'...",
-            author: "Rachel",
-            time: "6 months ago"
+            author: "Rachel", time: "6 months ago"
         }
     ];
-    
     displayStories(sampleStories);
 }
 
+// Story viewing functions
 async function viewFullStory(storyId, event) {
-    if (event) {
-        event.preventDefault();
-    }
-    
+    if (event) event.preventDefault();
     if (!storyId) {
         showToast('Story not found', 'error', 'Error');
         return;
@@ -303,19 +254,15 @@ async function viewFullStory(storyId, event) {
         const response = await fetch(`${API_BASE_URL}/stories/${storyId}`);
         
         if (!response.ok) {
-            if (response.status === 404) {
-                showToast('This story is no longer available.', 'error', 'Story Not Found');
-            } else if (response.status === 500) {
-                showToast('Server error loading story. Our team has been notified.', 'error', 'Server Error');
-                console.error(`Server error loading story ${storyId}:`, response.status);
-            } else {
-                showToast(`Error loading story (${response.status}). Please try again.`, 'error', 'Loading Error');
-            }
+            const errorMessages = {
+                404: 'This story is no longer available.',
+                500: 'Server error loading story. Our team has been notified.'
+            };
+            showToast(errorMessages[response.status] || `Error loading story (${response.status}). Please try again.`, 'error', 'Loading Error');
             return;
         }
 
         const data = await response.json();
-        
         if (data.success && data.story) {
             showFullStoryModal(data.story);
         } else {
@@ -323,94 +270,69 @@ async function viewFullStory(storyId, event) {
         }
     } catch (error) {
         console.error('Error loading story:', error);
-        
-        if (error instanceof TypeError && error.message.includes('fetch')) {
-            showToast('Connection error. Please check your internet and try again.', 'error', 'Connection Error');
-        } else {
-            showToast('Unable to load story. Please try again.', 'error', 'Loading Error');
-        }
+        const errorMessage = error instanceof TypeError && error.message.includes('fetch') ?
+            'Connection error. Please check your internet and try again.' :
+            'Unable to load story. Please try again.';
+        showToast(errorMessage, 'error', 'Loading Error');
     }
 }
 
 function showFullStoryModal(story) {
-    const modal = document.getElementById('fullStoryModal') || createFullStoryModal();
+    const modal = document.getElementById('fullStoryModal') || createStoryModal('fullStoryModal');
     
-    const title = story.challenge || story.title || 'Recovery Story';
-    const authorName = story.author_name || story.author || 'Anonymous';
-    const generatedStory = story.generated_story || story.story || 'Story content not available';
-    const createdAt = story.created_at ? new Date(story.created_at).toLocaleDateString() : 'Recently';
-    const experience = story.experience || '';
-    const solution = story.solution || '';
-    const advice = story.advice || '';
+    const content = {
+        title: story.challenge || story.title || 'Recovery Story',
+        author: story.author_name || story.author || 'Anonymous',
+        story: story.generated_story || story.story || 'Story content not available',
+        date: story.created_at ? new Date(story.created_at).toLocaleDateString() : 'Recently',
+        experience: story.experience || '',
+        solution: story.solution || '',
+        advice: story.advice || ''
+    };
+
+    const sections = [
+        { title: 'Recovery Story', content: `<div class="generated-story-preview">${content.story}</div>` },
+        content.experience && { title: 'Original Experience', content: `<div class="field-content">${content.experience}</div>` },
+        content.solution && { title: 'What Helped', content: `<div class="field-content">${content.solution}</div>` },
+        content.advice && { title: 'Advice to Others', content: `<div class="field-content">${content.advice}</div>` }
+    ].filter(Boolean);
 
     modal.querySelector('.modal-content').innerHTML = `
         <span class="close" onclick="closeModal('fullStoryModal')">&times;</span>
-        
         <div class="story-detail-header">
             <div class="story-title-section">
-                <h2>${title}</h2>
+                <h2>${content.title}</h2>
                 <div class="story-meta">
-                    <span>By ${authorName} • ${createdAt}</span>
+                    <span>By ${content.author} • ${content.date}</span>
                 </div>
             </div>
         </div>
-
         <div class="story-detail-content">
-            <div class="story-section">
-                <h3>Recovery Story</h3>
-                <div class="generated-story-preview">
-                    ${generatedStory}
+            ${sections.map(section => `
+                <div class="story-section">
+                    <h3>${section.title}</h3>
+                    ${section.content}
                 </div>
-            </div>
-
-            ${experience ? `
-            <div class="story-section">
-                <h3>Original Experience</h3>
-                <div class="story-field">
-                    <div class="field-content">${experience}</div>
-                </div>
-            </div>
-            ` : ''}
-
-            ${solution ? `
-            <div class="story-section">
-                <h3>What Helped</h3>
-                <div class="story-field">
-                    <div class="field-content">${solution}</div>
-                </div>
-            </div>
-            ` : ''}
-
-            ${advice ? `
-            <div class="story-section">
-                <h3>Advice to Others</h3>
-                <div class="story-field">
-                    <div class="field-content">${advice}</div>
-                </div>
-            </div>
-            ` : ''}
+            `).join('')}
         </div>
-
         <div class="story-viewer-actions">
-            <button class="btn btn-secondary" onclick="closeModal('fullStoryModal')">
-                Close Story
-            </button>
+            <button class="btn btn-secondary" onclick="closeModal('fullStoryModal')">Close Story</button>
         </div>
     `;
 
-    modal.style.display = 'block';
-    document.body.style.overflow = 'hidden';
+    openModal('fullStoryModal');
 }
 
-function createFullStoryModal() {
+function createStoryModal(modalId) {
     const modal = document.createElement('div');
-    modal.id = 'fullStoryModal';
+    modal.id = modalId;
     modal.className = 'modal story-detail-modal';
     modal.innerHTML = `<div class="modal-content story-detail-modal-content"></div>`;
     document.body.appendChild(modal);
     return modal;
 }
 
+// Search functionality
 async function searchSimilarStories() {
     const searchInput = document.getElementById('searchInput').value;
     if (!searchInput.trim()) {
@@ -421,9 +343,7 @@ async function searchSimilarStories() {
     try {
         const response = await fetch(`${API_BASE_URL}/search-similar`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ query: searchInput })
         });
 
@@ -440,6 +360,7 @@ async function searchSimilarStories() {
     }
 }
 
+// Story sharing
 function handleShareStoryClick() {
     if (!currentUser) {
         showToast('Please create an account or login to share your story with our community.', 'warning', 'Login Required');
@@ -447,6 +368,14 @@ function handleShareStoryClick() {
         return;
     }
     openModal('shareModal');
+}
+
+function showSampleStoryMessage() {
+    showToast('This is a sample story for demonstration. Real community stories will be available once members start sharing their experiences!', 'warning', 'Sample Story');
+}
+
+function showCrisisResourcesModal(resources) {
+    openModal('crisisModal');
 }
 
 // Handle story submission
@@ -458,13 +387,15 @@ document.getElementById('shareForm').addEventListener('submit', async function(e
         return;
     }
     
-    const authorName = document.getElementById('authorName').value;
-    const challenge = document.getElementById('challenge').value;
-    const experience = document.getElementById('experience').value;
-    const solution = document.getElementById('solution').value;
-    const advice = document.getElementById('advice').value;
+    const formData = {
+        author_name: document.getElementById('authorName').value,
+        challenge: document.getElementById('challenge').value,
+        experience: document.getElementById('experience').value,
+        solution: document.getElementById('solution').value,
+        advice: document.getElementById('advice').value
+    };
     
-    if (!challenge.trim() || !experience.trim() || !solution.trim()) {
+    if (!formData.challenge.trim() || !formData.experience.trim() || !formData.solution.trim()) {
         showToast('Please fill in your challenge, experience, and solution to help others understand your journey.', 'warning', 'More Details Needed');
         return;
     }
@@ -481,13 +412,7 @@ document.getElementById('shareForm').addEventListener('submit', async function(e
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${authToken}`
             },
-            body: JSON.stringify({
-                author_name: authorName,
-                challenge: challenge,
-                experience: experience,
-                solution: solution,
-                advice: advice
-            })
+            body: JSON.stringify(formData)
         });
 
         const data = await response.json();
@@ -511,11 +436,3 @@ document.getElementById('shareForm').addEventListener('submit', async function(e
         submitBtn.disabled = false;
     }
 });
-
-function showCrisisResourcesModal(resources) {
-    openModal('crisisModal');
-}
-
-function showSampleStoryMessage() {
-    showToast('This is a sample story for demonstration. Real community stories will be available once members start sharing their experiences!', 'warning', 'Sample Story');
-}

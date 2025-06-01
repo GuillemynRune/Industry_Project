@@ -17,9 +17,7 @@
                     <li><a href="#stories">Stories</a></li>
                     <li><a href="#support">Support</a></li>
                 </ul>
-                <div class="user-section" id="userSection">
-                    <!-- Will be populated by JavaScript -->
-                </div>
+                <div class="user-section" id="userSection"></div>
             </div>
         </nav>
     </header>
@@ -37,16 +35,15 @@
         </section>
 
         <div class="container main-content">
-            <!-- Authentication Section (shown when not logged in) -->
+            <!-- Authentication Section -->
             <section class="auth-section" id="authSection" style="display: none;">
                 <div class="auth-toggle">
                     <button onclick="switchAuth('login')" id="loginTab" class="auth-tab active">Login</button>
                     <button onclick="switchAuth('register')" id="registerTab" class="auth-tab">Sign Up</button>
                 </div>
 
-                <!-- Login Form -->
-                <form id="loginForm" class="auth-form" style="display: block;">
-                    <h2 style="text-align: center; margin-bottom: 1.5rem; color: var(--deep-blue);">Welcome Back</h2>
+                <form id="loginForm" class="auth-form">
+                    <h2>Welcome Back</h2>
                     <div class="form-group">
                         <label for="loginEmail">Email</label>
                         <input type="email" id="loginEmail" required>
@@ -55,14 +52,13 @@
                         <label for="loginPassword">Password</label>
                         <input type="password" id="loginPassword" required>
                     </div>
-                    <div style="text-align: center;">
+                    <div class="form-actions">
                         <button type="submit" class="btn btn-primary">Login</button>
                     </div>
                 </form>
 
-                <!-- Registration Form -->
                 <form id="registerForm" class="auth-form" style="display: none;">
-                    <h2 style="text-align: center; margin-bottom: 1.5rem; color: var(--deep-blue);">Join Our Community</h2>
+                    <h2>Join Our Community</h2>
                     <div class="form-group">
                         <label for="registerEmail">Email</label>
                         <input type="email" id="registerEmail" required>
@@ -75,31 +71,31 @@
                         <label for="displayName">Display Name (optional)</label>
                         <input type="text" id="displayName" placeholder="How you'd like to be known">
                     </div>
-                    <div class="form-group">
-                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div class="form-group checkbox-group">
+                        <label>
                             <input type="checkbox" id="ageVerification" required>
                             I confirm that I am 18 years of age or older
                         </label>
                     </div>
-                    <div class="form-group">
-                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div class="form-group checkbox-group">
+                        <label>
                             <input type="checkbox" id="termsAgreement" required>
                             I agree to the <a href="#" onclick="showTerms()">Terms of Service</a> and <a href="#" onclick="showPrivacy()">Privacy Policy</a>
                         </label>
                     </div>
-                    <div style="text-align: center;">
+                    <div class="form-actions">
                         <button type="submit" class="btn btn-primary">Create Account</button>
                     </div>
                 </form>
             </section>
 
-            <!-- Enhanced Share Story Section -->
+            <!-- Share Story Section -->
             <section class="share-story-section" id="share">
                 <h2>Share Your Recovery Story</h2>
                 <p>Your experience matters. Help others by sharing your journey through postnatal challenges and recovery.</p>
                 <div class="share-btn-container">
                     <button class="share-story-btn" onclick="handleShareStoryClick()">
-                        <span>Start Sharing Your Story</span>
+                        Start Sharing Your Story
                     </button>
                 </div>
             </section>
@@ -114,23 +110,19 @@
                 </div>
                 
                 <div class="stories-carousel" id="storiesCarousel">
-                    <div class="stories-track" id="storiesTrack">
-                        <!-- Slides will be populated by JavaScript -->
-                    </div>
+                    <div class="stories-track" id="storiesTrack"></div>
                 </div>
                 
                 <div class="carousel-controls">
                     <button class="carousel-btn" id="prevBtn">‹</button>
-                    <div class="carousel-dots" id="dotsContainer">
-                        <!-- Dots will be populated by JavaScript -->
-                    </div>
+                    <div class="carousel-dots" id="dotsContainer"></div>
                     <button class="carousel-btn" id="nextBtn">›</button>
                 </div>
             </section>
 
             <!-- How It Works -->
-            <section class="section how-it-works">
-                <h2 style="text-align: center; color: var(--deep-blue); font-size: 2.5rem; margin-bottom: 1rem;">How It Works</h2>
+            <section class="how-it-works">
+                <h2>How It Works</h2>
                 <div class="steps-grid">
                     <div class="step-card">
                         <div class="step-icon">📝</div>
@@ -152,7 +144,7 @@
 
             <!-- Crisis Support Section -->
             <section class="crisis-support-section" id="support">
-                <h2 style="text-align: center; color: var(--deep-blue); font-size: 2.5rem; margin-bottom: 1rem;">Support Resources</h2>
+                <h2>Support Resources</h2>
                 <div class="crisis-info-card">
                     <h3>Need immediate help?</h3>
                     <p>If you're experiencing thoughts of self-harm or are in crisis, please reach out:</p>
@@ -172,9 +164,9 @@
 
             <!-- Moderation Section -->
             <section class="moderation-section" id="moderationSection" style="display: none;">
-                <h2 style="text-align: center; color: var(--deep-blue); font-size: 2.5rem; margin-bottom: 2rem;">Story Moderation</h2>
+                <h2>Story Moderation</h2>
                 
-                <div class="moderation-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                <div class="moderation-stats">
                     <div class="stat-card">
                         <div class="stat-number" id="pendingCount">0</div>
                         <div class="stat-label">Pending Stories</div>
@@ -189,14 +181,12 @@
                     </div>
                 </div>
 
-                <div class="pending-stories-grid" id="pendingStoriesGrid">
-                    <!-- Pending stories will be populated here -->
-                </div>
+                <div class="pending-stories-grid" id="pendingStoriesGrid"></div>
             </section>
         </div>
     </main>
 
-    <!-- Crisis Resources Modal -->
+    <!-- Modals -->
     <div id="crisisModal" class="modal">
         <div class="modal-content crisis-modal">
             <span class="close" onclick="closeModal('crisisModal')">&times;</span>
@@ -209,13 +199,11 @@
                     <div class="phone">988</div>
                     <p>24/7 crisis support and suicide prevention</p>
                 </div>
-                
                 <div class="crisis-resource">
                     <h4>Postpartum Support International</h4>
                     <div class="phone">1-800-944-4773</div>
                     <p>24/7 helpline for perinatal mental health</p>
                 </div>
-                
                 <div class="crisis-resource">
                     <h4>Crisis Text Line</h4>
                     <div class="phone">Text HOME to 741741</div>
@@ -223,8 +211,8 @@
                 </div>
             </div>
             
-            <h3 style="color: var(--crisis-red); margin-top: 2rem;">Warning Signs That Need Immediate Attention:</h3>
-            <ul style="margin: 1rem 0; padding-left: 1.5rem; color: var(--text-dark);">
+            <h3>Warning Signs That Need Immediate Attention:</h3>
+            <ul>
                 <li>Thoughts of harming yourself or your baby</li>
                 <li>Feeling like you might hurt yourself</li>
                 <li>Thoughts of suicide or death</li>
@@ -232,46 +220,41 @@
                 <li>Feeling completely unable to cope</li>
             </ul>
             
-            <p style="margin-top: 1rem; font-style: italic; color: var(--text-light);">Remember: Seeking help is a sign of strength, not weakness.</p>
+            <p class="disclaimer">Remember: Seeking help is a sign of strength, not weakness.</p>
         </div>
     </div>
 
-    <!-- Share Story Modal -->
     <div id="shareModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('shareModal')">&times;</span>
-            <h2 style="color: var(--deep-blue); margin-bottom: 1.5rem; font-size: 2.2rem;">Share Your Recovery Story</h2>
-            <p style="margin-bottom: 2rem; color: var(--text-light); font-size: 1.1rem;">Your story will be reviewed by our team before publication to ensure it's supportive and appropriate for our community.</p>
+            <h2>Share Your Recovery Story</h2>
+            <p>Your story will be reviewed by our team before publication to ensure it's supportive and appropriate for our community.</p>
             
             <form id="shareForm">
                 <div class="form-group">
                     <label for="authorName">Your Name (optional, can be anonymous)</label>
                     <input type="text" id="authorName" placeholder="How would you like to be known?">
                 </div>
-                
                 <div class="form-group">
                     <label for="challenge">What challenge did you face?</label>
                     <textarea id="challenge" placeholder="Describe the postnatal challenge you experienced (e.g., postpartum depression, anxiety, sleep deprivation, bonding difficulties, etc.)" rows="4"></textarea>
                 </div>
-                
                 <div class="form-group">
                     <label for="experience">Tell us about your experience</label>
                     <textarea id="experience" placeholder="What was it like? How did it affect your daily life? How long did it last? Be specific about your journey." rows="6"></textarea>
                 </div>
-                
                 <div class="form-group">
                     <label for="solution">What helped you recover?</label>
                     <textarea id="solution" placeholder="What strategies, treatments, support, or changes helped you get through this? What would you recommend to others?" rows="6"></textarea>
                 </div>
-                
                 <div class="form-group">
                     <label for="advice">Your advice to others</label>
                     <textarea id="advice" placeholder="What would you tell someone going through the same thing? Any words of encouragement or practical tips?" rows="4"></textarea>
                 </div>
                 
-                <div style="text-align: center; margin-top: 2rem;">
-                    <button type="submit" class="btn btn-primary" style="padding: 16px 40px; font-size: 1.1rem;">Submit Story for Review</button>
-                    <button type="button" class="btn" onclick="closeModal('shareModal')" style="margin-left: 1rem; background: var(--light-gray); color: var(--text-dark);">Cancel</button>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Submit Story for Review</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('shareModal')">Cancel</button>
                 </div>
             </form>
         </div>
@@ -280,14 +263,12 @@
     <footer>
         <div class="container">
             <p>&copy; 2025 Postnatal Stories. A safe space for shared experiences. Remember: You are not alone, and seeking help is a sign of strength.</p>
-            <p style="margin-top: 1rem;">
+            <p>
                 <a href="#" onclick="showTerms()">Terms of Service</a> | 
                 <a href="#" onclick="showPrivacy()">Privacy Policy</a> | 
                 <a href="#" onclick="showCrisisResources()">Crisis Resources</a>
             </p>
-            <p style="margin-top: 0.5rem; font-size: 0.9rem; font-style: italic;">
-                This platform provides peer support and shared experiences. It is not a substitute for professional medical advice, diagnosis, or treatment.
-            </p>
+            <p class="disclaimer">This platform provides peer support and shared experiences. It is not a substitute for professional medical advice, diagnosis, or treatment.</p>
         </div>
     </footer>
 

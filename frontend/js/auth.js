@@ -1,49 +1,33 @@
-// Enhanced Authentication functionality with security improvements
+// Authentication functionality
 let tokenExpiryTimer = null;
 
 function initializeAuth() {
     const token = localStorage.getItem('authToken');
     const tokenExpiry = localStorage.getItem('tokenExpiry');
     
-    if (token && tokenExpiry) {
-        const now = Date.now();
-        const expiry = parseInt(tokenExpiry);
-        
-        if (now < expiry) {
-            authToken = token;
-            setupTokenExpiryTimer(expiry - now);
-            fetchUserInfo();
-        } else {
-            handleTokenExpiry();
-        }
+    if (token && tokenExpiry && Date.now() < parseInt(tokenExpiry)) {
+        authToken = token;
+        setupTokenExpiryTimer(parseInt(tokenExpiry) - Date.now());
+        fetchUserInfo();
     } else {
-        showAuthSection();
+        handleTokenExpiry();
     }
 }
 
 function setupTokenExpiryTimer(timeUntilExpiry) {
-    // Clear existing timer
-    if (tokenExpiryTimer) {
-        clearTimeout(tokenExpiryTimer);
-    }
+    if (tokenExpiryTimer) clearTimeout(tokenExpiryTimer);
     
-    // Set timer to refresh token 5 minutes before expiry
     const refreshTime = timeUntilExpiry - (5 * 60 * 1000); // 5 minutes before expiry
-    
     if (refreshTime > 0) {
         tokenExpiryTimer = setTimeout(refreshToken, refreshTime);
     } else {
-        // Token expires soon, try to refresh immediately
         refreshToken();
     }
 }
 
 async function refreshToken() {
     try {
-        const response = await makeAuthenticatedRequest(`${API_BASE_URL}/auth/refresh`, {
-            method: 'POST'
-        });
-
+        const response = await makeAuthenticatedRequest(`${API_BASE_URL}/auth/refresh`, { method: 'POST' });
         if (response.ok) {
             const data = await response.json();
             authToken = data.access_token;
@@ -51,9 +35,7 @@ async function refreshToken() {
             
             localStorage.setItem('authToken', authToken);
             localStorage.setItem('tokenExpiry', expiryTime.toString());
-            
             setupTokenExpiryTimer(data.expires_in * 1000);
-            console.log('Token refreshed successfully');
         } else {
             throw new Error('Token refresh failed');
         }
@@ -64,11 +46,9 @@ async function refreshToken() {
 }
 
 function handleTokenExpiry() {
-    // Clear stored auth data
     localStorage.removeItem('authToken');
     localStorage.removeItem('tokenExpiry');
     
-    // Clear timer
     if (tokenExpiryTimer) {
         clearTimeout(tokenExpiryTimer);
         tokenExpiryTimer = null;
@@ -81,38 +61,28 @@ function handleTokenExpiry() {
 }
 
 async function makeAuthenticatedRequest(url, options = {}) {
-    if (!authToken) {
-        throw new Error('No authentication token');
+    if (!authToken) throw new Error('No authentication token');
+    
+    const response = await fetch(url, {
+        ...options,
+        headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+    
+    if (response.status === 401) {
+        handleTokenExpiry();
+        throw new Error('Authentication failed');
     }
     
-    try {
-        const response = await fetch(url, {
-            ...options,
-            headers: {
-                'Authorization': `Bearer ${authToken}`,
-                'Content-Type': 'application/json',
-                ...options.headers
-            }
-        });
-        
-        if (response.status === 401) {
-            handleTokenExpiry();
-            throw new Error('Authentication failed');
-        }
-        
-        return response;
-    } catch (error) {
-        if (error.message.includes('Authentication failed') || error.message.includes('token')) {
-            handleTokenExpiry();
-        }
-        throw error;
-    }
+    return response;
 }
 
 async function fetchUserInfo() {
     try {
         const response = await makeAuthenticatedRequest(`${API_BASE_URL}/auth/me`);
-
         if (response.ok) {
             currentUser = await response.json();
             showUserSection();
@@ -155,35 +125,27 @@ function updateUserSection() {
 }
 
 function switchAuth(type) {
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    const loginTab = document.getElementById('loginTab');
-    const registerTab = document.getElementById('registerTab');
-
-    if (type === 'login') {
-        loginForm.style.display = 'block';
-        registerForm.style.display = 'none';
-        loginTab.classList.add('active');
-        registerTab.classList.remove('active');
-    } else {
-        loginForm.style.display = 'none';
-        registerForm.style.display = 'block';
-        loginTab.classList.remove('active');
-        registerTab.classList.add('active');
-    }
+    const forms = { login: 'loginForm', register: 'registerForm' };
+    const tabs = { login: 'loginTab', register: 'registerTab' };
+    
+    Object.values(forms).forEach(form => {
+        document.getElementById(form).style.display = 'none';
+    });
+    Object.values(tabs).forEach(tab => {
+        document.getElementById(tab).classList.remove('active');
+    });
+    
+    document.getElementById(forms[type]).style.display = 'block';
+    document.getElementById(tabs[type]).classList.add('active');
 }
 
 async function logout() {
     try {
-        // Call logout endpoint to blacklist token
         if (authToken) {
-            await makeAuthenticatedRequest(`${API_BASE_URL}/auth/logout`, {
-                method: 'POST'
-            });
+            await makeAuthenticatedRequest(`${API_BASE_URL}/auth/logout`, { method: 'POST' });
         }
     } catch (error) {
         console.error('Logout API error:', error);
-        // Continue with client-side logout even if API fails
     }
     
     // Clear all auth data
@@ -201,20 +163,17 @@ async function logout() {
     showToast('You\'ve been safely logged out. Thanks for visiting!', 'success', 'See You Soon!');
 }
 
-// Input validation and sanitization
+// Validation utilities
 function validateEmail(email) {
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailRegex.test(email);
+    return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 }
 
 function validatePassword(password) {
-    const minLength = 12;
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
-    const hasNumbers = /\d/.test(password);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    
-    return password.length >= minLength && hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar;
+    return password.length >= 12 && 
+           /[A-Z]/.test(password) && 
+           /[a-z]/.test(password) && 
+           /\d/.test(password) && 
+           /[!@#$%^&*(),.?":{}|<>]/.test(password);
 }
 
 function escapeHtml(unsafe) {
@@ -226,37 +185,43 @@ function escapeHtml(unsafe) {
          .replace(/'/g, "&#039;");
 }
 
-function getPasswordStrength(password) {
-    let strength = 0;
-    if (password.length >= 12) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/[a-z]/.test(password)) strength++;
-    if (/\d/.test(password)) strength++;
-    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
-    
-    return strength;
+// Form handlers
+async function handleAuthForm(endpoint, formData, successMessage, onSuccess) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            showToast(successMessage, 'success');
+            onSuccess(data);
+        } else {
+            const errorMessages = {
+                401: 'Invalid email or password. Please check your credentials and try again.',
+                404: 'Account not found. Please check your email or create a new account.',
+                409: 'An account with this email already exists. Try logging in instead.',
+                429: 'Too many attempts. Please wait a moment before trying again.',
+                500: 'Server error. Please try again in a moment.'
+            };
+            showToast(errorMessages[response.status] || data.detail || 'Unable to process request. Please try again.', 'error');
+        }
+    } catch (error) {
+        console.error(`${endpoint} error:`, error);
+        showToast('Connection error. Please check your internet and try again.', 'error', 'Connection Problem');
+    }
 }
 
-function updatePasswordStrength(password) {
-    const strengthMeter = document.getElementById('passwordStrength');
-    if (!strengthMeter) return;
-    
-    const strength = getPasswordStrength(password);
-    const strengthText = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'][strength];
-    const strengthColor = ['#d32f2f', '#f57c00', '#fbc02d', '#689f38', '#388e3c'][strength];
-    
-    strengthMeter.textContent = `Password Strength: ${strengthText}`;
-    strengthMeter.style.color = strengthColor;
-}
-
-// Enhanced login form handler
+// Login form handler
 document.getElementById('loginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
     
-    // Client-side validation
     if (!validateEmail(email)) {
         showToast('Please enter a valid email address to continue.', 'error', 'Invalid Email');
         return;
@@ -272,49 +237,27 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     submitBtn.textContent = 'Logging in...';
     submitBtn.disabled = true;
     
-    try {
-        const response = await fetch(`${API_BASE_URL}/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password })
-        });
-
-        const data = await response.json();
-        
-        if (response.ok) {
+    await handleAuthForm('login', { email, password }, 
+        `Welcome back, ${email}! Great to see you again.`,
+        (data) => {
             authToken = data.access_token;
             currentUser = data.user;
             const expiryTime = Date.now() + (data.expires_in * 1000);
             
             localStorage.setItem('authToken', authToken);
             localStorage.setItem('tokenExpiry', expiryTime.toString());
-            
             setupTokenExpiryTimer(data.expires_in * 1000);
             
-            showToast(`Welcome back, ${data.user.display_name || 'there'}! Great to see you again.`, 'success', 'Login Successful!');
             showUserSection();
             this.reset();
-        } else {
-            const errorMessages = {
-                401: 'Invalid email or password. Please check your credentials and try again.',
-                404: 'Account not found. Please check your email or create a new account.',
-                429: 'Too many login attempts. Please wait a moment before trying again.',
-                500: 'Server error. Please try again in a moment.'
-            };
-            showToast(errorMessages[response.status] || data.detail || 'Unable to login right now. Please try again.', 'error', 'Login Failed');
         }
-    } catch (error) {
-        console.error('Login error:', error);
-        showToast('Connection error. Please check your internet and try again.', 'error', 'Connection Problem');
-    } finally {
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-    }
+    );
+    
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
 });
 
-// Enhanced registration form handler
+// Registration form handler
 document.getElementById('registerForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -324,7 +267,6 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     const ageVerified = document.getElementById('ageVerification').checked;
     const termsAgreed = document.getElementById('termsAgreement').checked;
     
-    // Enhanced validation
     if (!validateEmail(email)) {
         showToast('Please enter a valid email address to create your account.', 'error', 'Invalid Email');
         return;
@@ -345,57 +287,18 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     submitBtn.textContent = 'Creating Account...';
     submitBtn.disabled = true;
     
-    try {
-        const response = await fetch(`${API_BASE_URL}/auth/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email,
-                password,
-                display_name: displayName || null,
-                age_verified: ageVerified,
-                agrees_to_terms: termsAgreed
-            })
-        });
-
-        const data = await response.json();
-        
-        if (response.ok) {
-            showToast('Welcome to our community! Your account has been created successfully. Please login with your new credentials.', 'success', 'Account Created!');
-            switchAuth('login');
-            this.reset();
-        } else {
-            const errorMessages = {
-                409: 'An account with this email already exists. Try logging in instead.',
-                400: 'Please check your information and try again.',
-                500: 'Server error. Please try again in a moment.'
-            };
-            showToast(errorMessages[response.status] || data.detail || 'Unable to create account right now. Please try again.', 'error', 'Registration Failed');
-        }
-    } catch (error) {
-        console.error('Registration error:', error);
-        showToast('Connection error. Please check your internet and try again.', 'error', 'Connection Problem');
-    } finally {
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-    }
-});
-
-// Add password strength indicator to registration form
-document.addEventListener('DOMContentLoaded', function() {
-    const passwordField = document.getElementById('registerPassword');
-    if (passwordField) {
-        // Add password strength indicator
-        const strengthIndicator = document.createElement('div');
-        strengthIndicator.id = 'passwordStrength';
-        strengthIndicator.style.marginTop = '0.5rem';
-        strengthIndicator.style.fontSize = '0.9rem';
-        passwordField.parentNode.appendChild(strengthIndicator);
-        
-        passwordField.addEventListener('input', function() {
-            updatePasswordStrength(this.value);
-        });
-    }
+    await handleAuthForm('register', {
+        email,
+        password,
+        display_name: displayName || null,
+        age_verified: ageVerified,
+        agrees_to_terms: termsAgreed
+    }, 'Welcome to our community! Your account has been created successfully. Please login with your new credentials.', 
+    () => {
+        switchAuth('login');
+        this.reset();
+    });
+    
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
 });
