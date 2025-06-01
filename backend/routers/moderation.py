@@ -7,7 +7,6 @@ from routers.auth import get_current_active_user
 from bson import ObjectId
 from datetime import datetime
 import logging
-from database.models.moderation import ModerationDatabase
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/moderation", tags=["moderation"])
@@ -52,13 +51,11 @@ async def get_story_details(
         raise HTTPException(status_code=403, detail="Insufficient permissions")
     
     try:
-        # Find story in pending_stories collection
         story = await mongodb.database.pending_stories.find_one({"_id": ObjectId(story_id)})
         
         if not story:
             raise HTTPException(status_code=404, detail="Story not found")
         
-        # Convert ObjectId to string for JSON serialization
         story["_id"] = str(story["_id"])
         
         return {
@@ -95,38 +92,10 @@ async def approve_story(
         await mongodb.database.pending_stories.delete_one({"_id": ObjectId(story_id)})
         return {
             "success": True,
-            "message": "✅ Story approved and moved to approved_stories"
+            "message": "✅ Story approved and published"
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to approve story: {str(e)}")
-
-@router.post("/approve/{story_id}")
-async def approve_story(
-    story_id: str,
-    current_user: dict = Depends(get_current_active_user),
-):
-    """Approve a pending story and move it to approved_stories"""
-    if current_user.get("role") not in ["moderator", "admin"]:
-        raise HTTPException(status_code=403, detail="Unauthorized")
-
-    story = await mongodb.database.pending_stories.find_one({"_id": ObjectId(story_id)})
-    if not story:
-        raise HTTPException(status_code=404, detail="Story not found")
-
-    approved_story = {
-        **story,
-        "status": "approved",
-        "approved_by": current_user["email"],
-        "approved_at": datetime.utcnow(),
-    }
-
-    try:
-        await mongodb.database.approved_stories.insert_one(approved_story)
-        await mongodb.database.pending_stories.delete_one({"_id": ObjectId(story_id)})
-        return {"message": "✅ Story approved and moved to approved_stories"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to approve story: {str(e)}")
-
 
 @router.post("/reject/{story_id}")
 async def reject_story(
@@ -134,13 +103,13 @@ async def reject_story(
     action: RejectAction,
     current_user: dict = Depends(get_current_active_user)
 ):
-    """Reject a pending story (moderators only)"""
+    """Reject a pending story (delete without storing)"""
     
     if current_user.get("role") not in ["moderator", "admin"]:
         raise HTTPException(status_code=403, detail="Insufficient permissions")
     
     try:
-        # Get the pending story
+        # Check if story exists
         pending_story = await mongodb.database.pending_stories.find_one(
             {"_id": ObjectId(story_id)}
         )
@@ -148,21 +117,10 @@ async def reject_story(
         if not pending_story:
             raise HTTPException(status_code=404, detail="Story not found")
         
-        # Move to rejected stories collection
-        rejected_story = pending_story.copy()
-        rejected_story["status"] = "rejected"
-        rejected_story["rejected_by"] = current_user["id"]
-        rejected_story["rejected_at"] = datetime.utcnow()
-        rejected_story["rejection_reason"] = action.reason
-        del rejected_story["_id"]
-        
-        # Insert into rejected_stories collection
-        await mongodb.database.rejected_stories.insert_one(rejected_story)
-        
-        # Remove from pending
+        # Simply delete from pending - no storage of rejected stories
         await mongodb.database.pending_stories.delete_one({"_id": ObjectId(story_id)})
         
-        logger.info(f"Story {story_id} rejected by {current_user['email']}")
+        logger.info(f"Story {story_id} rejected and deleted by {current_user['email']}")
         
         return {
             "success": True,

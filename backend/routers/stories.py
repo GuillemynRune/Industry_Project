@@ -44,7 +44,7 @@ async def generate_recovery_story(challenge: str, experience: str, solution: str
             try:
                 logger.info(f"Trying model: {model_name}")
                 
-                generated_text = query_ollama_model(model_name, prompt, max_tokens=150)
+                generated_text = query_ollama_model(model_name, prompt, max_tokens=300)
                 
                 if generated_text and len(generated_text.strip()) > 100:
                     story = generated_text.strip()

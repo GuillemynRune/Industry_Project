@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 def create_recovery_story_prompt(challenge: str, experience: str, solution: str, advice: str = "") -> str:
     """Create a recovery story from user's input"""
-    return f"""Write a concise, inspiring recovery story (150-200 words) based on this person's experience:
+    return f"""Write a concise, inspiring recovery story (~150 words NOT MORE) based on this person's experience:
 
 Challenge: {challenge}
 Experience: {experience}  
@@ -25,7 +25,7 @@ Create a short, compelling narrative that:
 - Ends with hope and encouragement
 - Keeps it concise but emotionally resonant
 
-Write in third person, make it feel authentic, and focus on the most important parts of their journey. Keep it under 200 words.
+Write in third person, make it feel authentic, and focus on the most important parts of their journey. Keep it UNDER 200 words.
 
 Story:"""
 

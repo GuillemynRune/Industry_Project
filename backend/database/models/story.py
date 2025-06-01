@@ -10,54 +10,10 @@ class StoryDatabase:
     """Recovery story database operations"""
     
     @staticmethod
-    async def save_recovery_story(
-        challenge: str,
-        experience: str,
-        solution: str,
-        generated_story: str,
-        user_id: Optional[str] = None,
-        transformation_method: str = "ollama"
-    ) -> Dict[str, Any]:
-        """Save a recovery story"""
-        try:
-            story_doc = {
-                "challenge": challenge,
-                "experience": experience,
-                "solution": solution,
-                "generated_story": generated_story,
-                "user_id": user_id,
-                "transformation_method": transformation_method,
-                "created_at": datetime.utcnow(),
-                "status": "approved",  # For moderation
-                "views": 0,
-                "helpful_votes": 0
-            }
-            
-            result = await mongodb.database.recovery_stories.insert_one(story_doc)
-            
-            return {
-                "success": True,
-                "message": "Recovery story saved successfully",
-                "story_id": str(result.inserted_id)
-            }
-            
-        except Exception as e:
-            logger.error(f"Error saving recovery story: {e}")
-            return {"success": False, "message": "Failed to save story"}
-    
-    @staticmethod
     async def get_story_by_id(story_id: str) -> Optional[Dict[str, Any]]:
-        """Get story by ID from approved stories collection"""
+        """Get story by ID from approved stories collection only"""
         try:
-            # First try approved_stories collection (where published stories are)
             story = await mongodb.database.approved_stories.find_one({"_id": ObjectId(story_id)})
-            
-            # If not found, try recovery_stories collection (for backwards compatibility)
-            if not story:
-                story = await mongodb.database.recovery_stories.find_one({
-                    "_id": ObjectId(story_id),
-                    "status": "approved"
-                })
             
             if story:
                 story["id"] = str(story["_id"])
@@ -71,9 +27,8 @@ class StoryDatabase:
     async def get_recovery_stories(limit: int = 20, skip: int = 0) -> List[Dict[str, Any]]:
         """Get approved recovery stories with pagination"""
         try:
-            # Look in approved_stories collection instead of recovery_stories
             cursor = mongodb.database.approved_stories.find(
-                {}  # Remove status filter since all stories in approved_stories are approved
+                {}
             ).skip(skip).limit(limit).sort("created_at", -1)
             
             stories = []
@@ -92,7 +47,7 @@ class StoryDatabase:
         """Search recovery stories using text search"""
         try:
             cursor = mongodb.database.approved_stories.find(
-                {"$text": {"$search": query}}  # Remove status filter
+                {"$text": {"$search": query}}
             ).limit(limit).sort("created_at", -1)
             
             stories = []
@@ -111,7 +66,7 @@ class StoryDatabase:
         """Get recent approved stories"""
         try:
             cursor = mongodb.database.approved_stories.find(
-                {}  # Remove status filter
+                {}
             ).limit(limit).sort("created_at", -1)
             
             stories = []
@@ -129,7 +84,7 @@ class StoryDatabase:
     async def increment_story_views(story_id: str) -> bool:
         """Increment story view count"""
         try:
-            result = await mongodb.database.recovery_stories.update_one(
+            result = await mongodb.database.approved_stories.update_one(
                 {"_id": ObjectId(story_id)},
                 {"$inc": {"views": 1}}
             )
@@ -142,7 +97,7 @@ class StoryDatabase:
     async def vote_helpful(story_id: str) -> bool:
         """Vote story as helpful"""
         try:
-            result = await mongodb.database.recovery_stories.update_one(
+            result = await mongodb.database.approved_stories.update_one(
                 {"_id": ObjectId(story_id)},
                 {"$inc": {"helpful_votes": 1}}
             )
@@ -155,13 +110,11 @@ class StoryDatabase:
     async def get_database_stats() -> Dict[str, Any]:
         """Get database statistics"""
         try:
-            total_stories = await mongodb.database.recovery_stories.count_documents({})
-            approved_stories = await mongodb.database.recovery_stories.count_documents({"status": "approved"})
-            pending_stories = await mongodb.database.recovery_stories.count_documents({"status": "pending"})
+            approved_stories = await mongodb.database.approved_stories.count_documents({})
+            pending_stories = await mongodb.database.pending_stories.count_documents({})
             total_users = await mongodb.database.users.count_documents({})
             
             return {
-                "total_stories": total_stories,
                 "approved_stories": approved_stories,
                 "pending_stories": pending_stories,
                 "total_users": total_users

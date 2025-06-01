@@ -12,13 +12,11 @@ logger = logging.getLogger(__name__)
 
 # Ollama configuration
 OLLAMA_BASE_URL = "http://localhost:11434"
-OLLAMA_MODEL = "phi4"  # The model you'll pull with Ollama
+OLLAMA_MODEL = "qwen2.5:3b"  # The model you'll pull with Ollama
 
 # Available models (you can add more as you install them)
 MODELS = [
-    "phi4",
-    "llama3.2:3b",  # Alternative if you want to try others
-    "gemma2:2b",    # Alternative smaller model
+    "qwen2.5:3b"    # Alternative smaller model
 ]
 
 def query_ollama_model(model_name: str, prompt: str, max_tokens: int = 300) -> str:
