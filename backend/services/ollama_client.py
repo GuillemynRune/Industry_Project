@@ -7,12 +7,11 @@ import requests
 import logging
 from typing import Dict, Any
 from fastapi import HTTPException
-import os
 
 logger = logging.getLogger(__name__)
 
 # Ollama configuration
-OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+OLLAMA_BASE_URL = "http://localhost:11434"
 OLLAMA_MODEL = "phi4"  # The model you'll pull with Ollama
 
 # Available models (you can add more as you install them)
