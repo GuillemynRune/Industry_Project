@@ -90,57 +90,6 @@ async def create_indexes():
         
     except Exception as e:
         logger.warning(f"Could not create indexes: {e}")
-
-class StoryDatabase:
-    """Database operations for recovery stories"""
-    
-    @staticmethod
-    async def save_recovery_story(
-        author_name: str,
-        challenge: str,
-        experience: str,
-        solution: str,
-        advice: str,
-        generated_story: str,
-        model_used: str,
-        key_symptoms: List[str] = None
-    ) -> Dict:
-        """Save a recovery story to the database"""
-        
-        try:
-            story_doc = {
-                "author_name": author_name,
-                "challenge": challenge,
-                "experience": experience,
-                "solution": solution,
-                "advice": advice,
-                "generated_story": generated_story,
-                "model_used": model_used,
-                "key_symptoms": key_symptoms or [],
-                "created_at": datetime.utcnow(),
-                "updated_at": datetime.utcnow(),
-                "status": "approved",  # Direct approval for backward compatibility
-                "word_count": len(generated_story.split()),
-                "character_count": len(generated_story)
-            }
-            
-            result = await mongodb.database.recovery_stories.insert_one(story_doc)
-            
-            logger.info(f"Saved recovery story with ID: {result.inserted_id}")
-            
-            return {
-                "success": True,
-                "story_id": str(result.inserted_id),
-                "message": "Recovery story saved successfully"
-            }
-            
-        except Exception as e:
-            logger.error(f"Error saving recovery story: {e}")
-            return {
-                "success": False,
-                "error": str(e),
-                "message": "Failed to save recovery story"
-            }
     
     @staticmethod
     async def get_recovery_stories(limit: int = 20, skip: int = 0) -> List[Dict]:

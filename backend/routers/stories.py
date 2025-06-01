@@ -2,7 +2,6 @@ from fastapi import APIRouter, HTTPException, Depends, Request
 from pydantic import BaseModel
 from typing import Optional, List
 from database.models.story import StoryDatabase
-from database.models.symptom import SymptomDatabase
 from database.models.moderation import ModerationDatabase
 from database.utils import CrisisSupport, ContentFilter
 from services.story_service import create_recovery_story_prompt

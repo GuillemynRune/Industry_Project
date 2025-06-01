@@ -115,10 +115,18 @@ class StoryDatabase:
             total_users = await mongodb.database.users.count_documents({})
             
             return {
+                "total_stories": approved_stories,
                 "approved_stories": approved_stories,
                 "pending_stories": pending_stories,
-                "total_users": total_users
+                "total_users": total_users,
+                "database_connected": True
             }
         except Exception as e:
             logger.error(f"Error getting database stats: {e}")
-            return {}
+            return {
+                "total_stories": 0,
+                "approved_stories": 0,
+                "pending_stories": 0,
+                "total_users": 0,
+                "database_connected": False
+            }

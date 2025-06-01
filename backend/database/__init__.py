@@ -1,8 +1,7 @@
-from .connection import connect_to_mongo, close_mongo_connection, check_database_health
+from .connection import connect_to_mongo, close_mongo_connection, mongodb
 from .models.users import UserDatabase
 from .models.story import StoryDatabase
-from .models.symptom import SymptomDatabase, CrisisSupport
-from .models.moderation import ModerationDatabase
+from .utils import CrisisSupport
 from .connection import mongodb
 
 __all__ = [

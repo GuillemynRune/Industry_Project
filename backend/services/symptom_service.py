@@ -1,5 +1,5 @@
 """
-Symptom extraction service using Ollama
+Symptom extraction service using Ollama - Functions only, no database storage
 """
 
 import logging

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from services.ollama_client import validate_ollama_connection, test_model_connection, MODELS
-from database import check_database_health
+from database.connection import check_database_health
 import psutil
 from datetime import datetime
 

@@ -41,16 +41,7 @@ async def close_mongo_connection():
 
 async def create_indexes():
     """Create database indexes"""
-    try:
-        # Stories indexes
-        await mongodb.database.recovery_stories.create_index([
-            ("challenge", "text"),
-            ("experience", "text"), 
-            ("solution", "text"),
-            ("generated_story", "text")
-        ])
-        await mongodb.database.recovery_stories.create_index([("created_at", -1)])
-        
+    try:        
         # User indexes
         await mongodb.database.users.create_index([("email", 1)], unique=True)
         
