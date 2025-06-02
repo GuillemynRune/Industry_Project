@@ -897,3 +897,16 @@
 {"timestamp": "2025-06-01T20:39:51.306333", "level": "INFO", "name": "main", "message": "Database connection closed", "service": "postnatal-stories-api"}
 {"timestamp": "2025-06-01T20:39:51.306333", "level": "INFO", "name": "uvicorn.error", "message": "Application shutdown complete.", "service": "postnatal-stories-api"}
 {"timestamp": "2025-06-01T20:39:51.306333", "level": "INFO", "name": "uvicorn.error", "message": "Finished server process [11044]", "color_message": "Finished server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T07:23:14.652201", "level": "INFO", "name": "uvicorn.error", "message": "Started server process [23004]", "color_message": "Started server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T07:23:14.652201", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application startup.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T07:23:17.103556", "level": "INFO", "name": "database.connection", "message": "Connected to MongoDB successfully!", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T07:23:17.971648", "level": "INFO", "name": "database.connection", "message": "Database indexes created successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T07:23:17.971648", "level": "INFO", "name": "main", "message": "Database connected successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T07:23:17.971648", "level": "INFO", "name": "main", "message": "Starting Postnatal Stories API v3.0.0 in development mode", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T07:23:17.972627", "level": "INFO", "name": "uvicorn.error", "message": "Application startup complete.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T07:23:20.915597", "level": "INFO", "name": "uvicorn.error", "message": "Shutting down", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T07:23:21.025035", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application shutdown.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T07:23:21.238487", "level": "INFO", "name": "database.connection", "message": "Disconnected from MongoDB", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T07:23:21.238487", "level": "INFO", "name": "main", "message": "Database connection closed", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T07:23:21.239488", "level": "INFO", "name": "uvicorn.error", "message": "Application shutdown complete.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T07:23:21.239488", "level": "INFO", "name": "uvicorn.error", "message": "Finished server process [23004]", "color_message": "Finished server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
