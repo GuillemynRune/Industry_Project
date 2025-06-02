@@ -16,6 +16,7 @@
                     <li><a href="#share">Share</a></li>
                     <li><a href="#stories">Stories</a></li>
                     <li><a href="#support">Support</a></li>
+                    <li><a href="javascript:void(0)" onclick="startTour()">Take Tour</a></li>
                 </ul>
                 <div class="user-section" id="userSection"></div>
             </div>
@@ -28,7 +29,7 @@
                 <h1>You're Not Alone</h1>
                 <p>Share your postnatal journey, find stories that resonate with you, and connect with a supportive community of parents who understand.</p>
                 <div class="cta-buttons">
-                    <button class="btn btn-primary" onclick="handleShareStoryClick()">Share Your Story</button>
+                    <button class="btn btn-primary" onclick="startGuidedStory()">Share Your Story</button>
                     <button class="btn btn-secondary" onclick="scrollToSection('stories')">Read Stories</button>
                 </div>
             </div>
@@ -97,8 +98,8 @@
                 <h2>Share Your Recovery Story</h2>
                 <p>Your experience matters. Help others by sharing your journey through postnatal challenges and recovery.</p>
                 <div class="share-btn-container">
-                    <button class="share-story-btn" onclick="handleShareStoryClick()">
-                        Start Sharing Your Story
+                    <button class="share-story-btn" onclick="startGuidedStory()">
+                        ✨ Start Guided Story Creation
                     </button>
                 </div>
             </section>
@@ -329,5 +330,7 @@
     <script src="js/auth.js"></script>
     <script src="js/stories.js"></script>
     <script src="js/moderation.js"></script>
+    <script src="js/tour.js"></script>
+    <script src="js/guided-prompts.js"></script>
 </body>
 </html>

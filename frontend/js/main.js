@@ -102,3 +102,54 @@ window.onclick = function(event) {
         }
     }
 }
+
+// Dark Mode System
+class ThemeManager {
+    constructor() {
+        this.currentTheme = localStorage.getItem('theme') || 'light';
+        this.init();
+    }
+    
+    init() {
+        this.applyTheme(this.currentTheme);
+        this.createToggleButton();
+    }
+    
+    createToggleButton() {
+        const button = document.createElement('button');
+        button.className = 'theme-toggle';
+        button.innerHTML = this.currentTheme === 'dark' ? '☀️' : '🌙';
+        button.onclick = () => this.toggleTheme();
+        document.body.appendChild(button);
+    }
+    
+    toggleTheme() {
+        this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
+        this.applyTheme(this.currentTheme);
+        localStorage.setItem('theme', this.currentTheme);
+        document.querySelector('.theme-toggle').innerHTML = this.currentTheme === 'dark' ? '☀️' : '🌙';
+    }
+    
+    applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+    }
+}
+
+// Initialize theme manager
+document.addEventListener('DOMContentLoaded', function() {
+    initializeAuth();
+    loadApprovedStories();
+    
+    // Initialize new systems
+    tour = new InteractiveTour();
+    guidedPrompts = new GuidedPrompts();
+    themeManager = new ThemeManager();
+    
+    // Auto-start tour for new users
+    setTimeout(() => {
+        if (tour.shouldShowTour() && !currentUser) {
+            tour.start();
+        }
+    }, 2000);
+});
+
