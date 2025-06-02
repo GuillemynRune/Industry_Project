@@ -285,14 +285,12 @@ function showFullStoryModal(story) {
         author: story.author_name || story.author || 'Anonymous',
         story: story.generated_story || story.story || 'Story content not available',
         date: story.created_at ? new Date(story.created_at).toLocaleDateString() : 'Recently',
-        experience: story.experience || '',
         solution: story.solution || '',
         advice: story.advice || ''
     };
 
     const sections = [
         { title: 'Recovery Story', content: `<div class="generated-story-preview">${content.story}</div>` },
-        content.experience && { title: 'Original Experience', content: `<div class="field-content">${content.experience}</div>` },
         content.solution && { title: 'What Helped', content: `<div class="field-content">${content.solution}</div>` },
         content.advice && { title: 'Advice to Others', content: `<div class="field-content">${content.advice}</div>` }
     ].filter(Boolean);
