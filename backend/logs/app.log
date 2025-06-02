@@ -910,3 +910,221 @@
 {"timestamp": "2025-06-02T07:23:21.238487", "level": "INFO", "name": "main", "message": "Database connection closed", "service": "postnatal-stories-api"}
 {"timestamp": "2025-06-02T07:23:21.239488", "level": "INFO", "name": "uvicorn.error", "message": "Application shutdown complete.", "service": "postnatal-stories-api"}
 {"timestamp": "2025-06-02T07:23:21.239488", "level": "INFO", "name": "uvicorn.error", "message": "Finished server process [23004]", "color_message": "Finished server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:07:15.011237", "level": "INFO", "name": "uvicorn.error", "message": "Started server process [23052]", "color_message": "Started server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:07:15.012239", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application startup.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:07:17.025669", "level": "INFO", "name": "database.connection", "message": "Connected to MongoDB successfully!", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:07:17.934333", "level": "INFO", "name": "database.connection", "message": "Database indexes created successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:07:17.934333", "level": "INFO", "name": "main", "message": "Database connected successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:07:17.934333", "level": "INFO", "name": "main", "message": "Starting Postnatal Stories API v3.0.0 in development mode", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:07:17.935345", "level": "INFO", "name": "uvicorn.error", "message": "Application startup complete.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:07:23.474007", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:51667 - \"OPTIONS /auth/forgot-password HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:07:24.178567", "level": "ERROR", "name": "services.email_service", "message": "SMTP credentials not configured", "request_id": "08549d82-77a5-46d3-a79f-06393db57681", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:07:24.179560", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:51667 - \"POST /auth/forgot-password HTTP/1.1\" 500", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:07:49.151489", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:51669 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:07:49.470166", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:51670 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "request_id": "febc0ee6-36f7-4865-a8bb-5853c1afaa93", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:07:50.165386", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:51684 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:07:50.511206", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:51684 - \"GET /stories/?limit=9&random=true HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:17:58.079640", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52016 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "request_id": "febc0ee6-36f7-4865-a8bb-5853c1afaa93", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:17:58.953319", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52016 - \"GET /stories/?limit=9&random=true HTTP/1.1\" 200", "request_id": "febc0ee6-36f7-4865-a8bb-5853c1afaa93", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:20:06.687906", "level": "INFO", "name": "uvicorn.error", "message": "Shutting down", "request_id": "febc0ee6-36f7-4865-a8bb-5853c1afaa93", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:20:06.797955", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application shutdown.", "request_id": "febc0ee6-36f7-4865-a8bb-5853c1afaa93", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:20:06.970604", "level": "INFO", "name": "database.connection", "message": "Disconnected from MongoDB", "request_id": "febc0ee6-36f7-4865-a8bb-5853c1afaa93", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:20:06.970604", "level": "INFO", "name": "main", "message": "Database connection closed", "request_id": "febc0ee6-36f7-4865-a8bb-5853c1afaa93", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:20:06.971205", "level": "INFO", "name": "uvicorn.error", "message": "Application shutdown complete.", "request_id": "febc0ee6-36f7-4865-a8bb-5853c1afaa93", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:20:06.971205", "level": "INFO", "name": "uvicorn.error", "message": "Finished server process [23052]", "request_id": "febc0ee6-36f7-4865-a8bb-5853c1afaa93", "color_message": "Finished server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:20:16.112724", "level": "INFO", "name": "uvicorn.error", "message": "Started server process [23300]", "color_message": "Started server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:20:16.113720", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application startup.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:20:17.786403", "level": "INFO", "name": "database.connection", "message": "Connected to MongoDB successfully!", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:20:18.635958", "level": "INFO", "name": "database.connection", "message": "Database indexes created successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:20:18.635958", "level": "INFO", "name": "main", "message": "Database connected successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:20:18.635958", "level": "INFO", "name": "main", "message": "Starting Postnatal Stories API v3.0.0 in development mode", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:20:18.635958", "level": "INFO", "name": "uvicorn.error", "message": "Application startup complete.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:20:23.379114", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52116 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:20:23.768726", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52116 - \"GET /stories/?limit=9&random=true HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:20:28.870024", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52117 - \"OPTIONS /auth/forgot-password HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:20:33.950111", "level": "INFO", "name": "services.email_service", "message": "Password reset email sent to peterdegrave191@gmail.com", "request_id": "0bcd83f3-0dbc-4b84-bf54-14d2d3b80e5c", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:20:33.950111", "level": "INFO", "name": "routers.auth", "message": "Password reset email sent to: peterdegrave191@gmail.com", "request_id": "0bcd83f3-0dbc-4b84-bf54-14d2d3b80e5c", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:20:33.952088", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52117 - \"POST /auth/forgot-password HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:21:31.502363", "level": "INFO", "name": "uvicorn.error", "message": "Shutting down", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:21:31.610055", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application shutdown.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:21:31.777636", "level": "INFO", "name": "database.connection", "message": "Disconnected from MongoDB", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:21:31.777636", "level": "INFO", "name": "main", "message": "Database connection closed", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:21:31.777636", "level": "INFO", "name": "uvicorn.error", "message": "Application shutdown complete.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:21:31.777636", "level": "INFO", "name": "uvicorn.error", "message": "Finished server process [23300]", "color_message": "Finished server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:21:48.694344", "level": "INFO", "name": "uvicorn.error", "message": "Started server process [5348]", "color_message": "Started server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:21:48.694344", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application startup.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:21:50.630286", "level": "INFO", "name": "database.connection", "message": "Connected to MongoDB successfully!", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:21:51.356060", "level": "INFO", "name": "database.connection", "message": "Database indexes created successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:21:51.356060", "level": "INFO", "name": "main", "message": "Database connected successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:21:51.356060", "level": "INFO", "name": "main", "message": "Starting Postnatal Stories API v3.0.0 in development mode", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:21:51.356060", "level": "INFO", "name": "uvicorn.error", "message": "Application startup complete.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:22:33.127640", "level": "INFO", "name": "services.email_service", "message": "Password reset email sent to peterdegrave191@gmail.com", "request_id": "bdb6910a-f210-4374-9b4b-bc56fa7c3750", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:22:33.127640", "level": "INFO", "name": "routers.auth", "message": "Password reset email sent to: peterdegrave191@gmail.com", "request_id": "bdb6910a-f210-4374-9b4b-bc56fa7c3750", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:22:33.129149", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52212 - \"POST /auth/forgot-password HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:24:03.884441", "level": "INFO", "name": "uvicorn.error", "message": "Started server process [4112]", "color_message": "Started server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:24:03.884441", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application startup.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:24:05.849232", "level": "INFO", "name": "database.connection", "message": "Connected to MongoDB successfully!", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:24:06.577342", "level": "INFO", "name": "database.connection", "message": "Database indexes created successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:24:06.577342", "level": "INFO", "name": "main", "message": "Database connected successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:24:06.577342", "level": "INFO", "name": "main", "message": "Starting Postnatal Stories API v3.0.0 in development mode", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:24:06.578369", "level": "INFO", "name": "uvicorn.error", "message": "Application startup complete.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:24:15.202076", "level": "INFO", "name": "uvicorn.error", "message": "Shutting down", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:24:15.311230", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application shutdown.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:24:15.486116", "level": "INFO", "name": "database.connection", "message": "Disconnected from MongoDB", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:24:15.486116", "level": "INFO", "name": "main", "message": "Database connection closed", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:24:15.486116", "level": "INFO", "name": "uvicorn.error", "message": "Application shutdown complete.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:24:15.486116", "level": "INFO", "name": "uvicorn.error", "message": "Finished server process [4112]", "color_message": "Finished server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:24:16.248908", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52298 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:24:16.633476", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52298 - \"GET /stories/?limit=9&random=true HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:26:10.598886", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52348 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:26:10.946217", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52348 - \"GET /stories/?limit=9&random=true HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:26:24.114796", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52349 - \"OPTIONS /auth/reset-password HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:26:24.290367", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52349 - \"POST /auth/reset-password HTTP/1.1\" 400", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:26:44.930058", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52355 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:26:45.599768", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52367 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:26:45.948745", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52367 - \"GET /stories/?limit=9&random=true HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:26:53.823435", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52368 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:26:54.451004", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52376 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:26:54.796815", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52376 - \"GET /stories/?limit=9&random=true HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:26:55.977799", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52376 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:26:56.356824", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52376 - \"GET /stories/?limit=9&random=true HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:27:02.990347", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52377 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:27:03.503960", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52399 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:27:03.824375", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52399 - \"GET /stories/?limit=9&random=true HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:27:04.147416", "level": "INFO", "name": "uvicorn.error", "message": "Shutting down", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:27:04.242452", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application shutdown.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:27:04.440677", "level": "INFO", "name": "database.connection", "message": "Disconnected from MongoDB", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:27:04.440677", "level": "INFO", "name": "main", "message": "Database connection closed", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:27:04.441680", "level": "INFO", "name": "uvicorn.error", "message": "Application shutdown complete.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:27:04.441680", "level": "INFO", "name": "uvicorn.error", "message": "Finished server process [5348]", "color_message": "Finished server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:32:14.559636", "level": "INFO", "name": "uvicorn.error", "message": "Started server process [14612]", "color_message": "Started server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:32:14.559636", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application startup.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:32:16.479452", "level": "INFO", "name": "database.connection", "message": "Connected to MongoDB successfully!", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:32:17.179939", "level": "INFO", "name": "database.connection", "message": "Database indexes created successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:32:17.180967", "level": "INFO", "name": "main", "message": "Database connected successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:32:17.180967", "level": "INFO", "name": "main", "message": "Starting Postnatal Stories API v3.0.0 in development mode", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:32:17.180967", "level": "INFO", "name": "uvicorn.error", "message": "Application startup complete.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:32:24.735456", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52609 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:32:30.217434", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52610 - \"OPTIONS /auth/forgot-password HTTP/1.1\" 400", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:32:36.263995", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52614 - \"OPTIONS /auth/forgot-password HTTP/1.1\" 400", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:33:37.219366", "level": "INFO", "name": "uvicorn.error", "message": "Shutting down", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:33:37.327171", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application shutdown.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:33:37.536760", "level": "INFO", "name": "database.connection", "message": "Disconnected from MongoDB", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:33:37.537765", "level": "INFO", "name": "main", "message": "Database connection closed", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:33:37.537765", "level": "INFO", "name": "uvicorn.error", "message": "Application shutdown complete.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:33:37.537765", "level": "INFO", "name": "uvicorn.error", "message": "Finished server process [14612]", "color_message": "Finished server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:33:42.325990", "level": "INFO", "name": "uvicorn.error", "message": "Started server process [13496]", "color_message": "Started server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:33:42.325990", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application startup.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:33:45.733698", "level": "INFO", "name": "database.connection", "message": "Connected to MongoDB successfully!", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:33:46.451237", "level": "INFO", "name": "database.connection", "message": "Database indexes created successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:33:46.452219", "level": "INFO", "name": "main", "message": "Database connected successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:33:46.452219", "level": "INFO", "name": "main", "message": "Starting Postnatal Stories API v3.0.0 in development mode", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:33:46.452219", "level": "INFO", "name": "uvicorn.error", "message": "Application startup complete.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:33:50.474602", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52678 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:33:57.143701", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52679 - \"OPTIONS /auth/forgot-password HTTP/1.1\" 400", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:10.604649", "level": "INFO", "name": "uvicorn.error", "message": "Shutting down", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:10.713740", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application shutdown.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:10.893873", "level": "INFO", "name": "database.connection", "message": "Disconnected from MongoDB", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:10.893873", "level": "INFO", "name": "main", "message": "Database connection closed", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:10.894791", "level": "INFO", "name": "uvicorn.error", "message": "Application shutdown complete.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:10.894791", "level": "INFO", "name": "uvicorn.error", "message": "Finished server process [13496]", "color_message": "Finished server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:14.715050", "level": "INFO", "name": "uvicorn.error", "message": "Started server process [14312]", "color_message": "Started server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:14.715050", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application startup.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:16.544044", "level": "INFO", "name": "database.connection", "message": "Connected to MongoDB successfully!", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:17.284702", "level": "INFO", "name": "database.connection", "message": "Database indexes created successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:17.284702", "level": "INFO", "name": "main", "message": "Database connected successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:17.284702", "level": "INFO", "name": "main", "message": "Starting Postnatal Stories API v3.0.0 in development mode", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:17.285714", "level": "INFO", "name": "uvicorn.error", "message": "Application startup complete.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:19.692527", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52729 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:20.916438", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52729 - \"GET /stories/?limit=9&random=true HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:24.382121", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52729 - \"OPTIONS /auth/forgot-password HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:25.267010", "level": "INFO", "name": "services.email_service", "message": "Constructed reset URL: */reset-password?token=6G4jJJltXBrm3rJeLau0LgQEzaAyGs4Hpp7OlC0LqGU", "request_id": "cc1d7e3d-7cf1-41dd-90fa-38bb87b49b8c", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:29.436441", "level": "ERROR", "name": "services.email_service", "message": "Failed to send password reset email to peterdegrave191@gmail.com: (550, '5.7.1 Sending from domain demomailtrap.com is not allowed', 'noreply@demomailtrap.com')", "request_id": "cc1d7e3d-7cf1-41dd-90fa-38bb87b49b8c", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:29.437443", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52730 - \"POST /auth/forgot-password HTTP/1.1\" 500", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:58.020141", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52751 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:58.587494", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52751 - \"GET /stories/?limit=9&random=true HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:59.489138", "level": "INFO", "name": "uvicorn.error", "message": "Shutting down", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:59.596333", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application shutdown.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:59.790902", "level": "INFO", "name": "database.connection", "message": "Disconnected from MongoDB", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:59.790902", "level": "INFO", "name": "main", "message": "Database connection closed", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:59.791901", "level": "INFO", "name": "uvicorn.error", "message": "Application shutdown complete.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:34:59.791901", "level": "INFO", "name": "uvicorn.error", "message": "Finished server process [14312]", "color_message": "Finished server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:35:03.732677", "level": "INFO", "name": "uvicorn.error", "message": "Started server process [23664]", "color_message": "Started server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:35:03.732677", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application startup.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:35:05.654050", "level": "INFO", "name": "database.connection", "message": "Connected to MongoDB successfully!", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:35:06.416128", "level": "INFO", "name": "database.connection", "message": "Database indexes created successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:35:06.417369", "level": "INFO", "name": "main", "message": "Database connected successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:35:06.417369", "level": "INFO", "name": "main", "message": "Starting Postnatal Stories API v3.0.0 in development mode", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:35:06.417369", "level": "INFO", "name": "uvicorn.error", "message": "Application startup complete.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:35:09.563372", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52782 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:35:09.989530", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52782 - \"GET /stories/?limit=9&random=true HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:35:16.469966", "level": "INFO", "name": "services.email_service", "message": "Constructed reset URL: */reset-password?token=12KqghmaUcJ5Xi2sP__wNGQngmB08o-YEdEt2Xt2klc", "request_id": "ab7825af-18a9-4939-ad17-2ec4de573cac", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:35:20.564642", "level": "INFO", "name": "services.email_service", "message": "Password reset email sent to peterdegrave191@gmail.com", "request_id": "ab7825af-18a9-4939-ad17-2ec4de573cac", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:35:20.565641", "level": "INFO", "name": "routers.auth", "message": "Password reset email sent to: peterdegrave191@gmail.com", "request_id": "ab7825af-18a9-4939-ad17-2ec4de573cac", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:35:20.567001", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52783 - \"POST /auth/forgot-password HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:35:54.714845", "level": "INFO", "name": "uvicorn.error", "message": "Shutting down", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:35:54.825200", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application shutdown.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:35:54.993404", "level": "INFO", "name": "database.connection", "message": "Disconnected from MongoDB", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:35:54.993404", "level": "INFO", "name": "main", "message": "Database connection closed", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:35:54.994396", "level": "INFO", "name": "uvicorn.error", "message": "Application shutdown complete.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:35:54.994396", "level": "INFO", "name": "uvicorn.error", "message": "Finished server process [23664]", "color_message": "Finished server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:37:12.698485", "level": "INFO", "name": "uvicorn.error", "message": "Started server process [22928]", "color_message": "Started server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:37:12.698485", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application startup.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:37:14.519398", "level": "INFO", "name": "database.connection", "message": "Connected to MongoDB successfully!", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:37:15.289192", "level": "INFO", "name": "database.connection", "message": "Database indexes created successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:37:15.289192", "level": "INFO", "name": "main", "message": "Database connected successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:37:15.289922", "level": "INFO", "name": "main", "message": "Starting Postnatal Stories API v3.0.0 in development mode", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:37:15.289922", "level": "INFO", "name": "uvicorn.error", "message": "Application startup complete.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:37:23.791635", "level": "INFO", "name": "services.email_service", "message": "Constructed reset URL: http://localhost:5500/reset-password?token=e2ArDmMrnthTPiMaBzgGR4Zcqi1SUbufcwjn-PWQlKk", "request_id": "be12803c-0c3c-4c9e-8882-29b32fd2a123", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:37:27.753423", "level": "INFO", "name": "services.email_service", "message": "Password reset email sent to peterdegrave191@gmail.com", "request_id": "be12803c-0c3c-4c9e-8882-29b32fd2a123", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:37:27.754423", "level": "INFO", "name": "routers.auth", "message": "Password reset email sent to: peterdegrave191@gmail.com", "request_id": "be12803c-0c3c-4c9e-8882-29b32fd2a123", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:37:27.755420", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52872 - \"POST /auth/forgot-password HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:39:46.879560", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52977 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:39:47.229073", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52977 - \"GET /stories/?limit=9&random=true HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:39:51.152343", "level": "INFO", "name": "uvicorn.error", "message": "Shutting down", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:39:51.260515", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application shutdown.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:39:51.433081", "level": "INFO", "name": "database.connection", "message": "Disconnected from MongoDB", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:39:51.433081", "level": "INFO", "name": "main", "message": "Database connection closed", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:39:51.434079", "level": "INFO", "name": "uvicorn.error", "message": "Application shutdown complete.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:39:51.434079", "level": "INFO", "name": "uvicorn.error", "message": "Finished server process [22928]", "color_message": "Finished server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:39:53.040513", "level": "INFO", "name": "uvicorn.error", "message": "Started server process [14028]", "color_message": "Started server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:39:53.040513", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application startup.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:39:54.858477", "level": "INFO", "name": "database.connection", "message": "Connected to MongoDB successfully!", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:39:55.565022", "level": "INFO", "name": "database.connection", "message": "Database indexes created successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:39:55.565022", "level": "INFO", "name": "main", "message": "Database connected successfully", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:39:55.565022", "level": "INFO", "name": "main", "message": "Starting Postnatal Stories API v3.0.0 in development mode", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:39:55.566019", "level": "INFO", "name": "uvicorn.error", "message": "Application startup complete.", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:39:55.570532", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52984 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:39:55.912174", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52984 - \"GET /stories/?limit=9&random=true HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:39:57.911748", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52984 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:39:58.285714", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52984 - \"GET /stories/?limit=9&random=true HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:02.701106", "level": "INFO", "name": "services.email_service", "message": "Constructed reset URL: http://127.0.0.1:5500/frontend/index.html?token=iiy-3abHXi63g2uDAT8rbIt3S-_MIv889DIahZPtImA", "request_id": "c9884752-0668-4968-ba1a-fde28ff52204", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:06.437617", "level": "INFO", "name": "services.email_service", "message": "Password reset email sent to peterdegrave191@gmail.com", "request_id": "c9884752-0668-4968-ba1a-fde28ff52204", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:06.437617", "level": "INFO", "name": "routers.auth", "message": "Password reset email sent to: peterdegrave191@gmail.com", "request_id": "c9884752-0668-4968-ba1a-fde28ff52204", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:06.439621", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52984 - \"POST /auth/forgot-password HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:12.111844", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52985 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:12.491582", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:52985 - \"GET /stories/?limit=9&random=true HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:31.099445", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:53049 - \"OPTIONS /auth/reset-password HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:31.304463", "level": "WARNING", "name": "passlib.handlers.bcrypt", "message": "(trapped) error reading bcrypt version", "exc_info": "Traceback (most recent call last):\n  File \"C:\\Users\\laure\\AppData\\Local\\Programs\\Python\\Python310\\lib\\site-packages\\passlib\\handlers\\bcrypt.py\", line 620, in _load_backend_mixin\n    version = _bcrypt.__about__.__version__\nAttributeError: module 'bcrypt' has no attribute '__about__'", "request_id": "409f2c12-354a-4ee1-a5f9-fc71401e4d0a", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:31.850831", "level": "INFO", "name": "routers.auth", "message": "Password reset successful for user: peterdegrave191@gmail.com", "request_id": "409f2c12-354a-4ee1-a5f9-fc71401e4d0a", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:31.851827", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:53049 - \"POST /auth/reset-password HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:39.040491", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:53051 - \"OPTIONS /auth/login HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:39.396863", "level": "WARNING", "name": "routers.auth", "message": "Failed login attempt for: peterdegrave191@gmail.com", "request_id": "c73f3c22-9561-415e-b999-1094e9f9198a", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:39.398371", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:53052 - \"POST /auth/login HTTP/1.1\" 401", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:42.731681", "level": "INFO", "name": "routers.auth", "message": "Successful login for user: peterdegrave191@gmail.com", "request_id": "06796694-d1db-4271-a829-6f968435022b", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:42.733792", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:53052 - \"POST /auth/login HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:42.740177", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:53052 - \"OPTIONS /moderation/pending HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:43.085243", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:53052 - \"GET /moderation/pending HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:51.332944", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:53059 - \"OPTIONS /auth/me HTTP/1.1\" 200", "request_id": "e3385fbb-b24e-40c6-a22f-234c44ac6b9b", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:51.333943", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:53060 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:51.519755", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:53059 - \"GET /auth/me HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:52.017749", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:53068 - \"GET /stories?limit=9&random=true HTTP/1.1\" 307", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:52.401889", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:53068 - \"GET /stories/?limit=9&random=true HTTP/1.1\" 200", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:52.822039", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:53062 - \"GET /auth/me HTTP/1.1\" 200", "request_id": "79177a5d-aa56-4aee-937e-f536a8658167", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:53.306504", "level": "INFO", "name": "uvicorn.error", "message": "Shutting down", "request_id": "9a335141-00fe-4eb5-a683-78d894d82376", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:53.320296", "level": "INFO", "name": "uvicorn.access", "message": "127.0.0.1:53062 - \"GET /moderation/pending HTTP/1.1\" 200", "request_id": "79177a5d-aa56-4aee-937e-f536a8658167", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:53.414869", "level": "INFO", "name": "uvicorn.error", "message": "Waiting for application shutdown.", "request_id": "79177a5d-aa56-4aee-937e-f536a8658167", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:53.587859", "level": "INFO", "name": "database.connection", "message": "Disconnected from MongoDB", "request_id": "79177a5d-aa56-4aee-937e-f536a8658167", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:53.587859", "level": "INFO", "name": "main", "message": "Database connection closed", "request_id": "79177a5d-aa56-4aee-937e-f536a8658167", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:53.587859", "level": "INFO", "name": "uvicorn.error", "message": "Application shutdown complete.", "request_id": "79177a5d-aa56-4aee-937e-f536a8658167", "service": "postnatal-stories-api"}
+{"timestamp": "2025-06-02T08:40:53.587859", "level": "INFO", "name": "uvicorn.error", "message": "Finished server process [14028]", "request_id": "79177a5d-aa56-4aee-937e-f536a8658167", "color_message": "Finished server process [\u001b[36m%d\u001b[0m]", "service": "postnatal-stories-api"}

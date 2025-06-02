@@ -6,6 +6,7 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from typing import Optional, Set
 from database.models.users import UserDatabase
+from services.email_service import EmailService
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 import os
@@ -52,6 +53,21 @@ class UserCreate(BaseModel):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
+class PasswordReset(BaseModel):
+    token: str
+    new_password: str
+
+    @validator('new_password')
+    def validate_password(cls, v):
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters long')
+        if not re.search(r'[A-Za-z]', v) or not re.search(r'\d', v):
+            raise ValueError('Password must contain letters and numbers')
+        return v
 
 class UserResponse(BaseModel):
     id: str
@@ -187,6 +203,73 @@ async def login_user(request: Request, user_data: UserLogin):
         user=user_response,
         expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )
+
+@router.post("/forgot-password")
+@limiter.limit("3/15minutes")
+async def forgot_password(request: Request, reset_request: PasswordResetRequest):
+    """Request password reset token"""
+    
+    # Clean up expired tokens first
+    await UserDatabase.clear_expired_reset_tokens()
+    
+    # Check if user exists
+    user = await UserDatabase.get_user_by_email(reset_request.email)
+    if not user:
+        # Return success even if user doesn't exist (security best practice)
+        return {
+            "success": True,
+            "message": "If an account with that email exists, we've sent password reset instructions."
+        }
+    
+    # Generate reset token
+    reset_token = await UserDatabase.create_password_reset_token(reset_request.email)
+    if not reset_token:
+        raise HTTPException(status_code=500, detail="Unable to generate reset token")
+    
+    # Send email
+    email_sent = await EmailService.send_password_reset_email(
+        email=reset_request.email,
+        reset_token=reset_token,
+        user_name=user.get("display_name", "there")
+    )
+    
+    if not email_sent:
+        raise HTTPException(status_code=500, detail="Unable to send reset email")
+    
+    logger.info(f"Password reset email sent to: {reset_request.email}")
+    
+    return {
+        "success": True,
+        "message": "If an account with that email exists, we've sent password reset instructions."
+    }
+
+@router.post("/reset-password")
+@limiter.limit("5/minute")
+async def reset_password(request: Request, reset_data: PasswordReset):
+    """Reset password using valid token"""
+    
+    # Verify token
+    user = await UserDatabase.verify_reset_token(reset_data.token)
+    if not user:
+        raise HTTPException(
+            status_code=400, 
+            detail="Invalid or expired reset token. Please request a new password reset."
+        )
+    
+    # Hash new password
+    new_password_hash = get_password_hash(reset_data.new_password)
+    
+    # Update password
+    success = await UserDatabase.reset_password(reset_data.token, new_password_hash)
+    if not success:
+        raise HTTPException(status_code=500, detail="Unable to reset password")
+    
+    logger.info(f"Password reset successful for user: {user['email']}")
+    
+    return {
+        "success": True,
+        "message": "Password reset successful! You can now log in with your new password."
+    }
 
 @router.post("/logout")
 async def logout_user(credentials: HTTPAuthorizationCredentials = Depends(security)):

@@ -1313,3 +1313,54 @@ footer .disclaimer {
     .stories-slide { grid-template-columns: 1fr; gap: 1rem; padding: 1rem; }
     .modal-content { padding: 2rem; }
 }
+
+/* Form Actions & Forgot Password Styling */
+.form-actions {
+    text-align: center;
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3.5rem;
+    align-items: center;
+}
+
+.forgot-password-link {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.forgot-link {
+    color: var(--deep-blue);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    padding: 0.8rem 1.5rem;
+    border-radius: 15px;
+    background: rgba(107, 182, 214, 0.1);
+    backdrop-filter: blur(5px);
+    display: inline-block;
+}
+
+.forgot-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--gradient-primary);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.forgot-link:hover {
+    color: var(--deep-pink);
+    background: rgba(232, 145, 163, 0.15);
+    transform: translateY(-1px);
+}
+
+.forgot-link:hover::after {
+    width: 80%;
+}

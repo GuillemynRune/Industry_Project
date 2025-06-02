@@ -12,6 +12,25 @@ function initializeAuth() {
     } else {
         handleTokenExpiry();
     }
+    
+    // Check for password reset token in URL
+    checkPasswordResetToken();
+}
+
+function checkPasswordResetToken() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const resetToken = urlParams.get('token');
+    
+    // Check if we're on reset-password page or have token parameter
+    if (resetToken || window.location.pathname === '/reset-password') {
+        const token = resetToken || urlParams.get('token');
+        if (token) {
+            // Clear URL parameters
+            window.history.replaceState({}, document.title, '/');
+            // Show reset password modal
+            showResetPasswordModal(token);
+        }
+    }
 }
 
 function setupTokenExpiryTimer(timeUntilExpiry) {
@@ -163,6 +182,79 @@ async function logout() {
     showToast('You\'ve been safely logged out. Thanks for visiting!', 'success', 'See You Soon!');
 }
 
+// Forgot Password Functions
+function showForgotPasswordModal() {
+    document.getElementById('forgotPasswordModal').style.display = 'block';
+    // Focus on email input after animation
+    setTimeout(() => {
+        document.getElementById('forgotEmail').focus();
+    }, 300);
+}
+
+function showResetPasswordModal(token) {
+    document.getElementById('resetPasswordModal').style.display = 'block';
+    document.getElementById('resetToken').value = token;
+    // Focus on password input after animation
+    setTimeout(() => {
+        document.getElementById('newPassword').focus();
+    }, 300);
+}
+
+async function requestPasswordReset(email) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            showToast(
+                'If an account with that email exists, we\'ve sent reset instructions. Check your email!',
+                'success',
+                'Reset Email Sent'
+            );
+            closeModal('forgotPasswordModal');
+        } else {
+            showToast(data.detail || 'Unable to process request. Please try again.', 'error');
+        }
+    } catch (error) {
+        console.error('Password reset request error:', error);
+        showToast('Connection error. Please check your internet and try again.', 'error', 'Connection Problem');
+    }
+}
+
+async function resetPassword(token, newPassword) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token, new_password: newPassword })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            showToast(
+                'Password reset successful! You can now log in with your new password.',
+                'success',
+                'Password Updated'
+            );
+            closeModal('resetPasswordModal');
+            // Switch to login form
+            switchAuth('login');
+            scrollToSection('authSection');
+        } else {
+            showToast(data.detail || 'Unable to reset password. Please try again.', 'error');
+        }
+    } catch (error) {
+        console.error('Password reset error:', error);
+        showToast('Connection error. Please check your internet and try again.', 'error', 'Connection Problem');
+    }
+}
+
 // Validation utilities
 function validateEmail(email) {
     return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
@@ -301,4 +393,57 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     
     submitBtn.textContent = originalText;
     submitBtn.disabled = false;
+});
+
+// Forgot password form handler
+document.getElementById('forgotPasswordForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const email = document.getElementById('forgotEmail').value.trim();
+    
+    if (!validateEmail(email)) {
+        showToast('Please enter a valid email address.', 'error', 'Invalid Email');
+        return;
+    }
+    
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+    
+    await requestPasswordReset(email);
+    
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
+    this.reset();
+});
+
+// Reset password form handler
+document.getElementById('resetPasswordForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const token = document.getElementById('resetToken').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    if (!newPassword || newPassword !== confirmPassword) {
+        showToast('Passwords do not match. Please try again.', 'error', 'Password Mismatch');
+        return;
+    }
+    
+    if (!validatePassword(newPassword)) {
+        showToast('Password must be at least 12 characters and include uppercase, lowercase, numbers, and special characters.', 'error', 'Password Too Weak');
+        return;
+    }
+    
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Resetting...';
+    submitBtn.disabled = true;
+    
+    await resetPassword(token, newPassword);
+    
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
+    this.reset();
 });
