@@ -1,7 +1,8 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 from bson import ObjectId
+import secrets
 from ..connection import mongodb
 
 logger = logging.getLogger(__name__)
@@ -23,7 +24,9 @@ class UserDatabase:
             "created_at": datetime.utcnow(),
             "last_login": None,
             "is_active": True,
-            "role": "user"
+            "role": "user",
+            "reset_token": None,
+            "reset_token_expires": None
         }
         
         result = await mongodb.database.users.insert_one(user_doc)
@@ -50,3 +53,81 @@ class UserDatabase:
             {"$set": {"last_login": datetime.utcnow()}}
         )
         return result.modified_count > 0
+    
+    @staticmethod
+    async def create_password_reset_token(email: str) -> Optional[str]:
+        """Generate and store a password reset token"""
+        user = await UserDatabase.get_user_by_email(email)
+        if not user:
+            return None
+        
+        # Generate secure token
+        reset_token = secrets.token_urlsafe(32)
+        expires_at = datetime.utcnow() + timedelta(hours=1)  # 1 hour expiry
+        
+        # Store token in database
+        result = await mongodb.database.users.update_one(
+            {"email": email},
+            {
+                "$set": {
+                    "reset_token": reset_token,
+                    "reset_token_expires": expires_at
+                }
+            }
+        )
+        
+        if result.modified_count > 0:
+            return reset_token
+        return None
+    
+    @staticmethod
+    async def verify_reset_token(token: str) -> Optional[Dict[str, Any]]:
+        """Verify reset token and return user if valid"""
+        user = await mongodb.database.users.find_one({
+            "reset_token": token,
+            "reset_token_expires": {"$gt": datetime.utcnow()}
+        })
+        
+        if user:
+            user["id"] = str(user["_id"])
+            user["_id"] = str(user["_id"])
+        
+        return user
+    
+    @staticmethod
+    async def reset_password(token: str, new_password_hash: str) -> bool:
+        """Reset password using valid token"""
+        # Verify token is valid
+        user = await UserDatabase.verify_reset_token(token)
+        if not user:
+            return False
+        
+        # Update password and clear reset token
+        result = await mongodb.database.users.update_one(
+            {"_id": ObjectId(user["id"])},
+            {
+                "$set": {
+                    "password_hash": new_password_hash,
+                    "last_login": datetime.utcnow()
+                },
+                "$unset": {
+                    "reset_token": "",
+                    "reset_token_expires": ""
+                }
+            }
+        )
+        
+        return result.modified_count > 0
+    
+    @staticmethod
+    async def clear_expired_reset_tokens():
+        """Clean up expired reset tokens"""
+        await mongodb.database.users.update_many(
+            {"reset_token_expires": {"$lt": datetime.utcnow()}},
+            {
+                "$unset": {
+                    "reset_token": "",
+                    "reset_token_expires": ""
+                }
+            }
+        )

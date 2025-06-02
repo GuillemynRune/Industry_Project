@@ -55,6 +55,9 @@
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">Login</button>
                     </div>
+                    <div class="forgot-password-link">
+                        <a href="#" onclick="showForgotPasswordModal()" class="forgot-link">Forgot your password?</a>
+                    </div>
                 </form>
 
                 <form id="registerForm" class="auth-form" style="display: none;">
@@ -247,6 +250,64 @@
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Submit Story for Review</button>
                     <button type="button" class="btn btn-secondary" onclick="closeModal('shareModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgotPasswordModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('forgotPasswordModal')">&times;</span>
+            <h2>🔐 Reset Your Password</h2>
+            <p>Enter your email address and we'll send you instructions to reset your password.</p>
+            
+            <form id="forgotPasswordForm">
+                <div class="form-group">
+                    <label for="forgotEmail">Email Address</label>
+                    <input type="email" id="forgotEmail" required placeholder="Enter your email address">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Send Reset Instructions</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('forgotPasswordModal')">Cancel</button>
+                </div>
+            </form>
+            
+            <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(168, 216, 234, 0.3);">
+                <p style="color: var(--text-light); font-size: 0.9rem;">
+                    Remember your password? <a href="#" onclick="closeModal('forgotPasswordModal'); switchAuth('login'); scrollToSection('authSection');" style="color: var(--deep-blue); font-weight: 600;">Back to Login</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div id="resetPasswordModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('resetPasswordModal')">&times;</span>
+            <h2>🔑 Create New Password</h2>
+            <p>Enter your new password below. Make it strong and memorable!</p>
+            
+            <form id="resetPasswordForm">
+                <input type="hidden" id="resetToken">
+                
+                <div class="form-group">
+                    <label for="newPassword">New Password</label>
+                    <input type="password" id="newPassword" required minlength="8" placeholder="Enter your new password">
+                    <div class="password-requirements">
+                        <small style="color: var(--text-light);">Password must be at least 8 characters and contain letters and numbers</small>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm New Password</label>
+                    <input type="password" id="confirmPassword" required minlength="8" placeholder="Confirm your new password">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Update Password</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('resetPasswordModal')">Cancel</button>
                 </div>
             </form>
         </div>

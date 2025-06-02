@@ -17,9 +17,18 @@ class Settings(BaseSettings):
     jwt_secret_key: str
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24 * 7
+    password_reset_expire_minutes: int = 60  # 1 hour for password reset
     
     # CORS - using your existing origins
     allowed_origins: str = "http://localhost:3000"
+    
+    # Email Configuration
+    smtp_server: str = "smtp.gmail.com"
+    smtp_port: int = 587
+    smtp_username: Optional[str] = None
+    smtp_password: Optional[str] = None
+    email_from: Optional[str] = None
+    email_from_name: str = "Postnatal Stories"
     
     # Azure OpenAI (optional - add when ready)
     azure_openai_endpoint: Optional[str] = None
