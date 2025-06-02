@@ -54,13 +54,13 @@ Backend runs on: http://localhost:8000
 6. Start the Frontend
 cd frontend
 python -m http.server 3000
-Frontend runs on: http://localhost:3000
+Frontend runs on: http://localhost:5500
 First Time Setup
 Create Account and in the mongodb change the role from "user" to "admin" inside the "users" section of the database
 
 Test Everything
 
-Visit http://localhost:3000 - should load without errors
+Visit http://localhost:5500 - should load without errors
 Visit http://localhost:8000/health - should show database connected
 Submit test story as regular user
 Review story as admin in moderation panel
