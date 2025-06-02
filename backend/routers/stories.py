@@ -6,7 +6,7 @@ from database.models.moderation import ModerationDatabase
 from database.utils import CrisisSupport, ContentFilter
 from services.story_service import create_recovery_story_prompt
 from services.symptom_service import extract_symptoms
-from services.ollama_client import query_ollama_model, MODELS
+from services.openai_client import query_openai_model, MODELS
 from routers.auth import get_current_active_user
 import logging
 
@@ -41,7 +41,7 @@ async def generate_recovery_story(challenge: str, experience: str, solution: str
     # Try AI models
     for model_name in MODELS:
         try:
-            generated_text = query_ollama_model(model_name, prompt, max_tokens=300)
+            generated_text = query_openai_model(model_name, prompt, max_tokens=300)
             if generated_text and len(generated_text.strip()) > 100:
                 story = generated_text.strip()
                 model_used = model_name

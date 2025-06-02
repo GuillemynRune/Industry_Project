@@ -4,7 +4,8 @@ Symptom extraction service using Ollama
 
 import logging
 from typing import List, Dict
-from .ollama_client import query_ollama_model, MODELS
+# from .ollama_client import query_ollama_model, MODELS
+from .openai_client import query_openai_model, MODELS
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +42,7 @@ def extract_symptoms(experience: str, feelings: str) -> Dict:
     # Try AI models first
     for model_name in MODELS[:2]:
         try:
-            generated_text = query_ollama_model(model_name, prompt, max_tokens=200)
+            generated_text = query_openai_model(model_name, prompt, max_tokens=200)
             
             if generated_text:
                 # Parse JSON response

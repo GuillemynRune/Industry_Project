@@ -3,7 +3,7 @@ Story transformation service using Ollama models
 """
 
 import logging
-from .ollama_client import query_ollama_model, MODELS
+from .openai_client import query_openai_model, MODELS
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +53,7 @@ def generate_supportive_message(experience: str, feelings: str, author_name: str
     # Try models in order
     for model_name in MODELS:
         try:
-            generated_text = query_ollama_model(model_name, prompt, max_tokens=300)
+            generated_text = query_openai_model(model_name, prompt, max_tokens=300)
             
             if generated_text and len(generated_text.strip()) > 50:
                 return {
