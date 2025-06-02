@@ -3,6 +3,7 @@ import logging
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import Optional
+import os
 from config import app_settings
 
 logger = logging.getLogger(__name__)
@@ -19,12 +20,16 @@ class EmailService:
         
         try:
             # FIXED: Handle wildcard in allowed_origins and match actual frontend path
-            if app_settings.allowed_origins[0] == "*":
-                # Match your actual frontend URL structure
-                base_url = "http://127.0.0.1:5500/frontend/index.html"
+            frontend_url = os.getenv("FRONTEND_URL")
+            if frontend_url:
+                reset_url = f"{frontend_url}?token={reset_token}"
             else:
-                base_url = app_settings.allowed_origins[0].rstrip('/')
-            reset_url = f"{base_url}?token={reset_token}"
+                # Fallback construction
+                if app_settings.allowed_origins[0] == "*":
+                    base_url = "http://localhost:5500/frontend"
+                else:
+                    base_url = app_settings.allowed_origins[0].rstrip('/')
+                reset_url = f"{base_url}/index.html?token={reset_token}"
             
             # DEBUG: Log the constructed URL
             logger.info(f"Constructed reset URL: {reset_url}")
