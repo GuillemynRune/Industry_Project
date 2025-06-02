@@ -820,9 +820,69 @@ nav {
 }
 
 .checkbox-group label {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
+    cursor: pointer;
+    padding: 0.4rem;
+    border-radius: 6px;
+    background: none;
+    border: none;
+    font-size: 0.85rem;
+    color: var(--text-dark);
+}
+
+.checkbox-group input[type="checkbox"] {
+    appearance: auto; /* Rely on default checkbox appearance */
+    -webkit-appearance: checkbox;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    margin-right: 0.3rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.checkbox-group input[type="checkbox"]:checked {
+    background: var(--gradient-primary);
+    border-color: var(--deep-blue);
+    transform: scale(1.05);
+}
+
+.checkbox-group input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px; /* Reduced checkmark size */
+    font-weight: bold;
+    line-height: 1;
+}
+
+.checkbox-group label a {
+    font-size: 0.85rem; /* Reduced link font size */
+    color: var(--deep-blue);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.checkbox-group label a:hover {
+    color: var(--deep-pink);
+    text-decoration: underline;
+}
+
+/* Special styling for required checkboxes */
+.checkbox-group input[type="checkbox"][required] + label::after {
+    content: '*';
+    color: var(--crisis-red);
+    margin-left: 0.2rem;
+    font-weight: bold;
 }
 
 .form-actions {
