@@ -11,7 +11,7 @@ async def ensure_production_ready():
         # Check if collections exist, create if not
         collections = await mongodb.database.list_collection_names()
         required_collections = [
-            "users", "pending_stories", "approved_stories", "symptom_extractions"
+            "users", "pending_stories", "approved_stories"
         ]
 
         for collection in required_collections:

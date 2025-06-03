@@ -10,7 +10,6 @@ __all__ = [
     'check_database_health',
     'UserDatabase',
     'StoryDatabase',
-    'SymptomDatabase',
     'CrisisSupport',
     'ModerationDatabase'
 ]

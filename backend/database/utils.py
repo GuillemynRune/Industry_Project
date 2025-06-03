@@ -36,13 +36,10 @@ class CrisisSupport:
     
     @staticmethod
     async def log_crisis_interaction(interaction_type: str, user_id: Optional[str] = None) -> bool:
-        """Log crisis support interaction"""
+        """Log crisis support interaction - DISABLED"""
         try:
-            await mongodb.database.crisis_interactions.insert_one({
-                "interaction_type": interaction_type,
-                "user_id": user_id,
-                "created_at": datetime.utcnow()
-            })
+            # Database logging disabled - just log to console
+            logger.info(f"Crisis interaction: {interaction_type} for user {user_id}")
             return True
         except Exception as e:
             logger.error(f"Error logging crisis interaction: {e}")

@@ -76,7 +76,7 @@ function handleTokenExpiry() {
     authToken = null;
     currentUser = null;
     showAuthSection();
-    showToast('Your session has expired. Please login again to continue.', 'warning', 'Session Expired');
+    // REMOVED: Duplicate login warning that showed on page load
 }
 
 async function makeAuthenticatedRequest(url, options = {}) {
@@ -261,11 +261,9 @@ function validateEmail(email) {
 }
 
 function validatePassword(password) {
-    return password.length >= 12 && 
-           /[A-Z]/.test(password) && 
-           /[a-z]/.test(password) && 
-           /\d/.test(password) && 
-           /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    return password.length >= 8 && 
+           /[A-Za-z]/.test(password) && 
+           /\d/.test(password);
 }
 
 function escapeHtml(unsafe) {
@@ -365,7 +363,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     }
     
     if (!validatePassword(password)) {
-        showToast('Password must be at least 12 characters and include uppercase, lowercase, numbers, and special characters for your security.', 'error', 'Password Too Weak');
+        showToast('Password must be at least 8 characters and include letters and numbers.', 'error', 'Password Too Weak');
         return;
     }
     
@@ -432,7 +430,7 @@ document.getElementById('resetPasswordForm').addEventListener('submit', async fu
     }
     
     if (!validatePassword(newPassword)) {
-        showToast('Password must be at least 12 characters and include uppercase, lowercase, numbers, and special characters.', 'error', 'Password Too Weak');
+        showToast('Password must be at least 8 characters and include letters and numbers.', 'error', 'Password Too Weak');
         return;
     }
     

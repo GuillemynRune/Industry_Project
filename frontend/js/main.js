@@ -7,6 +7,18 @@ let authToken = null;
 document.addEventListener('DOMContentLoaded', function() {
     initializeAuth();
     loadApprovedStories();
+    
+    // Initialize new systems
+    if (typeof InteractiveTour !== 'undefined') {
+        tour = new InteractiveTour();
+    }
+    if (typeof GuidedPrompts !== 'undefined') {
+        guidedPrompts = new GuidedPrompts();
+    }
+    themeManager = new ThemeManager();
+    
+    // REMOVED: Auto-start tour to prevent duplicate warnings
+    // Tour will only start when user clicks "Take Tour"
 });
 
 // Toast Notification System
@@ -134,22 +146,3 @@ class ThemeManager {
         document.documentElement.setAttribute('data-theme', theme);
     }
 }
-
-// Initialize theme manager
-document.addEventListener('DOMContentLoaded', function() {
-    initializeAuth();
-    loadApprovedStories();
-    
-    // Initialize new systems
-    tour = new InteractiveTour();
-    guidedPrompts = new GuidedPrompts();
-    themeManager = new ThemeManager();
-    
-    // Auto-start tour for new users
-    setTimeout(() => {
-        if (tour.shouldShowTour() && !currentUser) {
-            tour.start();
-        }
-    }, 2000);
-});
-

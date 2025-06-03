@@ -75,16 +75,21 @@ class InteractiveTour {
             return;
         }
         
-        // Show overlay
-        this.overlay.style.display = 'block';
-        this.createSpotlight(target);
+        // Scroll to target smoothly before showing tooltip
+        target.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center',
+            inline: 'center'
+        });
         
-        // Position and show tooltip
-        this.positionTooltip(target, step);
-        this.tooltip.style.display = 'block';
-        
-        // Add pulse animation to target
-        target.classList.add('tour-highlight');
+        // Reduced wait time from 800ms to 300ms
+        setTimeout(() => {
+            this.overlay.style.display = 'block';
+            this.createSpotlight(target);
+            this.positionTooltip(target, step);
+            this.tooltip.style.display = 'block';
+            target.classList.add('tour-highlight');
+        }, 300); // Changed from 800 to 300
     }
     
     createSpotlight(target) {
@@ -204,18 +209,6 @@ class InteractiveTour {
 
 // Initialize tour
 let tour;
-
-// Auto-start tour for new users
-document.addEventListener('DOMContentLoaded', function() {
-    tour = new InteractiveTour();
-    
-    // Start tour after page loads for new users
-    setTimeout(() => {
-        if (tour.shouldShowTour() && !currentUser) {
-            tour.start();
-        }
-    }, 2000);
-});
 
 // Manual tour trigger
 function startTour() {
