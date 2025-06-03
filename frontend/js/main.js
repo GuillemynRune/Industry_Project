@@ -17,8 +17,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     themeManager = new ThemeManager();
     
-    // REMOVED: Auto-start tour to prevent duplicate warnings
-    // Tour will only start when user clicks "Take Tour"
+    // Add smooth scroll to nav links
+    document.querySelectorAll('.nav-links a[href^="#"]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetSection = document.getElementById(targetId);
+            
+            if (targetSection) {
+                targetSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
 });
 
 // Toast Notification System
