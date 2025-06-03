@@ -24,14 +24,31 @@ def require_moderator(current_user: dict = Depends(get_current_active_user)):
 @router.get("/pending")
 async def get_pending_stories(
     current_user: dict = Depends(require_moderator),
-    limit: int = 20
+    limit: int = 4,
+    offset: int = 0
 ):
-    """Get stories pending moderation"""
-    pending_stories = await ModerationDatabase.get_pending_stories(limit=limit)
+    """Get stories pending moderation with pagination"""
+    
+    # Get total count
+    total_pending = await mongodb.database.pending_stories.count_documents({"status": "pending_review"})
+    
+    # Get limited stories
+    cursor = mongodb.database.pending_stories.find(
+        {"status": "pending_review"}
+    ).sort("created_at", 1).skip(offset).limit(limit)
+    
+    stories = []
+    async for story in cursor:
+        story["id"] = str(story["_id"])
+        del story["_id"]
+        stories.append(story)
+    
     return {
         "success": True,
-        "pending_stories": pending_stories,
-        "count": len(pending_stories)
+        "pending_stories": stories,
+        "total_count": total_pending,
+        "displayed_count": len(stories),
+        "has_more": (offset + len(stories)) < total_pending
     }
     
 @router.get("/story/{story_id}")
@@ -91,4 +108,16 @@ async def reject_story(
     return {
         "success": True,
         "message": "Story rejected and removed from queue"
+    }
+
+@router.get("/stats")
+async def get_moderation_stats(current_user: dict = Depends(require_moderator)):
+    """Get real-time moderation statistics"""
+    total_pending = await mongodb.database.pending_stories.count_documents({"status": "pending_review"})
+    total_approved = await mongodb.database.approved_stories.count_documents({})
+    
+    return {
+        "success": True,
+        "total_pending": total_pending,
+        "total_approved": total_approved
     }

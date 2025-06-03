@@ -1,4 +1,8 @@
-// Moderation functionality
+// Enhanced Moderation functionality with pagination and animations
+let currentDisplayedStories = [];
+let totalPendingCount = 0;
+let displayedOffset = 0;
+
 function checkAdminAccess() {
     if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'moderator')) {
         document.getElementById('moderationSection').style.display = 'block';
@@ -17,16 +21,24 @@ function checkAdminAccess() {
         }
 
         loadPendingStories();
+        
+        // Auto-refresh stats every 30 seconds
+        setInterval(refreshModerationStats, 30000);
     }
 }
 
-async function loadPendingStories() {
+async function loadPendingStories(resetOffset = true) {
     if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'moderator')) {
         return;
     }
 
+    if (resetOffset) {
+        displayedOffset = 0;
+        currentDisplayedStories = [];
+    }
+
     try {
-        const response = await fetch(`${API_BASE_URL}/moderation/pending`, {
+        const response = await fetch(`${API_BASE_URL}/moderation/pending?limit=4&offset=${displayedOffset}`, {
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
 
@@ -35,10 +47,24 @@ async function loadPendingStories() {
         }
 
         const data = await response.json();
-        const stories = (data.success ? data.pending_stories : data.pending_stories) || [];
         
-        displayPendingStories(stories);
-        updateModerationStats(stories);
+        if (data.success) {
+            totalPendingCount = data.total_count;
+            const newStories = data.pending_stories || [];
+            
+            if (resetOffset) {
+                currentDisplayedStories = newStories;
+                displayPendingStories(currentDisplayedStories);
+            } else {
+                // Add new stories with animation
+                newStories.forEach(story => {
+                    currentDisplayedStories.push(story);
+                    addStoryWithAnimation(story);
+                });
+            }
+            
+            updateModerationStats();
+        }
     } catch (error) {
         console.error('Error loading pending stories:', error);
         showToast('Error loading pending stories: ' + error.message, 'error', 'Loading Error');
@@ -67,11 +93,31 @@ function displayPendingStories(stories) {
 
     stories.forEach((story, index) => {
         try {
-            grid.appendChild(createCompactStoryCard(story, index));
+            const card = createCompactStoryCard(story, index);
+            card.style.animationDelay = `${index * 0.1}s`;
+            grid.appendChild(card);
         } catch (error) {
             console.error('Error creating story card:', error, story);
         }
     });
+}
+
+function addStoryWithAnimation(story) {
+    const grid = document.getElementById('pendingStoriesGrid');
+    if (!grid || grid.querySelector('.no-stories-message')) {
+        // If showing "no stories" message, reload completely
+        displayPendingStories(currentDisplayedStories);
+        return;
+    }
+
+    const card = createCompactStoryCard(story, currentDisplayedStories.length - 1);
+    card.classList.add('story-card-enter');
+    grid.appendChild(card);
+
+    // Remove animation class after animation completes
+    setTimeout(() => {
+        card.classList.remove('story-card-enter');
+    }, 500);
 }
 
 function createCompactStoryCard(story, index) {
@@ -79,7 +125,7 @@ function createCompactStoryCard(story, index) {
     const riskLevel = story.risk_level || 'minimal';
     
     card.className = `pending-story-card-compact ${riskLevel}-risk`;
-    card.style.animationDelay = `${index * 0.1}s`;
+    card.dataset.storyId = story._id || story.id;
 
     const storyData = {
         id: story._id || story.id,
@@ -117,23 +163,106 @@ function createCompactStoryCard(story, index) {
     return card;
 }
 
-function updateModerationStats(stories) {
-    const stats = {
-        pending: stories.length,
-        highRisk: stories.filter(s => s.risk_level === 'high').length,
-        totalApproved: '—' // Placeholder
-    };
+function updateModerationStats() {
+    const pendingCountElement = document.getElementById('pendingCount');
+    if (pendingCountElement) {
+        pendingCountElement.textContent = totalPendingCount;
+    }
+}
 
-    const elements = {
-        pendingCount: document.getElementById('pendingCount'),
-        highRiskCount: document.getElementById('highRiskCount'),
-        totalApproved: document.getElementById('totalApproved')
-    };
+async function refreshModerationStats() {
+    if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'moderator')) {
+        return;
+    }
 
-    Object.entries(stats).forEach(([key, value]) => {
-        const element = elements[key + (key === 'totalApproved' ? '' : 'Count')];
-        if (element) element.textContent = value;
-    });
+    try {
+        const response = await fetch(`${API_BASE_URL}/moderation/stats`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                totalPendingCount = data.total_pending;
+                updateModerationStats();
+                
+                // If we're showing fewer than 4 stories but there are more available, load them
+                if (currentDisplayedStories.length < 4 && currentDisplayedStories.length < totalPendingCount) {
+                    const needed = Math.min(4 - currentDisplayedStories.length, totalPendingCount - currentDisplayedStories.length);
+                    await loadAdditionalStories(needed);
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error refreshing stats:', error);
+    }
+}
+
+async function loadAdditionalStories(count) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/moderation/pending?limit=${count}&offset=${currentDisplayedStories.length}`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.pending_stories.length > 0) {
+                data.pending_stories.forEach(story => {
+                    currentDisplayedStories.push(story);
+                    addStoryWithAnimation(story);
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Error loading additional stories:', error);
+    }
+}
+
+async function removeStoryWithAnimation(storyId) {
+    const grid = document.getElementById('pendingStoriesGrid');
+    const card = grid.querySelector(`[data-story-id="${storyId}"]`);
+    
+    if (!card) return;
+
+    // Add exit animation
+    card.classList.add('story-card-exit');
+    
+    // Remove from current displayed stories
+    currentDisplayedStories = currentDisplayedStories.filter(s => (s._id || s.id) !== storyId);
+    
+    // Wait for animation to complete, then remove card
+    setTimeout(async () => {
+        card.remove();
+        
+        // If we have fewer than 4 stories displayed and there are more available, load the next one
+        if (currentDisplayedStories.length < 4 && currentDisplayedStories.length < totalPendingCount) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/moderation/pending?limit=1&offset=${currentDisplayedStories.length}`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.pending_stories.length > 0) {
+                        const newStory = data.pending_stories[0];
+                        currentDisplayedStories.push(newStory);
+                        addStoryWithAnimation(newStory);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading next story:', error);
+            }
+        }
+        
+        // Update total count
+        totalPendingCount = Math.max(0, totalPendingCount - 1);
+        updateModerationStats();
+        
+        // If no stories left, show empty message
+        if (currentDisplayedStories.length === 0) {
+            displayPendingStories([]);
+        }
+    }, 500);
 }
 
 async function openStoryDetailModal(storyId) {
@@ -289,7 +418,9 @@ async function moderateStory(storyId, action) {
             };
             showToast(messages[action], 'success', action === 'approve' ? 'Story Published!' : 'Story Rejected');
             closeModal('storyDetailModal');
-            loadPendingStories();
+            
+            // Remove story with animation
+            await removeStoryWithAnimation(storyId);
         } else {
             showToast(`Failed to ${action} story: ${data.message || 'Unknown error'}`, 'error', `${action.charAt(0).toUpperCase() + action.slice(1)} Failed`);
         }

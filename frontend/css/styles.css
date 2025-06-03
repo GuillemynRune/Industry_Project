@@ -2156,3 +2156,63 @@ footer .disclaimer {
         width: 100%;
     }
 }
+
+/* Story Card Animations */
+@keyframes slideOut {
+    from { 
+        opacity: 1; 
+        transform: translateX(0) scale(1); 
+        max-height: 400px; 
+        margin-bottom: 2rem;
+    }
+    to { 
+        opacity: 0; 
+        transform: translateX(-100px) scale(0.8); 
+        max-height: 0; 
+        margin-bottom: 0;
+    }
+}
+
+@keyframes slideIn {
+    from { 
+        opacity: 0; 
+        transform: translateX(100px) scale(0.8); 
+        max-height: 0; 
+        margin-bottom: 0;
+    }
+    to { 
+        opacity: 1; 
+        transform: translateX(0) scale(1); 
+        max-height: 400px; 
+        margin-bottom: 2rem;
+    }
+}
+
+.story-card-exit {
+    animation: slideOut 0.5s ease-in-out forwards;
+    pointer-events: none;
+}
+
+.story-card-enter {
+    animation: slideIn 0.5s ease-in-out forwards;
+}
+
+.pending-story-card-compact {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+/* Loading placeholder for new stories */
+.story-loading-placeholder {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 25px;
+    height: 200px;
+    margin-bottom: 2rem;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
