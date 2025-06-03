@@ -129,6 +129,14 @@ function updateUserSection() {
     const userSection = document.getElementById('userSection');
     
     if (currentUser) {
+        // Add tour link to navigation for logged-in users
+        if (!document.getElementById('tourLink')) {
+            const navLinks = document.querySelector('.nav-links');
+            const tourLi = document.createElement('li');
+            tourLi.innerHTML = '<a href="javascript:void(0)" id="tourLink" onclick="startTour()">Take Tour</a>';
+            navLinks.appendChild(tourLi);
+        }
+        
         userSection.innerHTML = `
             <div class="user-info">
                 <div class="user-avatar">${currentUser.display_name.charAt(0).toUpperCase()}</div>
@@ -137,6 +145,12 @@ function updateUserSection() {
             </div>
         `;
     } else {
+        // Remove tour link when not logged in
+        const existingTourLink = document.getElementById('tourLink');
+        if (existingTourLink) {
+            existingTourLink.parentElement.remove();
+        }
+        
         userSection.innerHTML = `
             <button class="auth-prompt-btn" onclick="scrollToSection('authSection')">Login / Sign Up</button>
         `;

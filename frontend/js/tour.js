@@ -1,7 +1,17 @@
-// Interactive Tour System
+// Updated tour.js - Conditional tour based on user state
 class InteractiveTour {
     constructor() {
-        this.steps = [
+        this.currentStep = 0;
+        this.isActive = false;
+        this.overlay = null;
+        this.tooltip = null;
+        this.steps = [];
+        
+        this.createTourElements();
+    }
+    
+    getStepsForUser() {
+        const baseSteps = [
             {
                 target: '.logo',
                 title: 'Welcome to Postnatal Stories',
@@ -15,7 +25,7 @@ class InteractiveTour {
                 position: 'bottom'
             },
             {
-                target: '.btn-primary',
+                target: '.cta-buttons .btn-primary',
                 title: 'Share Your Story',
                 content: 'Help others by sharing your experiences and recovery journey.',
                 position: 'bottom'
@@ -33,21 +43,30 @@ class InteractiveTour {
                 position: 'top'
             }
         ];
-        
-        this.currentStep = 0;
-        this.isActive = false;
-        this.overlay = null;
-        this.tooltip = null;
-        
-        this.createTourElements();
+
+        // Add moderation step for admins/moderators
+        if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'moderator')) {
+            baseSteps.push({
+                target: '#moderationSection',
+                title: 'Story Moderation',
+                content: 'Review and approve community stories before they go live. Keep our community safe and supportive.',
+                position: 'top'
+            });
+        }
+
+        return baseSteps;
     }
     
     createTourElements() {
-        // Create overlay
+        // Remove existing elements
+        const existingOverlay = document.querySelector('.tour-overlay');
+        const existingTooltip = document.querySelector('.tour-tooltip');
+        if (existingOverlay) existingOverlay.remove();
+        if (existingTooltip) existingTooltip.remove();
+        
         this.overlay = document.createElement('div');
         this.overlay.className = 'tour-overlay';
         
-        // Create tooltip
         this.tooltip = document.createElement('div');
         this.tooltip.className = 'tour-tooltip';
         
@@ -58,11 +77,12 @@ class InteractiveTour {
     start() {
         if (this.isActive) return;
         
+        // Get steps based on current user
+        this.steps = this.getStepsForUser();
         this.isActive = true;
         this.currentStep = 0;
         this.showStep();
         
-        // Track tour completion
         localStorage.setItem('tourCompleted', 'false');
     }
     
@@ -71,35 +91,37 @@ class InteractiveTour {
         const target = document.querySelector(step.target);
         
         if (!target) {
-            this.next();
+            // Skip missing targets
+            if (this.currentStep < this.steps.length - 1) {
+                this.currentStep++;
+                setTimeout(() => this.showStep(), 100);
+            } else {
+                this.end();
+            }
             return;
         }
         
-        // Scroll to target smoothly before showing tooltip
+        this.clearHighlight();
+        
         target.scrollIntoView({ 
             behavior: 'smooth', 
             block: 'center',
             inline: 'center'
         });
         
-        // Reduced wait time from 800ms to 300ms
         setTimeout(() => {
             this.overlay.style.display = 'block';
             this.createSpotlight(target);
             this.positionTooltip(target, step);
             this.tooltip.style.display = 'block';
             target.classList.add('tour-highlight');
-        }, 300); // Changed from 800 to 300
+        }, 600);
     }
     
     createSpotlight(target) {
         const rect = target.getBoundingClientRect();
-        const padding = 10;
+        const padding = 15;
         
-        // Clear previous spotlight
-        this.overlay.innerHTML = '';
-        
-        // Create spotlight hole
         this.overlay.style.clipPath = `polygon(
             0% 0%, 
             0% 100%, 
@@ -116,9 +138,8 @@ class InteractiveTour {
     
     positionTooltip(target, step) {
         const rect = target.getBoundingClientRect();
-        const tooltip = this.tooltip;
         
-        tooltip.innerHTML = `
+        this.tooltip.innerHTML = `
             <div class="tour-content">
                 <div class="tour-header">
                     <h3>${step.title}</h3>
@@ -136,7 +157,7 @@ class InteractiveTour {
                         ${this.currentStep > 0 ? '<button class="tour-btn tour-btn-secondary" onclick="tour.previous()">← Previous</button>' : ''}
                         ${this.currentStep < this.steps.length - 1 ? 
                             '<button class="tour-btn tour-btn-primary" onclick="tour.next()">Next →</button>' : 
-                            '<button class="tour-btn tour-btn-primary" onclick="tour.end()">Finish Tour</button>'
+                            '<button class="tour-btn tour-btn-primary" onclick="tour.complete()">Finish Tour</button>'
                         }
                     </div>
                 </div>
@@ -145,23 +166,13 @@ class InteractiveTour {
         
         // Position tooltip
         if (step.position === 'bottom') {
-            tooltip.style.top = (rect.bottom + 20) + 'px';
-            tooltip.style.left = (rect.left + rect.width / 2) + 'px';
-            tooltip.style.transform = 'translateX(-50%)';
+            this.tooltip.style.top = (rect.bottom + 20) + 'px';
+            this.tooltip.style.left = Math.max(10, rect.left + rect.width / 2 - 175) + 'px';
+            this.tooltip.style.transform = 'none';
         } else {
-            tooltip.style.top = (rect.top - 20) + 'px';
-            tooltip.style.left = (rect.left + rect.width / 2) + 'px';
-            tooltip.style.transform = 'translateX(-50%) translateY(-100%)';
-        }
-        
-        // Ensure tooltip is within viewport
-        const tooltipRect = tooltip.getBoundingClientRect();
-        if (tooltipRect.left < 10) {
-            tooltip.style.left = '10px';
-            tooltip.style.transform = 'none';
-        } else if (tooltipRect.right > window.innerWidth - 10) {
-            tooltip.style.left = (window.innerWidth - tooltipRect.width - 10) + 'px';
-            tooltip.style.transform = 'none';
+            this.tooltip.style.top = (rect.top - 20) + 'px';
+            this.tooltip.style.left = Math.max(10, rect.left + rect.width / 2 - 175) + 'px';
+            this.tooltip.style.transform = 'translateY(-100%)';
         }
     }
     
@@ -171,7 +182,7 @@ class InteractiveTour {
             this.currentStep++;
             setTimeout(() => this.showStep(), 300);
         } else {
-            this.end();
+            this.complete();
         }
     }
     
@@ -183,35 +194,51 @@ class InteractiveTour {
         }
     }
     
+    complete() {
+        this.cleanup();
+        localStorage.setItem('tourCompleted', 'true');
+        
+        // Smooth scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        setTimeout(() => {
+            showToast('Tour completed! Welcome to our community.', 'success', 'Welcome!');
+        }, 800);
+    }
+    
+    end() {
+        this.cleanup();
+        showToast('Tour cancelled.', 'warning', 'Tour Cancelled');
+    }
+    
+    cleanup() {
+        this.isActive = false;
+        this.clearHighlight();
+        this.overlay.style.display = 'none';
+        this.tooltip.style.display = 'none';
+        this.overlay.style.clipPath = '';
+    }
+    
     clearHighlight() {
         document.querySelectorAll('.tour-highlight').forEach(el => {
             el.classList.remove('tour-highlight');
         });
     }
     
-    end() {
-        this.isActive = false;
-        this.clearHighlight();
-        this.overlay.style.display = 'none';
-        this.tooltip.style.display = 'none';
-        
-        // Mark tour as completed
-        localStorage.setItem('tourCompleted', 'true');
-        
-        showToast('Tour completed! Explore the platform and share your story when you\'re ready.', 'success', 'Welcome!');
-    }
-    
-    // Check if user should see tour
     shouldShowTour() {
         return !localStorage.getItem('tourCompleted') || localStorage.getItem('tourCompleted') === 'false';
     }
 }
 
-// Initialize tour
 let tour;
 
-// Manual tour trigger
 function startTour() {
+    if (!currentUser) {
+        showToast('Please login first to take the full tour.', 'warning', 'Login Required');
+        scrollToSection('authSection');
+        return;
+    }
+    
     if (!tour) tour = new InteractiveTour();
     tour.start();
 }
