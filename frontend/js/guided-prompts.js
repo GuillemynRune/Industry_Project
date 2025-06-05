@@ -115,6 +115,7 @@ class GuidedPrompts {
                             id="guided-${step.id}" 
                             placeholder="${step.placeholder}"
                             rows="6"
+                            style="padding-bottom: 60px;"
                         >${this.formData[step.id] || ''}</textarea>
                         <div class="character-count">
                             <span id="charCount">0</span> characters
@@ -157,6 +158,13 @@ class GuidedPrompts {
         
         // Initial character count
         charCount.textContent = textarea.value.length;
+        
+        // Add microphone button
+        setTimeout(() => {
+            if (window.speechToText) {
+                window.speechToText.addMicrophoneButton(textarea);
+            }
+        }, 100);
         
         // Focus on textarea after animation
         setTimeout(() => textarea.focus(), 500);
