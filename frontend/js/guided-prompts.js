@@ -137,8 +137,13 @@ class GuidedPrompts {
                         }
                     </div>
                     <div class="guided-nav-center">
-                        <button type="button" class="guided-speech-btn" onclick="handleGuidedSpeech(this)">
-                            <div class="guided-speech-icon"></div>
+                        <button type="button" class="guided-speech-btn" onclick="handleGuidedSpeech(this)" title="Use voice input">
+                            <div class="guided-speech-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 1a4 4 0 0 0-4 4v7a4 4 0 0 0 8 0V5a4 4 0 0 0-4-4z" fill="currentColor"/>
+                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </div>
                             <span>Voice Input</span>
                             <div class="volume-bars">
                                 <div class="bar"></div>

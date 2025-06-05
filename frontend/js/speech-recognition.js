@@ -1,4 +1,4 @@
-// Enhanced Speech Recognition System
+// Enhanced Speech Recognition System with Beautiful Animations
 class SpeechRecognitionManager {
     constructor() {
         this.recognition = null;
@@ -8,6 +8,7 @@ class SpeechRecognitionManager {
         this.analyser = null;
         this.mediaStream = null;
         this.animationId = null;
+        this.volumeRings = [];
         this.init();
     }
 
@@ -53,6 +54,8 @@ class SpeechRecognitionManager {
             if (this.currentTextarea) {
                 const existingText = this.currentTextarea.dataset.originalText || '';
                 this.currentTextarea.value = existingText + finalTranscript + interimTranscript;
+                
+                // Trigger input event for character count updates
                 this.currentTextarea.dispatchEvent(new Event('input', { bubbles: true }));
             }
         };
@@ -85,6 +88,7 @@ class SpeechRecognitionManager {
             this.enhanceTextarea(textarea);
         });
 
+        // Watch for new textareas
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 mutation.addedNodes.forEach((node) => {
@@ -106,62 +110,34 @@ class SpeechRecognitionManager {
     enhanceTextarea(textarea) {
         if (textarea.dataset.speechEnhanced) return;
         textarea.dataset.speechEnhanced = 'true';
-
-        const micContainer = document.createElement('div');
-        micContainer.className = 'speech-mic-container';
-        
-        const isSupported = this.recognition !== null;
-        const buttonTitle = isSupported ? 'Click to use voice input' : 'Speech recognition not supported in this browser';
-        
-        micContainer.innerHTML = `
-            <button type="button" class="speech-mic-btn" aria-label="Voice input" title="${buttonTitle}" ${!isSupported ? 'disabled' : ''}>
-                <div class="mic-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 1a4 4 0 0 0-4 4v7a4 4 0 0 0 8 0V5a4 4 0 0 0-4-4z" fill="currentColor"/>
-                        <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <div class="volume-bars">
-                    ${Array(5).fill('<div class="bar"></div>').join('')}
-                </div>
-            </button>
-        `;
-
-        const textareaParent = textarea.parentNode;
-        textareaParent.style.position = 'relative';
-        textareaParent.appendChild(micContainer);
-
-        const micBtn = micContainer.querySelector('.speech-mic-btn');
-        micBtn.addEventListener('click', () => {
-            if (!isSupported) {
-                showToast('Speech recognition is not supported in this browser. Please try Chrome, Edge, or Safari.', 'warning', 'Browser Not Supported');
-                return;
-            }
-            
-            if (this.isListening && this.currentTextarea === textarea) {
-                this.stopListening();
-            } else {
-                this.startListening(textarea, micContainer);
-            }
-        });
+        // Store reference for guided prompts
+        textarea.speechManager = this;
     }
 
     async startListening(textarea, micContainer) {
         try {
+            // Store original text
             textarea.dataset.originalText = textarea.value;
             this.currentTextarea = textarea;
 
+            // Setup audio visualization
             await this.setupAudioVisualization();
 
+            // Start recognition
             this.recognition.start();
             this.isListening = true;
 
-            micContainer.classList.add('listening');
-            textarea.classList.add('speech-active');
+            // Add visual feedback with smooth transitions
+            setTimeout(() => {
+                micContainer.classList.add('listening');
+                textarea.classList.add('speech-active');
+            }, 100);
 
+            // Create beautiful overlay
             this.createListeningOverlay();
 
-            showToast('Listening... Speak now!', 'success', 'Voice Input Active');
+            // Show success toast
+            showToast('🎤 Listening... Speak now!', 'success', 'Voice Input Active');
 
         } catch (error) {
             console.error('Error starting speech recognition:', error);
@@ -175,7 +151,8 @@ class SpeechRecognitionManager {
                 audio: {
                     echoCancellation: true,
                     noiseSuppression: true,
-                    autoGainControl: true
+                    autoGainControl: true,
+                    sampleRate: 44100
                 }
             });
             
@@ -183,46 +160,54 @@ class SpeechRecognitionManager {
             this.analyser = this.audioContext.createAnalyser();
             const microphone = this.audioContext.createMediaStreamSource(this.mediaStream);
             
-            this.analyser.fftSize = 128;
+            this.analyser.fftSize = 256;
             this.analyser.smoothingTimeConstant = 0.8;
             microphone.connect(this.analyser);
             
-            this.animateVolumeBars();
+            // Start audio visualization
+            this.animateAudioVisualization();
         } catch (error) {
             console.error('Error setting up audio visualization:', error);
         }
     }
 
-    animateVolumeBars() {
+    animateAudioVisualization() {
         if (!this.isListening || !this.analyser) return;
 
         const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
         this.analyser.getByteFrequencyData(dataArray);
         
+        // Calculate volume level
         let sum = 0;
         for (let i = 0; i < dataArray.length; i++) {
             sum += dataArray[i] * dataArray[i];
         }
         const rms = Math.sqrt(sum / dataArray.length);
-        const normalizedVolume = Math.min(rms / 100, 1);
+        const normalizedVolume = Math.min(rms / 128, 1);
 
-        // Update volume bars
-        const bars = document.querySelectorAll('.speech-mic-container.listening .bar');
-        bars.forEach((bar, index) => {
-            const barHeight = Math.max(0.2, normalizedVolume * (0.5 + index * 0.2));
-            bar.style.transform = `scaleY(${barHeight})`;
+        // Update volume rings opacity based on volume
+        const rings = document.querySelectorAll('.speech-mic-container.listening .volume-ring');
+        rings.forEach((ring, index) => {
+            const threshold = (index + 1) * 0.25;
+            ring.style.opacity = normalizedVolume > threshold ? '0.8' : '0.2';
         });
 
+        // Update large volume bars in overlay
         const largeBars = document.querySelectorAll('.volume-bars-large .bar-large');
         largeBars.forEach((bar, index) => {
-            const barHeight = Math.max(0.2, normalizedVolume * (0.6 + index * 0.15));
+            const minScale = 0.3;
+            const maxScale = 1.5;
+            const barHeight = minScale + (normalizedVolume * (maxScale - minScale) * (0.8 + index * 0.1));
             bar.style.transform = `scaleY(${barHeight})`;
+            bar.style.opacity = 0.6 + (normalizedVolume * 0.4);
         });
 
-        this.animationId = requestAnimationFrame(() => this.animateVolumeBars());
+        // Continue animation
+        this.animationId = requestAnimationFrame(() => this.animateAudioVisualization());
     }
 
     createListeningOverlay() {
+        // Remove existing overlay
         const existingOverlay = document.querySelector('.speech-overlay');
         if (existingOverlay) existingOverlay.remove();
 
@@ -231,29 +216,37 @@ class SpeechRecognitionManager {
         
         overlay.innerHTML = `
             <div class="speech-overlay-content">
-                <div class="pulse-ring"></div>
                 <div class="speech-mic-large">
                     <div class="mic-icon-large">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
                             <path d="M12 1a4 4 0 0 0-4 4v7a4 4 0 0 0 8 0V5a4 4 0 0 0-4-4z" fill="currentColor"/>
                             <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                         </svg>
                     </div>
                     <div class="volume-bars-large">
-                        ${Array(5).fill('<div class="bar-large"></div>').join('')}
+                        <div class="bar-large"></div>
+                        <div class="bar-large"></div>
+                        <div class="bar-large"></div>
+                        <div class="bar-large"></div>
+                        <div class="bar-large"></div>
                     </div>
                 </div>
-                <div class="speech-status">Listening...</div>
-                <button class="speech-stop-btn">Stop Recording</button>
+                <div class="speech-status">Listening for your voice...</div>
+                <button class="speech-stop-btn">
+                    <span style="margin-right: 8px;">⏹</span>
+                    Stop Recording
+                </button>
             </div>
         `;
 
         document.body.appendChild(overlay);
 
+        // Add event listeners
         overlay.querySelector('.speech-stop-btn').addEventListener('click', () => {
             this.stopListening();
         });
 
+        // Close on escape key
         const escHandler = (e) => {
             if (e.key === 'Escape') {
                 this.stopListening();
@@ -261,51 +254,94 @@ class SpeechRecognitionManager {
             }
         };
         document.addEventListener('keydown', escHandler);
+
+        // Prevent clicks outside from closing (intentional UX choice)
+        overlay.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
     }
 
     stopListening() {
         this.isListening = false;
 
+        // Stop recognition
         if (this.recognition) {
             this.recognition.stop();
         }
 
+        // Stop audio visualization
         if (this.animationId) {
             cancelAnimationFrame(this.animationId);
             this.animationId = null;
         }
 
+        // Clean up audio resources
         if (this.mediaStream) {
             this.mediaStream.getTracks().forEach(track => track.stop());
             this.mediaStream = null;
         }
 
-        if (this.audioContext) {
+        if (this.audioContext && this.audioContext.state !== 'closed') {
             this.audioContext.close();
             this.audioContext = null;
         }
 
-        // Remove visual feedback
-        document.querySelectorAll('.speech-mic-container').forEach(container => {
+        // Remove visual feedback with smooth transitions
+        const micContainers = document.querySelectorAll('.speech-mic-container');
+        micContainers.forEach(container => {
             container.classList.remove('listening');
         });
 
-        document.querySelectorAll('textarea').forEach(textarea => {
+        const textareas = document.querySelectorAll('textarea');
+        textareas.forEach(textarea => {
             textarea.classList.remove('speech-active');
         });
 
-        // Remove overlay
+        // Remove overlay with fade animation
         const overlay = document.querySelector('.speech-overlay');
         if (overlay) {
             overlay.classList.add('fade-out');
-            setTimeout(() => overlay.remove(), 300);
+            setTimeout(() => {
+                if (overlay.parentNode) {
+                    overlay.remove();
+                }
+            }, 400);
         }
 
         this.currentTextarea = null;
+        this.currentGuidedButton = null;
+
+        // Update guided button if exists
+        if (this.currentGuidedButton) {
+            updateGuidedSpeechButton(this.currentGuidedButton, false);
+        }
+
+        // Show completion toast
+        showToast('Voice input stopped', 'success', 'Recording Complete');
+    }
+
+    async startGuidedListening(textarea, button) {
+        try {
+            textarea.dataset.originalText = textarea.value;
+            this.currentTextarea = textarea;
+            this.currentGuidedButton = button;
+
+            await this.setupAudioVisualization();
+            this.recognition.start();
+            this.isListening = true;
+
+            updateGuidedSpeechButton(button, true);
+            textarea.classList.add('speech-active');
+            this.createListeningOverlay();
+
+        } catch (error) {
+            console.error('Error starting speech recognition:', error);
+            showToast('Unable to access microphone. Please check your browser settings.', 'error', 'Microphone Error');
+        }
     }
 }
 
-// Initialize when DOM is ready
+// Initialize enhanced speech manager
 document.addEventListener('DOMContentLoaded', () => {
     if (!window.speechManager) {
         window.speechManager = new SpeechRecognitionManager();
@@ -314,3 +350,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Make globally available
 window.speechManager = window.speechManager;
+
+// Helper function for guided prompts
+function handleGuidedSpeech(button) {
+    if (!window.speechManager) {
+        showToast('Speech recognition not available', 'error', 'Feature Unavailable');
+        return;
+    }
+    
+    if (!window.speechManager.recognition) {
+        showToast('Speech recognition is not supported in this browser. Please try Chrome, Edge, or Safari.', 'warning', 'Browser Not Supported');
+        return;
+    }
+    
+    // Find the associated textarea
+    const container = button.closest('.guided-step');
+    const textarea = container ? container.querySelector('textarea') : null;
+    
+    if (textarea) {
+        // Check if currently listening to this textarea
+        if (window.speechManager.isListening && window.speechManager.currentTextarea === textarea) {
+            window.speechManager.stopListening();
+            updateGuidedSpeechButton(button, false);
+        } else {
+            window.speechManager.startGuidedListening(textarea, button);
+        }
+    } else {
+        showToast('No input field found', 'error', 'Input Error');
+    }
+}
+
+function updateGuidedSpeechButton(button, isListening) {
+    const icon = button.querySelector('.guided-speech-icon');
+    const text = button.querySelector('span');
+    const volumeBars = button.querySelector('.volume-bars');
+    
+    if (isListening) {
+        button.classList.add('listening');
+        icon.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M12 1a4 4 0 0 0-4 4v7a4 4 0 0 0 8 0V5a4 4 0 0 0-4-4z" fill="currentColor"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        `;
+        text.textContent = 'Stop Recording';
+        volumeBars.style.opacity = '1';
+    } else {
+        button.classList.remove('listening');
+        icon.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M12 1a4 4 0 0 0-4 4v7a4 4 0 0 0 8 0V5a4 4 0 0 0-4-4z" fill="currentColor"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        `;
+        text.textContent = 'Voice Input';
+        volumeBars.style.opacity = '0';
+    }
+}
