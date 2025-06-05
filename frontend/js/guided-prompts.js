@@ -136,6 +136,17 @@ class GuidedPrompts {
                             '<button class="btn btn-secondary" onclick="guidedPrompts.close()">Cancel</button>'
                         }
                     </div>
+                    <div class="guided-nav-center">
+                        <button type="button" class="guided-speech-btn" onclick="handleGuidedSpeech(this)">
+                            <div class="guided-speech-icon">🎤</div>
+                            <span>Voice Input</span>
+                            <div class="volume-bars">
+                                <div class="bar"></div>
+                                <div class="bar"></div>
+                                <div class="bar"></div>
+                            </div>
+                        </button>
+                    </div>
                     <div class="guided-nav-right">
                         ${this.currentStep < this.steps.length - 1 ? 
                             '<button class="btn btn-primary" onclick="guidedPrompts.nextStep()">Continue →</button>' : 
