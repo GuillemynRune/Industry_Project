@@ -64,6 +64,12 @@ class SpeechRecognitionManager {
             if (this.currentTextarea && finalTranscript) {
                 this.currentTextarea.dataset.originalText = this.currentTextarea.value;
             }
+            
+            // FIX: Ensure button resets when recognition ends
+            if (this.currentGuidedButton) {
+                updateGuidedSpeechButton(this.currentGuidedButton, false);
+            }
+            
             this.stopListening();
         };
 
@@ -134,10 +140,7 @@ class SpeechRecognitionManager {
             }, 100);
 
             // Create beautiful overlay
-            this.createListeningOverlay();
-
-            // Show success toast
-            showToast('🎤 Listening... Speak now!', 'success', 'Voice Input Active');
+            this.createListeningOverlay();  
 
         } catch (error) {
             console.error('Error starting speech recognition:', error);
@@ -309,15 +312,12 @@ class SpeechRecognitionManager {
         }
 
         this.currentTextarea = null;
-        this.currentGuidedButton = null;
 
-        // Update guided button if exists
+        // FIX: Reset guided button state properly
         if (this.currentGuidedButton) {
             updateGuidedSpeechButton(this.currentGuidedButton, false);
+            this.currentGuidedButton = null;
         }
-
-        // Show completion toast
-        showToast('Voice input stopped', 'success', 'Recording Complete');
     }
 
     async startGuidedListening(textarea, button) {
