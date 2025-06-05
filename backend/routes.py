@@ -13,6 +13,7 @@ from database.utils import CrisisSupport
 from backup_manager import BackupManager
 from slowapi import Limiter
 from slowapi.util import get_remote_address
+from routers import tts
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +39,7 @@ def setup_routes(app: FastAPI, settings):
     app.include_router(stories.router)
     app.include_router(moderation.router)
     app.include_router(health.router)
+    app.include_router(tts.router)
     
     # Backup router
     backup_router = APIRouter(prefix="/admin/backup", tags=["admin"])
