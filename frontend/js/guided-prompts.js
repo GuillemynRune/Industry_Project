@@ -138,7 +138,7 @@ class GuidedPrompts {
                     </div>
                     <div class="guided-nav-center">
                         <button type="button" class="guided-speech-btn" onclick="handleGuidedSpeech(this)">
-                            <div class="guided-speech-icon">🎤</div>
+                            <div class="guided-speech-icon"></div>
                             <span>Voice Input</span>
                             <div class="volume-bars">
                                 <div class="bar"></div>

@@ -2732,3 +2732,455 @@ footer .disclaimer {
         padding: 14px 20px;
     }
 }
+
+/* Voice Input Button Styles */
+.speech-mic-container {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    z-index: 10;
+}
+
+.speech-mic-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 10px 16px;
+    background: linear-gradient(45deg, var(--soft-blue), var(--deep-blue));
+    border: 2px solid transparent;
+    border-radius: 25px;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(107, 182, 214, 0.3);
+    overflow: hidden;
+}
+
+.speech-mic-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.2);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 23px;
+}
+
+.speech-mic-btn:hover::before {
+    opacity: 1;
+}
+
+.speech-mic-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(107, 182, 214, 0.4);
+}
+
+.speech-mic-btn:disabled {
+    background: rgba(168, 216, 234, 0.5);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.speech-mic-btn:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.mic-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+}
+
+.voice-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.volume-bars {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.bar {
+    width: 2px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 1px;
+    transform: scaleY(0.3);
+    transition: transform 0.1s ease;
+}
+
+.bar:nth-child(2) { height: 10px; }
+.bar:nth-child(3) { height: 6px; }
+
+/* Active/Listening State */
+.speech-mic-container.listening .speech-mic-btn {
+    background: linear-gradient(45deg, var(--deep-pink), var(--soft-pink));
+    animation: voicePulse 2s infinite;
+    transform: scale(1.05);
+}
+
+.speech-mic-container.listening .volume-bars {
+    opacity: 1;
+}
+
+.speech-mic-container.listening .voice-text {
+    animation: voiceBreathe 1.5s ease-in-out infinite;
+}
+
+/* Animations */
+@keyframes voicePulse {
+    0%, 100% { 
+        box-shadow: 0 4px 15px rgba(232, 145, 163, 0.4);
+    }
+    50% { 
+        box-shadow: 0 6px 25px rgba(232, 145, 163, 0.6);
+    }
+}
+
+@keyframes voiceBreathe {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+/* Active Textarea State */
+.speech-active {
+    border-color: var(--deep-pink) !important;
+    box-shadow: 0 0 0 3px rgba(232, 145, 163, 0.2) !important;
+    background: linear-gradient(135deg, rgba(252, 232, 234, 0.1), rgba(168, 216, 234, 0.05)) !important;
+}
+
+/* Dark Mode Support */
+[data-theme="dark"] .speech-mic-btn {
+    background: linear-gradient(45deg, #4299e1, #ed64a6);
+    box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
+}
+
+[data-theme="dark"] .speech-mic-btn:hover {
+    box-shadow: 0 8px 25px rgba(66, 153, 225, 0.4);
+}
+
+[data-theme="dark"] .speech-mic-container.listening .speech-mic-btn {
+    background: linear-gradient(45deg, #ed64a6, #f093fb);
+    animation: voicePulseDark 2s infinite;
+}
+
+@keyframes voicePulseDark {
+    0%, 100% { 
+        box-shadow: 0 4px 15px rgba(237, 100, 166, 0.4);
+    }
+    50% { 
+        box-shadow: 0 6px 25px rgba(237, 100, 166, 0.6);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .speech-mic-btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+    
+    .mic-icon {
+        width: 14px;
+        height: 14px;
+    }
+    
+    .voice-text {
+        font-size: 0.8rem;
+    }
+}
+
+/* Full-Screen Speech Overlay */
+.speech-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, 
+        rgba(168, 216, 234, 0.95), 
+        rgba(232, 145, 163, 0.95));
+    backdrop-filter: blur(20px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: overlayFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.speech-overlay.fade-out {
+    animation: overlayFadeOut 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.speech-overlay-content {
+    text-align: center;
+    color: white;
+    position: relative;
+}
+
+/* Large Microphone with Pulse Ring emanating from center */
+.pulse-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px; /* Start same size as microphone */
+    height: 120px;
+    border: 3px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    animation: pulseRingFromCenter 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+}
+
+/* Pulse rings start from inside the microphone */
+.pulse-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border: 3px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulseFromInside 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+}
+
+.pulse-ring::before,
+.pulse-ring::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border: 3px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulseFromInside 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pulse-ring::before {
+    animation-delay: 0.7s;
+}
+
+.pulse-ring::after {
+    animation-delay: 1.4s;
+}
+
+@keyframes pulseFromInside {
+    0% { 
+        width: 0;
+        height: 0;
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 0.4;
+    }
+    100% { 
+        width: 300px;
+        height: 300px;
+        opacity: 0;
+    }
+}
+
+.speech-mic-large {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    margin: 0 auto 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    animation: micFloat 3s ease-in-out infinite;
+    z-index: 2; /* Keep mic above pulse rings */
+}
+
+/* Remove volume bars from large microphone */
+.volume-bars-large {
+    display: none;
+}
+
+/* Updated pulse animation - starts from microphone size */
+@keyframes pulseRingFromCenter {
+    0% { 
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.7;
+    }
+    100% { 
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+    }
+}
+.speech-mic-large {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    margin: 0 auto 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    animation: micFloat 3s ease-in-out infinite;
+}
+
+.mic-icon-large {
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Large Volume Bars */
+.volume-bars-large {
+    position: absolute;
+    right: -60px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.bar-large {
+    width: 6px;
+    height: 16px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 3px;
+    transform: scaleY(0.3);
+    transition: transform 0.1s ease;
+}
+
+.bar-large:nth-child(2) { height: 24px; }
+.bar-large:nth-child(3) { height: 32px; }
+.bar-large:nth-child(4) { height: 24px; }
+.bar-large:nth-child(5) { height: 16px; }
+
+/* Status Text */
+.speech-status {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    animation: statusPulse 2s ease-in-out infinite;
+}
+
+/* Stop Button */
+.speech-stop-btn {
+    padding: 16px 32px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 30px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.speech-stop-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Animations */
+@keyframes overlayFadeIn {
+    from { 
+        opacity: 0; 
+        backdrop-filter: blur(0px);
+    }
+    to { 
+        opacity: 1; 
+        backdrop-filter: blur(20px);
+    }
+}
+
+@keyframes overlayFadeOut {
+    from { 
+        opacity: 1; 
+        backdrop-filter: blur(20px);
+    }
+    to { 
+        opacity: 0; 
+        backdrop-filter: blur(0px);
+    }
+}
+
+@keyframes pulseRing {
+    0% { 
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.7;
+    }
+    100% { 
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 0;
+    }
+}
+
+@keyframes micFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes statusPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Dark Mode Support */
+[data-theme="dark"] .speech-overlay {
+    background: linear-gradient(135deg, 
+        rgba(45, 55, 72, 0.95), 
+        rgba(74, 85, 104, 0.95));
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .speech-mic-large {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .volume-bars-large {
+        right: -50px;
+    }
+    
+    .speech-status {
+        font-size: 1.5rem;
+    }
+    
+    .speech-stop-btn {
+        padding: 12px 24px;
+        font-size: 1rem;
+    }
+    
+    .pulse-ring {
+        width: 160px;
+        height: 160px;
+    }
+}
