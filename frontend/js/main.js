@@ -16,6 +16,10 @@ document.addEventListener('DOMContentLoaded', function() {
         guidedPrompts = new GuidedPrompts();
     }
     themeManager = new ThemeManager();
+
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        console.log('Speech recognition not supported - microphone buttons will be hidden');
+    }
     
     // Add smooth scroll to nav links
     document.querySelectorAll('.nav-links a[href^="#"]').forEach(link => {
