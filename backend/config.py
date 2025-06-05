@@ -12,9 +12,6 @@ class Settings(BaseSettings):
     # Database - using your existing MongoDB URI
     mongodb_uri: str
     database_name: str = "postnatal_stories"
-
-    # ElevenLabs API Key
-    elevenlabs_api_key: Optional[str] = None
     
     # Authentication - using your existing JWT secret
     jwt_secret_key: str
