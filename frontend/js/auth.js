@@ -1,6 +1,7 @@
 // Authentication functionality
 let tokenExpiryTimer = null;
 
+// Initialization
 function initializeAuth() {
     const token = localStorage.getItem('authToken');
     const tokenExpiry = localStorage.getItem('tokenExpiry');
@@ -13,7 +14,6 @@ function initializeAuth() {
         handleTokenExpiry();
     }
     
-    // Check for password reset token in URL
     checkPasswordResetToken();
 }
 
@@ -21,18 +21,13 @@ function checkPasswordResetToken() {
     const urlParams = new URLSearchParams(window.location.search);
     const resetToken = urlParams.get('token');
     
-    // Check if we're on reset-password page or have token parameter
-    if (resetToken || window.location.pathname === '/reset-password') {
-        const token = resetToken || urlParams.get('token');
-        if (token) {
-            // Clear URL parameters
-            window.history.replaceState({}, document.title, '/');
-            // Show reset password modal
-            showResetPasswordModal(token);
-        }
+    if (resetToken) {
+        window.history.replaceState({}, document.title, '/');
+        showResetPasswordModal(resetToken);
     }
 }
 
+// Token Management
 function setupTokenExpiryTimer(timeUntilExpiry) {
     if (tokenExpiryTimer) clearTimeout(tokenExpiryTimer);
     
@@ -76,7 +71,6 @@ function handleTokenExpiry() {
     authToken = null;
     currentUser = null;
     showAuthSection();
-    // REMOVED: Duplicate login warning that showed on page load
 }
 
 async function makeAuthenticatedRequest(url, options = {}) {
@@ -99,6 +93,7 @@ async function makeAuthenticatedRequest(url, options = {}) {
     return response;
 }
 
+// User Info Management
 async function fetchUserInfo() {
     try {
         const response = await makeAuthenticatedRequest(`${API_BASE_URL}/auth/me`);
@@ -114,6 +109,7 @@ async function fetchUserInfo() {
     }
 }
 
+// UI State Management
 function showAuthSection() {
     document.getElementById('authSection').style.display = 'block';
     updateUserSection();
@@ -129,14 +125,7 @@ function updateUserSection() {
     const userSection = document.getElementById('userSection');
     
     if (currentUser) {
-        // Add tour link to navigation for logged-in users
-        if (!document.getElementById('tourLink')) {
-            const navLinks = document.querySelector('.nav-links');
-            const tourLi = document.createElement('li');
-            tourLi.innerHTML = '<a href="javascript:void(0)" id="tourLink" onclick="startTour()">Take Tour</a>';
-            navLinks.appendChild(tourLi);
-        }
-        
+        addTourLinkIfNeeded();
         userSection.innerHTML = `
             <div class="user-info">
                 <div class="user-avatar">${currentUser.display_name.charAt(0).toUpperCase()}</div>
@@ -145,15 +134,26 @@ function updateUserSection() {
             </div>
         `;
     } else {
-        // Remove tour link when not logged in
-        const existingTourLink = document.getElementById('tourLink');
-        if (existingTourLink) {
-            existingTourLink.parentElement.remove();
-        }
-        
+        removeTourLink();
         userSection.innerHTML = `
             <button class="auth-prompt-btn" onclick="scrollToSection('authSection')">Login / Sign Up</button>
         `;
+    }
+}
+
+function addTourLinkIfNeeded() {
+    if (!document.getElementById('tourLink')) {
+        const navLinks = document.querySelector('.nav-links');
+        const tourLi = document.createElement('li');
+        tourLi.innerHTML = '<a href="javascript:void(0)" id="tourLink" onclick="startTour()">Take Tour</a>';
+        navLinks.appendChild(tourLi);
+    }
+}
+
+function removeTourLink() {
+    const existingTourLink = document.getElementById('tourLink');
+    if (existingTourLink) {
+        existingTourLink.parentElement.remove();
     }
 }
 
@@ -196,22 +196,16 @@ async function logout() {
     showToast('You\'ve been safely logged out. Thanks for visiting!', 'success', 'See You Soon!');
 }
 
-// Forgot Password Functions
+// Password Reset Functions
 function showForgotPasswordModal() {
-    document.getElementById('forgotPasswordModal').style.display = 'block';
-    // Focus on email input after animation
-    setTimeout(() => {
-        document.getElementById('forgotEmail').focus();
-    }, 300);
+    openModal('forgotPasswordModal');
+    setTimeout(() => document.getElementById('forgotEmail').focus(), 300);
 }
 
 function showResetPasswordModal(token) {
-    document.getElementById('resetPasswordModal').style.display = 'block';
     document.getElementById('resetToken').value = token;
-    // Focus on password input after animation
-    setTimeout(() => {
-        document.getElementById('newPassword').focus();
-    }, 300);
+    openModal('resetPasswordModal');
+    setTimeout(() => document.getElementById('newPassword').focus(), 300);
 }
 
 async function requestPasswordReset(email) {
@@ -257,7 +251,6 @@ async function resetPassword(token, newPassword) {
                 'Password Updated'
             );
             closeModal('resetPasswordModal');
-            // Switch to login form
             switchAuth('login');
             scrollToSection('authSection');
         } else {
@@ -269,7 +262,7 @@ async function resetPassword(token, newPassword) {
     }
 }
 
-// Validation utilities
+// Validation Utilities
 function validateEmail(email) {
     return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 }
@@ -289,7 +282,7 @@ function escapeHtml(unsafe) {
          .replace(/'/g, "&#039;");
 }
 
-// Form handlers
+// Form Handler Utilities
 async function handleAuthForm(endpoint, formData, successMessage, onSuccess) {
     try {
         const response = await fetch(`${API_BASE_URL}/auth/${endpoint}`, {
@@ -319,7 +312,17 @@ async function handleAuthForm(endpoint, formData, successMessage, onSuccess) {
     }
 }
 
-// Login form handler
+function setButtonLoading(button, isLoading, originalText) {
+    if (isLoading) {
+        button.textContent = button.dataset.loadingText || 'Loading...';
+        button.disabled = true;
+    } else {
+        button.textContent = originalText;
+        button.disabled = false;
+    }
+}
+
+// Form Event Handlers
 document.getElementById('loginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -338,8 +341,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     
     const submitBtn = this.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Logging in...';
-    submitBtn.disabled = true;
+    setButtonLoading(submitBtn, true, originalText);
     
     await handleAuthForm('login', { email, password }, 
         `Welcome back, ${email}! Great to see you again.`,
@@ -357,11 +359,9 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         }
     );
     
-    submitBtn.textContent = originalText;
-    submitBtn.disabled = false;
+    setButtonLoading(submitBtn, false, originalText);
 });
 
-// Registration form handler
 document.getElementById('registerForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -388,8 +388,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     
     const submitBtn = this.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Creating Account...';
-    submitBtn.disabled = true;
+    setButtonLoading(submitBtn, true, originalText);
     
     await handleAuthForm('register', {
         email,
@@ -403,11 +402,9 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         this.reset();
     });
     
-    submitBtn.textContent = originalText;
-    submitBtn.disabled = false;
+    setButtonLoading(submitBtn, false, originalText);
 });
 
-// Forgot password form handler
 document.getElementById('forgotPasswordForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -420,17 +417,14 @@ document.getElementById('forgotPasswordForm').addEventListener('submit', async f
     
     const submitBtn = this.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Sending...';
-    submitBtn.disabled = true;
+    setButtonLoading(submitBtn, true, originalText);
     
     await requestPasswordReset(email);
     
-    submitBtn.textContent = originalText;
-    submitBtn.disabled = false;
+    setButtonLoading(submitBtn, false, originalText);
     this.reset();
 });
 
-// Reset password form handler
 document.getElementById('resetPasswordForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -450,12 +444,10 @@ document.getElementById('resetPasswordForm').addEventListener('submit', async fu
     
     const submitBtn = this.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Resetting...';
-    submitBtn.disabled = true;
+    setButtonLoading(submitBtn, true, originalText);
     
     await resetPassword(token, newPassword);
     
-    submitBtn.textContent = originalText;
-    submitBtn.disabled = false;
+    setButtonLoading(submitBtn, false, originalText);
     this.reset();
 });
