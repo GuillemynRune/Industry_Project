@@ -1,4 +1,4 @@
-// Enhanced Speech Recognition System with Beautiful Animations
+// Enhanced Speech Recognition System with Live Transcription Display
 class SpeechRecognitionManager {
     constructor() {
         this.recognition = null;
@@ -9,6 +9,7 @@ class SpeechRecognitionManager {
         this.mediaStream = null;
         this.animationId = null;
         this.volumeRings = [];
+        this.transcriptionElement = null; // Add this for live transcription
         this.init();
     }
 
@@ -36,6 +37,7 @@ class SpeechRecognitionManager {
         this.recognition.onstart = () => {
             console.log('Speech recognition started');
             finalTranscript = '';
+            this.updateTranscriptionDisplay('', ''); // Clear transcription display
         };
 
         this.recognition.onresult = (event) => {
@@ -50,6 +52,9 @@ class SpeechRecognitionManager {
                     interimTranscript += transcript;
                 }
             }
+
+            // Update live transcription display
+            this.updateTranscriptionDisplay(finalTranscript, interimTranscript);
 
             if (this.currentTextarea) {
                 const existingText = this.currentTextarea.dataset.originalText || '';
@@ -87,6 +92,29 @@ class SpeechRecognitionManager {
             const message = errorMessages[event.error] || `Speech recognition error: ${event.error}`;
             showToast(message, 'error', 'Speech Recognition Error');
         };
+    }
+
+    // NEW: Method to update live transcription display
+    updateTranscriptionDisplay(finalText, interimText) {
+        if (!this.transcriptionElement) return;
+
+        const displayText = finalText + interimText;
+        
+        if (displayText.trim()) {
+            this.transcriptionElement.innerHTML = `
+                <div class="transcription-content">
+                    <span class="final-text">${finalText}</span><span class="interim-text">${interimText}</span>
+                </div>
+            `;
+            this.transcriptionElement.classList.add('visible');
+        } else {
+            this.transcriptionElement.innerHTML = `
+                <div class="transcription-placeholder">
+                    Start speaking to see your words appear here...
+                </div>
+            `;
+            this.transcriptionElement.classList.remove('visible');
+        }
     }
 
     addMicrophoneButtonsToTextareas() {
@@ -139,7 +167,7 @@ class SpeechRecognitionManager {
                 textarea.classList.add('speech-active');
             }, 100);
 
-            // Create beautiful overlay
+            // Create beautiful overlay with transcription
             this.createListeningOverlay();  
 
         } catch (error) {
@@ -209,6 +237,7 @@ class SpeechRecognitionManager {
         this.animationId = requestAnimationFrame(() => this.animateAudioVisualization());
     }
 
+    // UPDATED: Enhanced overlay with live transcription
     createListeningOverlay() {
         // Remove existing overlay
         const existingOverlay = document.querySelector('.speech-overlay');
@@ -219,6 +248,13 @@ class SpeechRecognitionManager {
         
         overlay.innerHTML = `
             <div class="speech-overlay-content">
+                <!-- Live Transcription Display Above Mic -->
+                <div class="live-transcription" id="liveTranscription">
+                    <div class="transcription-placeholder">
+                        Start speaking to see your words appear here...
+                    </div>
+                </div>
+                
                 <div class="speech-mic-large">
                     <div class="mic-icon-large">
                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
@@ -234,7 +270,9 @@ class SpeechRecognitionManager {
                         <div class="bar-large"></div>
                     </div>
                 </div>
+                
                 <div class="speech-status">Listening for your voice...</div>
+                
                 <button class="speech-stop-btn">
                     <span style="margin-right: 8px;">⏹</span>
                     Stop Recording
@@ -242,7 +280,9 @@ class SpeechRecognitionManager {
             </div>
         `;
 
+        // Store reference to transcription element
         document.body.appendChild(overlay);
+        this.transcriptionElement = overlay.querySelector('#liveTranscription');
 
         // Add event listeners
         overlay.querySelector('.speech-stop-btn').addEventListener('click', () => {
@@ -312,6 +352,7 @@ class SpeechRecognitionManager {
         }
 
         this.currentTextarea = null;
+        this.transcriptionElement = null; // Clear reference
 
         // FIX: Reset guided button state properly
         if (this.currentGuidedButton) {
