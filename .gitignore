@@ -27,3 +27,7 @@ __pycache__/
 # OS files
 .DS_Store
 Thumbs.db
+
+# AI Models - Downloaded automatically, too large for Git
+ai_models/
+backend/ai_models/
