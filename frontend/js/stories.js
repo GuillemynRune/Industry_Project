@@ -338,23 +338,82 @@ async function searchSimilarStories() {
         return;
     }
 
+    // Show loading state
+    const searchBtn = document.querySelector('.search-bar button');
+    const originalText = searchBtn.textContent;
+    searchBtn.textContent = 'Searching...';
+    searchBtn.disabled = true;
+
     try {
-        const response = await fetch(`${API_BASE_URL}/search-similar`, {
+        // Check if user is authenticated for protected endpoints
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        
+        // Add auth token if available (for protected endpoints)
+        if (typeof authToken !== 'undefined' && authToken) {
+            headers['Authorization'] = `Bearer ${authToken}`;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/stories/find-similar`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: searchInput })
+            headers: headers,
+            body: JSON.stringify({ story: searchInput })
         });
 
+        // Handle different error types
+        if (response.status === 403) {
+            // Authentication required
+            if (!currentUser) {
+                showToast('Please login to search for similar stories.', 'warning', 'Login Required');
+                scrollToSection('authSection');
+                return;
+            } else {
+                showToast('Access denied. Please try logging in again.', 'error', 'Access Denied');
+                return;
+            }
+        }
+
+        if (response.status === 429) {
+            showToast('Too many search requests. Please wait a moment and try again.', 'warning', 'Rate Limited');
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(`Server responded with ${response.status}`);
+        }
+
         const data = await response.json();
+        console.log('Search API response:', data);  // Add this line here
         
-        if (data.success && data.results.length > 0) {
-            displayStories(data.results);
+        if (data.success && data.stories && data.stories.length > 0) {
+            // Extract the actual story objects from the response
+            const searchResults = data.stories.map(item => item.story || item);
+            displayStories(searchResults);
+            
+            // Show success message
+            showToast(`Found ${data.stories.length} similar stories`, 'success', 'Search Results');
         } else {
-            alert('No similar stories found. Try different keywords.');
+            // Fallback to original stories if no results
+            loadApprovedStories();
+            showToast('No similar stories found. Showing all community stories.', 'info', 'No Results');
         }
     } catch (error) {
         console.error('Search error:', error);
-        alert('Unable to search right now. Please make sure the backend is running.');
+        
+        // Handle network errors
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            showToast('Connection error. Please check your internet and try again.', 'error', 'Connection Error');
+        } else {
+            showToast('Search unavailable. Showing all community stories.', 'warning', 'Search Error');
+        }
+        
+        // Fallback to original stories on error
+        loadApprovedStories();
+    } finally {
+        // Reset button state
+        searchBtn.textContent = originalText;
+        searchBtn.disabled = false;
     }
 }
 
