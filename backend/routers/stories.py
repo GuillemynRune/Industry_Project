@@ -4,7 +4,7 @@ from typing import Optional
 from database.models.story import StoryDatabase
 from database.models.moderation import ModerationDatabase
 from database.utils import CrisisSupport, ContentFilter
-from services.story_service import create_recovery_story_prompt
+from services.story_service import create_recovery_story_prompt, find_similar_stories, get_story_recommendations
 from services.symptom_service import extract_symptoms
 from services.openai_client import query_openai_model, MODELS
 from routers.auth import get_current_active_user
@@ -20,6 +20,13 @@ class StoryRequest(BaseModel):
     experience: str
     solution: str
     advice: Optional[str] = ""
+
+class SimilarityRequest(BaseModel):
+    story: str
+
+class RecommendationRequest(BaseModel):
+    challenge: str
+    experience: str
 
 def create_fallback_recovery_story(challenge: str, experience: str, solution: str, advice: str = "") -> str:
     """Create fallback story when AI models fail"""
@@ -123,7 +130,8 @@ async def submit_story_for_review(
         advice=story_request.advice,
         generated_story=story_result["story"],
         model_used=story_result["model_used"],
-        key_symptoms=story_result.get("key_symptoms", [])
+        key_symptoms=story_result.get("key_symptoms", []),
+        embedding=story_result.get("embedding")
     )
     
     return {
@@ -171,3 +179,72 @@ async def get_story(story_id: str):
     story.pop("similarity_score", None)
     
     return {"success": True, "story": story}
+
+@router.post("/find-similar")
+async def find_similar_stories_endpoint(
+    request: SimilarityRequest,
+    current_user: dict = Depends(get_current_active_user)
+):
+    """Find stories similar to the user's input"""
+    
+    if not request.story.strip():
+        raise HTTPException(status_code=400, detail="Story text is required")
+    
+    if len(request.story.strip()) < 10:
+        raise HTTPException(status_code=400, detail="Please provide more details about your situation")
+    
+    try:
+        similar_stories = await find_similar_stories(
+            input_story=request.story,
+            top_k=9,
+            min_similarity=0.1
+        )
+        
+        return {
+            "success": True,
+            "stories": similar_stories,
+            "total_found": len(similar_stories),
+            "message": "Found similar stories" if similar_stories else "No similar stories found"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in find_similar_stories_endpoint: {e}")
+        raise HTTPException(status_code=500, detail="An error occurred while finding similar stories")
+
+@router.post("/recommendations")
+async def get_story_recommendations_endpoint(
+    request: RecommendationRequest,
+    current_user: dict = Depends(get_current_active_user)
+):
+    """Get story recommendations based on user's challenge and experience"""
+    
+    if not request.challenge.strip() or not request.experience.strip():
+        raise HTTPException(status_code=400, detail="Challenge and experience are required")
+    
+    try:
+        recommendations = await get_story_recommendations(
+            user_challenge=request.challenge,
+            user_experience=request.experience
+        )
+        
+        return recommendations
+        
+    except Exception as e:
+        logger.error(f"Error in get_story_recommendations_endpoint: {e}")
+        raise HTTPException(status_code=500, detail="An error occurred while getting story recommendations")
+
+@router.get("/themes/analysis")
+async def get_story_themes_analysis(current_user: dict = Depends(get_current_active_user)):
+    """Get analysis of common themes in stories"""
+    try:
+        return {
+            "success": True,
+            "message": "Theme analysis endpoint - implement based on your needs",
+            "common_themes": [
+                "depression", "anxiety", "isolation", "sleep", 
+                "feeding", "bonding", "identity", "support"
+            ]
+        }
+    except Exception as e:
+        logger.error(f"Error in themes analysis: {e}")
+        raise HTTPException(status_code=500, detail="An error occurred while analyzing themes")
