@@ -2671,3 +2671,90 @@ footer .disclaimer {
         transition: none;
     }
 }
+
+/* Dark Mode Fixes for autofill and notifications */
+
+/* Fix for browser autofilled input fields in dark mode */
+[data-theme="dark"] .form-group input:-webkit-autofill,
+[data-theme="dark"] .form-group input:-webkit-autofill:hover,
+[data-theme="dark"] .form-group input:-webkit-autofill:focus,
+[data-theme="dark"] .form-group input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px rgba(45, 55, 72, 0.9) inset !important;
+    -webkit-text-fill-color: #e2e8f0 !important;
+    border-color: rgba(74, 85, 104, 0.5) !important;
+    caret-color: #e2e8f0 !important;
+}
+
+/* Additional autofill fix for different browsers */
+[data-theme="dark"] .form-group input:-moz-autofill {
+    background: rgba(45, 55, 72, 0.9) !important;
+    color: #e2e8f0 !important;
+    border-color: rgba(74, 85, 104, 0.5) !important;
+}
+
+/* Fix toast notifications in dark mode */
+[data-theme="dark"] .toast {
+    background: rgba(45, 55, 72, 0.98) !important;
+    border: 1px solid rgba(74, 85, 104, 0.4) !important;
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .toast-title {
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .toast-message {
+    color: #a0aec0 !important;
+}
+
+[data-theme="dark"] .toast-close {
+    color: #a0aec0 !important;
+}
+
+[data-theme="dark"] .toast-close:hover {
+    background: rgba(74, 85, 104, 0.3) !important;
+    color: #e2e8f0 !important;
+}
+
+/* Fix crisis modal in dark mode */
+[data-theme="dark"] .crisis-modal {
+    background: linear-gradient(135deg, rgba(45, 55, 72, 0.95), rgba(74, 85, 104, 0.95)) !important;
+}
+
+[data-theme="dark"] .crisis-modal h2 {
+    color: #fc8181 !important; /* Lighter red for dark mode */
+}
+
+[data-theme="dark"] .crisis-modal p {
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .crisis-modal ul {
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .crisis-modal li {
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .crisis-resource {
+    background: rgba(45, 55, 72, 0.8) !important;
+    border-left-color: #fc8181 !important;
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .crisis-resource h4 {
+    color: #fc8181 !important;
+}
+
+[data-theme="dark"] .crisis-resource .phone {
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .crisis-resource p {
+    color: #a0aec0 !important;
+}
+
+[data-theme="dark"] .disclaimer {
+    color: #a0aec0 !important;
+}
