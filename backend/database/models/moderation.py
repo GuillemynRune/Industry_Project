@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from ..connection import mongodb
 
 logger = logging.getLogger(__name__)
@@ -18,11 +18,13 @@ class ModerationDatabase:
         advice: str,
         generated_story: str,
         model_used: str,
-        key_symptoms: List[str]
+        key_symptoms: List[str],
+        embedding: Optional[List[float]] = None
     ) -> Dict[str, Any]:
         """Submit story for moderation review"""
         
         story_doc = {
+            "content_type": "story",  
             "user_id": user_id,
             "author_name": author_name,
             "challenge": challenge,
@@ -32,8 +34,14 @@ class ModerationDatabase:
             "generated_story": generated_story,
             "model_used": model_used,
             "key_symptoms": key_symptoms,
+            "embedding": embedding, 
             "status": "pending_review",
             "created_at": datetime.utcnow(),
+            "reviewed_at": None,
+            "reviewer_id": None,
+            "review_notes": None,
+            "approved_by": None,
+            "approved_at": None,
             "risk_level": ModerationDatabase._assess_risk_level(experience, advice)
         }
         
@@ -55,6 +63,7 @@ class ModerationDatabase:
         stories = []
         async for story in cursor:
             story["id"] = str(story["_id"])
+            story.pop("embedding", None)
             del story["_id"]
             stories.append(story)
         
