@@ -4,6 +4,9 @@ Story transformation service using Ollama models
 
 import logging
 from .openai_client import query_openai_model, MODELS
+from database.connection import mongodb
+from typing import List, Dict
+from .story_matcher import story_matcher
 
 logger = logging.getLogger(__name__)
 
@@ -87,3 +90,137 @@ def create_fallback_supportive_message(experience: str, feelings: str) -> str:
     message += f"Be gentle with yourself - you're navigating one of life's biggest transitions, and it's okay to struggle while you find your way."
     
     return message
+
+async def find_similar_stories(input_story: str, top_k: int = 9, min_similarity: float = 0.1) -> List[Dict]:
+    """Find similar stories using semantic similarity"""
+    try:
+        stories_collection = mongodb.database.approved_stories
+        
+        return await story_matcher.find_similar_stories_with_embeddings(
+            input_text=input_story,
+            stories_collection=stories_collection,
+            top_k=top_k,
+            min_similarity=min_similarity
+        )
+    except Exception as e:
+        logger.error(f"Error finding similar stories: {e}")
+        return []
+    
+def create_story_with_embedding(story_data: dict) -> dict:
+    """Create story and generate embedding"""
+    try:
+        story_text = story_matcher.create_story_embedding_text(story_data)
+        embedding = story_matcher.generate_embedding(story_text)
+        
+        if embedding:
+            story_data["embedding"] = embedding
+            logger.info(f"Generated embedding with length: {len(embedding)}")
+        else:
+            logger.warning("Failed to generate embedding")
+        
+        return story_data
+    except Exception as e:
+        logger.error(f"Error creating story with embedding: {e}")
+        return story_data
+    
+def generate_recovery_story(
+    challenge: str, 
+    experience: str, 
+    solution: str, 
+    advice: str = "", 
+    author_name: str = "Anonymous"
+) -> dict:
+    """Generate recovery story with AI models and fallback"""
+    prompt = create_recovery_story_prompt(challenge, experience, solution, advice)
+    story = None
+    model_used = None
+    
+    # Try AI models
+    for model_name in MODELS:
+        try:
+            generated_text = query_ollama_model(model_name, prompt, max_tokens=300)
+            if generated_text and len(generated_text.strip()) > 100:
+                story = generated_text.strip()
+                model_used = model_name
+                break
+        except Exception as e:
+            logger.warning(f"Model {model_name} failed: {str(e)}")
+            continue
+    
+    # Fallback
+    if not story or len(story.strip()) < 100:
+        story = create_fallback_recovery_story(challenge, experience, solution, advice)
+        model_used = "fallback"
+    
+    # Extract symptoms
+    key_symptoms = []
+    try:
+        from .symptom_service import extract_symptoms
+        symptom_data = extract_symptoms(f"{challenge}. {experience}", advice)
+        key_symptoms = symptom_data.get("symptoms_identified", [])[:3]
+    except Exception as e:
+        logger.warning(f"Symptom extraction failed: {e}")
+    
+    # Create story data with embedding
+    story_data = {
+        "challenge": challenge,
+        "experience": experience,
+        "solution": solution,
+        "advice": advice,
+        "generated_story": story,
+        "author_name": author_name,
+        "model_used": model_used,
+        "key_symptoms": key_symptoms
+    }
+    
+    story_data_with_embedding = create_story_with_embedding(story_data)
+    
+    return {
+        "success": True,
+        "story": story,
+        "author_name": author_name,
+        "model_used": model_used,
+        "key_symptoms": key_symptoms,
+        "embedding": story_data_with_embedding.get("embedding"),
+        "message": f"Recovery story created using {model_used}"
+    }
+
+def create_fallback_recovery_story(challenge: str, experience: str, solution: str, advice: str = "") -> str:
+    """Create fallback story when AI models fail"""
+    story = f"Recovery Story: Overcoming {challenge}\n\n"
+    story += f"The challenge: {experience[:150]}{'...' if len(experience) > 150 else ''}\n\n"
+    story += f"What helped: {solution[:150]}{'...' if len(solution) > 150 else ''}\n\n"
+    if advice:
+        story += f"Advice to others: {advice[:100]}{'...' if len(advice) > 100 else ''}\n\n"
+    story += "Remember: Recovery is possible. Every small step forward matters, and you're not alone in this journey."
+    return story
+
+async def get_story_recommendations(user_challenge: str, user_experience: str) -> Dict:
+    """Get story recommendations based on user input"""
+    combined_input = f"{user_challenge}. {user_experience}"
+    
+    try:
+        similar_stories = await find_similar_stories(combined_input, top_k=9, min_similarity=0.1)
+        
+        if similar_stories:
+            return {
+                "success": True,
+                "message": "Found stories from others with similar experiences",
+                "stories": similar_stories,
+                "total_found": len(similar_stories)
+            }
+        else:
+            return {
+                "success": True,
+                "message": "No similar stories found, but you're not alone in your journey",
+                "stories": [],
+                "total_found": 0
+            }
+    except Exception as e:
+        logger.error(f"Error getting story recommendations: {e}")
+        return {
+            "success": False,
+            "message": "Unable to find similar stories at this time",
+            "stories": [],
+            "total_found": 0
+        }
