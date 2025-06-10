@@ -38,6 +38,12 @@ class Settings(BaseSettings):
     # Logging
     log_level: str = "INFO"
     log_file: str = "logs/app.log"
+
+    # Story Matching Settings
+    story_matcher_model: str = "all-distilroberta-v1"
+    models_cache_dir: str = "./ai_models"
+    similarity_threshold: float = 0.1
+    max_similar_stories: int = 9
     
     @field_validator('allowed_origins')
     @classmethod

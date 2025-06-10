@@ -40,6 +40,14 @@ async def startup_event():
         logger.error(f"Missing required environment variables: {missing_vars}")
         raise ValueError(f"Missing environment variables: {missing_vars}")
     
+        # Initialize story matcher (this will download models on first run)
+    try:
+        from services.story_matcher import story_matcher
+        logger.info("Story matcher initialized successfully")
+    except Exception as e:
+        logger.warning(f"Story matcher initialization failed: {e}")
+        logger.info("Story matching features may not work properly")
+        
     logger.info(f"Starting Postnatal Stories API v3.0.0 in {settings.environment} mode")
 
 @app.on_event("shutdown")
