@@ -37,9 +37,6 @@ class ModerationDatabase:
             "embedding": embedding, 
             "status": "pending_review",
             "created_at": datetime.utcnow(),
-            "reviewed_at": None,
-            "reviewer_id": None,
-            "review_notes": None,
             "approved_by": None,
             "approved_at": None,
             "risk_level": ModerationDatabase._assess_risk_level(experience, advice)

@@ -4,7 +4,7 @@ from typing import Optional
 from database.models.story import StoryDatabase
 from database.models.moderation import ModerationDatabase
 from database.utils import CrisisSupport, ContentFilter
-from services.story_service import create_recovery_story_prompt, find_similar_stories, get_story_recommendations
+from services.story_service import create_recovery_story_prompt, find_similar_stories, get_story_recommendations, generate_recovery_story
 from services.symptom_service import extract_symptoms
 from services.openai_client import query_openai_model, MODELS
 from routers.auth import get_current_active_user
@@ -38,46 +38,7 @@ def create_fallback_recovery_story(challenge: str, experience: str, solution: st
     story += "Remember: Recovery is possible. Every small step forward matters, and you're not alone in this journey."
     return story
 
-async def generate_recovery_story(challenge: str, experience: str, solution: str, advice: str = "", author_name: str = "Anonymous") -> dict:
-    """Generate recovery story using AI models with fallback"""
-    
-    prompt = create_recovery_story_prompt(challenge, experience, solution, advice)
-    story = None
-    model_used = None
-    
-    # Try AI models
-    for model_name in MODELS:
-        try:
-            generated_text = query_openai_model(model_name, prompt, max_tokens=300)
-            if generated_text and len(generated_text.strip()) > 100:
-                story = generated_text.strip()
-                model_used = model_name
-                break
-        except Exception as e:
-            logger.warning(f"Model {model_name} failed: {str(e)}")
-            continue
-    
-    # Fallback if no model worked
-    if not story or len(story.strip()) < 100:
-        story = create_fallback_recovery_story(challenge, experience, solution, advice)
-        model_used = "fallback"
-    
-    # Extract symptoms
-    key_symptoms = []
-    try:
-        symptom_data = extract_symptoms(f"{challenge}. {experience}", advice)
-        key_symptoms = symptom_data.get("symptoms_identified", [])[:3]
-    except Exception as e:
-        logger.warning(f"Symptom extraction failed: {e}")
-    
-    return {
-        "success": True,
-        "story": story,
-        "author_name": author_name,
-        "model_used": model_used,
-        "key_symptoms": key_symptoms,
-        "message": f"Recovery story created using {model_used}"
-    }
+# REMOVED the local generate_recovery_story function - using the one from story_service instead
 
 @router.post("/submit")
 async def submit_story_for_review(
@@ -108,7 +69,12 @@ async def submit_story_for_review(
             "message": "We noticed your message indicates you might be in distress. Please reach out for immediate support."
         }
     
-    # Generate story
+    # DEBUG: Check what function we're actually calling
+    logger.info("🔍 DEBUG: About to call generate_recovery_story function")
+    logger.info(f"🔍 DEBUG: Function location: {generate_recovery_story}")
+    
+    # Generate story WITH embedding - now using the correct function from story_service!
+    logger.info("Generating recovery story with embedding for submission")
     story_result = await generate_recovery_story(
         challenge=story_request.challenge,
         experience=story_request.experience,
@@ -117,10 +83,16 @@ async def submit_story_for_review(
         author_name=story_request.author_name or current_user.get("display_name", "Anonymous")
     )
     
+    logger.info(f"🔍 DEBUG: Story result keys: {list(story_result.keys())}")
+    logger.info(f"🔍 DEBUG: Story result success: {story_result.get('success')}")
+    logger.info(f"🔍 DEBUG: Story result embedding present: {story_result.get('embedding') is not None}")
+    
     if not story_result["success"]:
         raise HTTPException(status_code=500, detail="Failed to generate story")
     
-    # Submit for moderation
+    logger.info(f"Story generation result - embedding present: {story_result.get('embedding') is not None}")
+    
+    # Submit for moderation WITH the embedding
     moderation_result = await ModerationDatabase.submit_story_for_review(
         user_id=current_user["id"],
         author_name=story_request.author_name or current_user.get("display_name", "Anonymous"),
@@ -131,7 +103,7 @@ async def submit_story_for_review(
         generated_story=story_result["story"],
         model_used=story_result["model_used"],
         key_symptoms=story_result.get("key_symptoms", []),
-        embedding=story_result.get("embedding")
+        embedding=story_result.get("embedding")  # Pass the embedding here!
     )
     
     return {
@@ -139,7 +111,8 @@ async def submit_story_for_review(
         "message": "Your story has been submitted for review and will be published within 24-48 hours.",
         "story_id": moderation_result["story_id"],
         "estimated_review_time": moderation_result["estimated_review_time"],
-        "story_preview": story_result["story"][:200] + "..."
+        "story_preview": story_result["story"][:200] + "...",
+        "embedding_generated": story_result.get("embedding") is not None
     }
 
 @router.get("/")

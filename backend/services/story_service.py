@@ -3,6 +3,7 @@ Story transformation service using Ollama models
 """
 
 import logging
+import traceback
 from .openai_client import query_openai_model, MODELS
 from database.connection import mongodb
 from typing import List, Dict
@@ -107,30 +108,54 @@ async def find_similar_stories(input_story: str, top_k: int = 9, min_similarity:
         return []
     
 def create_story_with_embedding(story_data: dict) -> dict:
-    """Create story and generate embedding"""
+    """Create story and generate embedding with detailed debugging"""
     try:
+        logger.info("Starting embedding generation process")
+        logger.info(f"Story data keys: {list(story_data.keys())}")
+        
+        # Check if story_matcher is available
+        if not hasattr(story_matcher, 'model') or story_matcher.model is None:
+            logger.error("Story matcher model not available")
+            return story_data
+        
+        # Create the text for embedding
         story_text = story_matcher.create_story_embedding_text(story_data)
+        
+        if not story_text or story_text == "Error creating embedding text":
+            logger.error("Failed to create story text for embedding")
+            return story_data
+        
+        logger.info(f"Created story text for embedding: length={len(story_text)}")
+        
+        # Generate the embedding
         embedding = story_matcher.generate_embedding(story_text)
         
-        if embedding:
+        if embedding and len(embedding) > 0:
             story_data["embedding"] = embedding
-            logger.info(f"Generated embedding with length: {len(embedding)}")
+            logger.info(f"✓ Successfully generated embedding with length: {len(embedding)}")
+            logger.info(f"Embedding sample: {embedding[:5]}...")  # Show first 5 values
         else:
-            logger.warning("Failed to generate embedding")
+            logger.warning("Failed to generate embedding - embedding is empty or None")
+            story_data["embedding"] = None
         
         return story_data
+        
     except Exception as e:
         logger.error(f"Error creating story with embedding: {e}")
+        logger.error(f"Full traceback: {traceback.format_exc()}")
         return story_data
-    
-def generate_recovery_story(
+
+async def generate_recovery_story(
     challenge: str, 
     experience: str, 
     solution: str, 
     advice: str = "", 
     author_name: str = "Anonymous"
 ) -> dict:
-    """Generate recovery story with AI models and fallback"""
+    """Generate recovery story with AI models and fallback - with embedding debugging"""
+    
+    logger.info("Starting recovery story generation")
+    
     prompt = create_recovery_story_prompt(challenge, experience, solution, advice)
     story = None
     model_used = None
@@ -138,10 +163,11 @@ def generate_recovery_story(
     # Try AI models
     for model_name in MODELS:
         try:
-            generated_text = query_ollama_model(model_name, prompt, max_tokens=300)
+            generated_text = query_openai_model(model_name, prompt, max_tokens=300)
             if generated_text and len(generated_text.strip()) > 100:
                 story = generated_text.strip()
                 model_used = model_name
+                logger.info(f"✓ Story generated using {model_name}")
                 break
         except Exception as e:
             logger.warning(f"Model {model_name} failed: {str(e)}")
@@ -151,6 +177,7 @@ def generate_recovery_story(
     if not story or len(story.strip()) < 100:
         story = create_fallback_recovery_story(challenge, experience, solution, advice)
         model_used = "fallback"
+        logger.info("Using fallback story generation")
     
     # Extract symptoms
     key_symptoms = []
@@ -158,10 +185,11 @@ def generate_recovery_story(
         from .symptom_service import extract_symptoms
         symptom_data = extract_symptoms(f"{challenge}. {experience}", advice)
         key_symptoms = symptom_data.get("symptoms_identified", [])[:3]
+        logger.info(f"Extracted symptoms: {key_symptoms}")
     except Exception as e:
         logger.warning(f"Symptom extraction failed: {e}")
     
-    # Create story data with embedding
+    # Create story data
     story_data = {
         "challenge": challenge,
         "experience": experience,
@@ -173,7 +201,14 @@ def generate_recovery_story(
         "key_symptoms": key_symptoms
     }
     
+    logger.info("Creating story with embedding...")
     story_data_with_embedding = create_story_with_embedding(story_data)
+    
+    # Log embedding status
+    if story_data_with_embedding.get("embedding"):
+        logger.info("✓ Embedding successfully added to story")
+    else:
+        logger.warning("❌ No embedding was added to story")
     
     return {
         "success": True,
