@@ -69,6 +69,20 @@ class PasswordReset(BaseModel):
             raise ValueError('Password must contain letters and numbers')
         return v
 
+class AccountDeletionRequest(BaseModel):
+    email: EmailStr
+    password: str  # Require password confirmation for security
+
+class AccountDeletionConfirm(BaseModel):
+    token: str
+    confirmation_text: str  # User must type specific text to confirm
+
+    @validator('confirmation_text')
+    def validate_confirmation(cls, v):
+        if v.strip().lower() != "delete my account":
+            raise ValueError('You must type "DELETE MY ACCOUNT" to confirm deletion')
+        return v
+
 class UserResponse(BaseModel):
     id: str
     email: str
@@ -270,6 +284,25 @@ async def reset_password(request: Request, reset_data: PasswordReset):
         "success": True,
         "message": "Password reset successful! You can now log in with your new password."
     }
+
+@router.post("/request-account-deletion")
+@limiter.limit("2/hour")
+async def request_account_deletion(request: Request, deletion_request: AccountDeletionRequest):
+    user = await UserDatabase.get_user_by_email(deletion_request.email)
+    if not user or not verify_password(deletion_request.password, user["password_hash"]):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    try:
+        success = await UserDatabase.delete_user_account(user_id=user["id"], deletion_token=None)
+        if not success:
+            raise HTTPException(status_code=500, detail="Unable to delete account")
+
+        logger.info(f"Account successfully deleted for user: {user['email']}")
+        return {"success": True, "message": "Your account has been permanently deleted."}
+
+    except Exception as e:
+        logger.error(f"Error deleting account for user {user['email']}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error deleting account")
 
 @router.post("/logout")
 async def logout_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
