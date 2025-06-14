@@ -111,16 +111,15 @@ async function fetchUserInfo() {
 
 // UI State Management
 function showAuthSection() {
-    document.getElementById('authSection').style.display = 'block';
+    openModal('authModal');
     updateUserSection();
 }
 
 function showUserSection() {
-    document.getElementById('authSection').style.display = 'none';
+    closeModal('authModal');
     updateUserSection();
     checkAdminAccess();
 }
-
 function updateUserSection() {
     const userSection = document.getElementById('userSection');
     
@@ -136,7 +135,7 @@ function updateUserSection() {
     } else {
         removeTourLink();
         userSection.innerHTML = `
-            <button class="auth-prompt-btn" onclick="scrollToSection('authSection')">Login / Sign Up</button>
+            <button class="auth-prompt-btn" onclick="openModal('authModal')">Login / Sign Up</button>
         `;
     }
 }

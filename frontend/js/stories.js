@@ -366,7 +366,7 @@ async function searchSimilarStories() {
             // Authentication required
             if (!currentUser) {
                 showToast('Please login to search for similar stories.', 'warning', 'Login Required');
-                scrollToSection('authSection');
+                openModal('authModal')
                 return;
             } else {
                 showToast('Access denied. Please try logging in again.', 'error', 'Access Denied');
@@ -421,7 +421,7 @@ async function searchSimilarStories() {
 function handleShareStoryClick() {
     if (!currentUser) {
         showToast('Please create an account or login to share your story with our community.', 'warning', 'Login Required');
-        scrollToSection('authSection');
+        openModal('authModal')
         return;
     }
     openModal('shareModal');

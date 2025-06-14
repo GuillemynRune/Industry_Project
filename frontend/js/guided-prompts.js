@@ -82,7 +82,7 @@ class GuidedPrompts {
     start() {
         if (!currentUser) {
             showToast('Please create an account or login to share your story.', 'warning', 'Login Required');
-            scrollToSection('authSection');
+            openModal('authModal');
             return;
         }
         
