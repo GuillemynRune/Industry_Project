@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Postnatal Stories - You're Not Alone</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
     <header>
         <nav class="container">
@@ -34,7 +36,8 @@
         <section class="hero" id="home">
             <div class="container">
                 <h1>You're Not Alone</h1>
-                <p>Share your postnatal journey, find stories that resonate with you, and connect with a supportive community of parents who understand.</p>
+                <p>Share your postnatal journey, find stories that resonate with you, and connect with a supportive
+                    community of parents who understand.</p>
                 <div class="cta-buttons">
                     <button class="btn btn-primary" onclick="startGuidedStory()">Share Your Story</button>
                     <button class="btn btn-secondary" onclick="scrollToSection('stories')">Read Stories</button>
@@ -47,7 +50,8 @@
             <!-- Share Story Section -->
             <section class="share-story-section" id="share">
                 <h2>Share Your Recovery Story</h2>
-                <p>Your experience matters. Help others by sharing your journey through postnatal challenges and recovery.</p>
+                <p>Your experience matters. Help others by sharing your journey through postnatal challenges and
+                    recovery.</p>
                 <div class="share-btn-container">
                     <button class="share-story-btn" onclick="startGuidedStory()">
                         ✨ Start Story Creation
@@ -58,16 +62,18 @@
             <!-- Stories Section -->
             <section class="stories-section" id="stories">
                 <h2>Stories from Our Community</h2>
-                
+
                 <div class="search-bar">
-                    <input type="text" class="search-input" placeholder="Describe what you're going through... (e.g., 'feeling overwhelmed', 'sleep deprivation', 'anxiety')" id="searchInput">
+                    <input type="text" class="search-input"
+                        placeholder="Describe what you're going through... (e.g., 'feeling overwhelmed', 'sleep deprivation', 'anxiety')"
+                        id="searchInput">
                     <button class="btn btn-primary" onclick="searchSimilarStories()">Find Similar Stories</button>
                 </div>
-                
+
                 <div class="stories-carousel" id="storiesCarousel">
                     <div class="stories-track" id="storiesTrack"></div>
                 </div>
-                
+
                 <div class="carousel-controls">
                     <button class="carousel-btn" id="prevBtn">‹</button>
                     <div class="carousel-dots" id="dotsContainer"></div>
@@ -82,12 +88,14 @@
                     <div class="step-card">
                         <div class="step-icon">📝</div>
                         <h3>Share Your Experience</h3>
-                        <p>Create an account and tell us about your journey in your own words. All stories are reviewed before publication.</p>
+                        <p>Create an account and tell us about your journey in your own words. All stories are reviewed
+                            before publication.</p>
                     </div>
                     <div class="step-card">
                         <div class="step-icon">✨</div>
                         <h3>AI Creates Your Story</h3>
-                        <p>Our AI transforms your experience into a beautiful, readable story while preserving your truth.</p>
+                        <p>Our AI transforms your experience into a beautiful, readable story while preserving your
+                            truth.</p>
                     </div>
                     <div class="step-card">
                         <div class="step-icon">🤝</div>
@@ -120,7 +128,7 @@
             <!-- Moderation Section -->
             <section class="moderation-section" id="moderationSection" style="display: none;">
                 <h2>Story Moderation</h2>
-                
+
                 <div class="moderation-stats">
                     <div class="stat-card">
                         <div class="stat-number" id="pendingCount">0</div>
@@ -144,7 +152,7 @@
             <span class="close" onclick="closeModal('crisisModal')">&times;</span>
             <h2>🚨 Immediate Crisis Support</h2>
             <p><strong>If you're in immediate danger, call 911 or go to your nearest emergency room.</strong></p>
-            
+
             <div class="crisis-resources">
                 <div class="crisis-resource">
                     <h4>National Suicide Prevention Lifeline</h4>
@@ -162,7 +170,7 @@
                     <p>24/7 crisis support via text message</p>
                 </div>
             </div>
-            
+
             <h3>Warning Signs That Need Immediate Attention:</h3>
             <ul>
                 <li>Thoughts of harming yourself or your baby</li>
@@ -171,7 +179,7 @@
                 <li>Severe anxiety or panic attacks</li>
                 <li>Feeling completely unable to cope</li>
             </ul>
-            
+
             <p class="disclaimer">Remember: Seeking help is a sign of strength, not weakness.</p>
         </div>
     </div>
@@ -180,8 +188,9 @@
         <div class="modal-content">
             <span class="close" onclick="closeModal('shareModal')">&times;</span>
             <h2>Share Your Recovery Story</h2>
-            <p>Your story will be reviewed by our team before publication to ensure it's supportive and appropriate for our community.</p>
-            
+            <p>Your story will be reviewed by our team before publication to ensure it's supportive and appropriate for
+                our community.</p>
+
             <form id="shareForm">
                 <div class="form-group">
                     <label for="authorName">Your Name (optional, can be anonymous)</label>
@@ -189,21 +198,29 @@
                 </div>
                 <div class="form-group">
                     <label for="challenge">What challenge did you face?</label>
-                    <textarea id="challenge" placeholder="Describe the postnatal challenge you experienced (e.g., postpartum depression, anxiety, sleep deprivation, bonding difficulties, etc.)" rows="4"></textarea>
+                    <textarea id="challenge"
+                        placeholder="Describe the postnatal challenge you experienced (e.g., postpartum depression, anxiety, sleep deprivation, bonding difficulties, etc.)"
+                        rows="4"></textarea>
                 </div>
                 <div class="form-group">
                     <label for="experience">Tell us about your experience</label>
-                    <textarea id="experience" placeholder="What was it like? How did it affect your daily life? How long did it last? Be specific about your journey." rows="6"></textarea>
+                    <textarea id="experience"
+                        placeholder="What was it like? How did it affect your daily life? How long did it last? Be specific about your journey."
+                        rows="6"></textarea>
                 </div>
                 <div class="form-group">
                     <label for="solution">What helped you recover?</label>
-                    <textarea id="solution" placeholder="What strategies, treatments, support, or changes helped you get through this? What would you recommend to others?" rows="6"></textarea>
+                    <textarea id="solution"
+                        placeholder="What strategies, treatments, support, or changes helped you get through this? What would you recommend to others?"
+                        rows="6"></textarea>
                 </div>
                 <div class="form-group">
                     <label for="advice">Your advice to others</label>
-                    <textarea id="advice" placeholder="What would you tell someone going through the same thing? Any words of encouragement or practical tips?" rows="4"></textarea>
+                    <textarea id="advice"
+                        placeholder="What would you tell someone going through the same thing? Any words of encouragement or practical tips?"
+                        rows="4"></textarea>
                 </div>
-                
+
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Submit Story for Review</button>
                     <button type="button" class="btn btn-secondary" onclick="closeModal('shareModal')">Cancel</button>
@@ -218,22 +235,26 @@
             <span class="close" onclick="closeModal('forgotPasswordModal')">&times;</span>
             <h2>🔐 Reset Your Password</h2>
             <p>Enter your email address and we'll send you instructions to reset your password.</p>
-            
+
             <form id="forgotPasswordForm">
                 <div class="form-group">
                     <label for="forgotEmail">Email Address</label>
                     <input type="email" id="forgotEmail" required placeholder="Enter your email address">
                 </div>
-                
+
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Send Reset Instructions</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('forgotPasswordModal')">Cancel</button>
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('forgotPasswordModal')">Cancel</button>
                 </div>
             </form>
-            
-            <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(168, 216, 234, 0.3);">
+
+            <div
+                style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(168, 216, 234, 0.3);">
                 <p style="color: var(--text-light); font-size: 0.9rem;">
-                    Remember your password? <a href="#" onclick="closeModal('forgotPasswordModal'); switchAuth('login'); scrollToSection('authSection');" style="color: var(--deep-blue); font-weight: 600;">Back to Login</a>
+                    Remember your password? <a href="#"
+                        onclick="closeModal('forgotPasswordModal'); switchAuth('login'); scrollToSection('authSection');"
+                        style="color: var(--deep-blue); font-weight: 600;">Back to Login</a>
                 </p>
             </div>
         </div>
@@ -245,26 +266,30 @@
             <span class="close" onclick="closeModal('resetPasswordModal')">&times;</span>
             <h2>🔑 Create New Password</h2>
             <p>Enter your new password below. Make it strong and memorable!</p>
-            
+
             <form id="resetPasswordForm">
                 <input type="hidden" id="resetToken">
-                
+
                 <div class="form-group">
                     <label for="newPassword">New Password</label>
-                    <input type="password" id="newPassword" required minlength="8" placeholder="Enter your new password">
+                    <input type="password" id="newPassword" required minlength="8"
+                        placeholder="Enter your new password">
                     <div class="password-requirements">
-                        <small style="color: var(--text-light);">Password must be at least 8 characters and contain letters and numbers</small>
+                        <small style="color: var(--text-light);">Password must be at least 8 characters and contain
+                            letters and numbers</small>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="confirmPassword">Confirm New Password</label>
-                    <input type="password" id="confirmPassword" required minlength="8" placeholder="Confirm your new password">
+                    <input type="password" id="confirmPassword" required minlength="8"
+                        placeholder="Confirm your new password">
                 </div>
-                
+
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Update Password</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('resetPasswordModal')">Cancel</button>
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('resetPasswordModal')">Cancel</button>
                 </div>
             </form>
         </div>
@@ -272,13 +297,15 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 Postnatal Stories. A safe space for shared experiences. Remember: You are not alone, and seeking help is a sign of strength.</p>
+            <p>&copy; 2025 Postnatal Stories. A safe space for shared experiences. Remember: You are not alone, and
+                seeking help is a sign of strength.</p>
             <p>
-                <a href="#" onclick="showTerms()">Terms of Service</a> | 
-                <a href="#" onclick="showPrivacy()">Privacy Policy</a> | 
+                <a href="#" onclick="showTerms()">Terms of Service</a> |
+                <a href="#" onclick="showPrivacy()">Privacy Policy</a> |
                 <a href="#" onclick="showCrisisResources()">Crisis Resources</a>
             </p>
-            <p class="disclaimer">This platform provides peer support and shared experiences. It is not a substitute for professional medical advice, diagnosis, or treatment.</p>
+            <p class="disclaimer">This platform provides peer support and shared experiences. It is not a substitute for
+                professional medical advice, diagnosis, or treatment.</p>
         </div>
     </footer>
 
@@ -286,7 +313,7 @@
     <div id="authModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('authModal')">&times;</span>
-            
+
             <div class="auth-toggle">
                 <button onclick="switchAuth('login')" id="loginTab" class="auth-tab active">Login</button>
                 <button onclick="switchAuth('register')" id="registerTab" class="auth-tab">Sign Up</button>
@@ -333,7 +360,8 @@
                 <div class="form-group checkbox-group">
                     <label>
                         <input type="checkbox" id="termsAgreement" required>
-                        I agree to the <a href="#" onclick="showTerms()">Terms of Service</a> and <a href="#" onclick="showPrivacy()">Privacy Policy</a>
+                        I agree to the <a href="#" onclick="showTerms()">Terms of Service</a> and <a href="#"
+                            onclick="showPrivacy()">Privacy Policy</a>
                     </label>
                 </div>
                 <div class="form-actions">
@@ -346,7 +374,7 @@
     <div id="myStoriesModal" class="modal">
         <div class="modal-content my-stories-modal-content">
             <span class="close" onclick="closeModal('myStoriesModal')">&times;</span>
-            
+
             <div class="my-stories-header">
                 <h2>📚 My Stories</h2>
                 <p>Track your submitted stories and their review status</p>
@@ -359,7 +387,7 @@
                     </button>
                 </div>
             </div>
-            
+
             <div class="my-stories-content">
                 <div id="userStoriesContainer">
                     <div class="loading-placeholder">
@@ -368,6 +396,29 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    <div id="deleteAccountModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('deleteAccountModal')">&times;</span>
+            <h2>⚠️ Delete Your Account</h2>
+            <p>This action is <strong>permanent</strong>. Please enter your credentials to confirm.</p>
+
+            <form id="deleteAccountForm">
+                <div class="form-group">
+                    <label for="deleteEmail">Email</label>
+                    <input type="email" id="deleteEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="deletePassword">Password</label>
+                    <input type="password" id="deletePassword" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Yes, Delete My Account</button>
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('deleteAccountModal')">Cancel</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -379,4 +430,5 @@
     <script src="js/speech-recognition.js"></script>
     <script src="js/user-stories.js"></script>
 </body>
+
 </html>

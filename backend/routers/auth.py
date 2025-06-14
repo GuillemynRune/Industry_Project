@@ -285,24 +285,30 @@ async def reset_password(request: Request, reset_data: PasswordReset):
         "message": "Password reset successful! You can now log in with your new password."
     }
 
-@router.post("/request-account-deletion")
-@limiter.limit("2/hour")
-async def request_account_deletion(request: Request, deletion_request: AccountDeletionRequest):
+
+@router.post("/delete-account")
+@limiter.limit("3/hour")
+async def delete_account(request: Request, deletion_request: AccountDeletionRequest):
+    """Delete account immediately upon credential verification"""
     user = await UserDatabase.get_user_by_email(deletion_request.email)
     if not user or not verify_password(deletion_request.password, user["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid email or password")
-
+    
     try:
-        success = await UserDatabase.delete_user_account(user_id=user["id"], deletion_token=None)
+        success = await UserDatabase.delete_user_account(user_id=user["id"])
         if not success:
             raise HTTPException(status_code=500, detail="Unable to delete account")
-
+        
         logger.info(f"Account successfully deleted for user: {user['email']}")
-        return {"success": True, "message": "Your account has been permanently deleted."}
-
+        return {
+            "success": True,
+            "message": "Your account has been permanently deleted."
+        }
+    
     except Exception as e:
-        logger.error(f"Error deleting account for user {user['email']}: {str(e)}")
-        raise HTTPException(status_code=500, detail="Error deleting account")
+        logger.error(f"Account deletion failed for user {user['email']}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Account deletion failed")
+    
 
 @router.post("/logout")
 async def logout_user(credentials: HTTPAuthorizationCredentials = Depends(security)):

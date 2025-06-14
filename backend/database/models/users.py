@@ -131,3 +131,9 @@ class UserDatabase:
                 }
             }
         )
+    
+    @staticmethod
+    async def delete_user_account(user_id: str) -> bool:
+        """Delete a user account by ID"""
+        result = await mongodb.database.users.delete_one({"_id": ObjectId(user_id)})
+        return result.deleted_count == 1
