@@ -1446,21 +1446,33 @@ footer .disclaimer {
 }
 
 /* Theme Toggle */
-.theme-toggle {
-    position: fixed;
-    top: 100px;
-    right: 20px;
-    z-index: 1000;
-    background: var(--deep-pink);
-    border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
+.nav-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.theme-toggle-nav {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(107, 182, 214, 0.3);
+    border-radius: 12px;
+    width: 40px;
+    height: 40px;
     cursor: pointer;
-    color: white;
-    font-size: 1.5rem;
-    box-shadow: var(--shadow-medium);
+    color: var(--text-dark);
+    font-size: 1.2rem;
     transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle-nav:hover {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--deep-blue);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-light);
 }
 
 .theme-toggle:hover {
@@ -2150,6 +2162,17 @@ footer .disclaimer {
         rgba(74, 85, 104, 0.95));
 }
 
+[data-theme="dark"] .theme-toggle-nav {
+    background: rgba(45, 55, 72, 0.8);
+    border-color: rgba(74, 85, 104, 0.5);
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .theme-toggle-nav:hover {
+    background: rgba(45, 55, 72, 0.9);
+    border-color: var(--deep-blue);
+}
+
 [data-theme="dark"] .btn-primary {
     background: var(--deep-blue);
 }
@@ -2593,14 +2616,6 @@ footer .disclaimer {
         width: 100%;
     }
     
-    .theme-toggle {
-        top: 80px;
-        right: 15px;
-        width: 45px;
-        height: 45px;
-        font-size: 1.3rem;
-    }
-    
     .speech-mic-btn {
         padding: 8px 12px;
         font-size: 0.8rem;
@@ -2849,6 +2864,16 @@ footer .disclaimer {
     .transcription-placeholder {
         font-size: 12px;
         padding: 15px;
+    }
+
+    .nav-controls {
+        gap: 0.5rem;
+    }
+    
+    .theme-toggle-nav {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
     }
 }
 

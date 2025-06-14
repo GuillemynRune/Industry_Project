@@ -141,22 +141,51 @@ class ThemeManager {
     
     init() {
         this.applyTheme(this.currentTheme);
-        this.createToggleButton();
+        this.setupNavToggle();
     }
     
-    createToggleButton() {
-        const button = document.createElement('button');
-        button.className = 'theme-toggle';
-        button.innerHTML = this.currentTheme === 'dark' ? '☀️' : '🌙';
-        button.onclick = () => this.toggleTheme();
-        document.body.appendChild(button);
+    setupNavToggle() {
+        // Wait for DOM to be ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.createNavToggle());
+        } else {
+            this.createNavToggle();
+        }
+    }
+    
+    createNavToggle() {
+        const existingToggle = document.getElementById('themeToggleNav');
+        if (existingToggle) {
+            existingToggle.innerHTML = this.currentTheme === 'dark' ? '☀️' : '🌙';
+            existingToggle.onclick = () => this.toggleTheme();
+            return;
+        }
+        
+        // If the nav toggle doesn't exist in HTML, create it
+        const navControls = document.querySelector('.nav-controls');
+        if (navControls && !document.getElementById('themeToggleNav')) {
+            const button = document.createElement('button');
+            button.id = 'themeToggleNav';
+            button.className = 'theme-toggle-nav';
+            button.title = 'Toggle dark/light mode';
+            button.innerHTML = this.currentTheme === 'dark' ? '☀️' : '🌙';
+            button.onclick = () => this.toggleTheme();
+            
+            // Insert before user section
+            const userSection = document.getElementById('userSection');
+            navControls.insertBefore(button, userSection);
+        }
     }
     
     toggleTheme() {
         this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
         this.applyTheme(this.currentTheme);
         localStorage.setItem('theme', this.currentTheme);
-        document.querySelector('.theme-toggle').innerHTML = this.currentTheme === 'dark' ? '☀️' : '🌙';
+        
+        const toggle = document.getElementById('themeToggleNav');
+        if (toggle) {
+            toggle.innerHTML = this.currentTheme === 'dark' ? '☀️' : '🌙';
+        }
     }
     
     applyTheme(theme) {
