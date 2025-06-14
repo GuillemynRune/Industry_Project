@@ -7,6 +7,7 @@ from routers.auth import get_current_active_user
 from bson import ObjectId
 from datetime import datetime
 import logging
+import traceback
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/moderation", tags=["moderation"])
@@ -110,26 +111,79 @@ async def reject_story(
     current_user: dict = Depends(require_moderator)
 ):
     """Reject story and move to rejected collection"""
-    story = await mongodb.database.pending_stories.find_one({"_id": ObjectId(story_id)})
-    if not story:
-        raise HTTPException(status_code=404, detail="Story not found")
+    try:
+        story = await mongodb.database.pending_stories.find_one({"_id": ObjectId(story_id)})
+        if not story:
+            raise HTTPException(status_code=404, detail="Story not found")
 
-    # Move to rejected collection with rejection info
-    rejected_story = {
-        **story,
-        "status": "rejected",
-        "rejected_by": current_user["email"],
-        "rejected_at": datetime.utcnow(),
-        "rejection_reason": action.reason or "Does not meet community guidelines"
-    }
+        # Move to rejected collection with rejection info
+        rejected_story = {
+            **story,
+            "status": "rejected",
+            "rejected_by": current_user["email"],
+            "rejected_at": datetime.utcnow(),
+            "rejection_reason": action.reason or "Does not meet community guidelines"
+        }
 
-    # Insert into rejected collection and remove from pending
-    await mongodb.database.rejected_stories.insert_one(rejected_story)
-    await mongodb.database.pending_stories.delete_one({"_id": ObjectId(story_id)})
-    
-    logger.info(f"Story {story_id} rejected by {current_user['email']}: {action.reason}")
-    
-    return {
-        "success": True,
-        "message": "Story rejected and moved to rejected collection"
-    }
+        # DEBUG: Log what we're trying to insert
+        logger.info(f"Rejecting story {story_id} by {current_user['email']}")
+        logger.info(f"Rejected story user_id type: {type(rejected_story.get('user_id'))}")
+        logger.info(f"Rejected story user_id value: {rejected_story.get('user_id')}")
+
+        # Insert into rejected collection and remove from pending
+        try:
+            result = await mongodb.database.rejected_stories.insert_one(rejected_story)
+            logger.info(f"Successfully inserted rejected story with ID: {result.inserted_id}")
+            
+            # Only delete from pending if rejection insert succeeded
+            await mongodb.database.pending_stories.delete_one({"_id": ObjectId(story_id)})
+            logger.info(f"Successfully deleted story {story_id} from pending_stories")
+            
+        except Exception as db_error:
+            logger.error(f"Database error during rejection: {db_error}")
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            raise HTTPException(status_code=500, detail=f"Database error: {str(db_error)}")
+        
+        logger.info(f"Story {story_id} rejected by {current_user['email']}: {action.reason}")
+        
+        return {
+            "success": True,
+            "message": "Story rejected and moved to rejected collection"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error rejecting story {story_id}: {e}")
+        logger.error(f"Full traceback: {traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail="Internal server error during rejection")
+
+# Add this debug endpoint to check collections
+@router.get("/debug/collections")
+async def debug_collections(current_user: dict = Depends(require_moderator)):
+    """Debug endpoint to check collections exist"""
+    try:
+        collections = await mongodb.database.list_collection_names()
+        
+        # Count documents in each collection
+        stats = {}
+        for collection_name in ['pending_stories', 'approved_stories', 'rejected_stories']:
+            try:
+                count = await mongodb.database[collection_name].count_documents({})
+                stats[collection_name] = {
+                    "exists": collection_name in collections,
+                    "count": count
+                }
+            except Exception as e:
+                stats[collection_name] = {
+                    "exists": collection_name in collections,
+                    "error": str(e)
+                }
+        
+        return {
+            "all_collections": collections,
+            "story_collections": stats
+        }
+    except Exception as e:
+        logger.error(f"Debug collections error: {e}")
+        return {"error": str(e)}

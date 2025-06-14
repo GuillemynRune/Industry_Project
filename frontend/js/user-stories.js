@@ -19,7 +19,7 @@ async function showMyStories() {
     await loadUserStories();
 }
 
-// Load user's stories from backend
+// Load user's stories from backend  
 async function loadUserStories() {
     const container = document.getElementById('userStoriesContainer');
     
@@ -42,11 +42,12 @@ async function loadUserStories() {
         
         if (data.success) {
             userStories = data.stories || [];
+            // FIX: Use backend counts consistently
             userStoriesStats = {
                 total: data.total_count || 0,
                 pending: data.pending_count || 0,
                 approved: data.approved_count || 0,
-                rejected: userStories.filter(s => s.status === 'rejected').length
+                rejected: data.rejected_count || 0  // Use backend count
             };
             
             displayUserStories();
@@ -59,7 +60,137 @@ async function loadUserStories() {
     }
 }
 
-// Display user stories in the modal
+// Update the status info to include rejection details
+function getStatusInfo(status) {
+    const statusMap = {
+        'pending': {
+            label: 'Pending Review',
+            icon: '⏳',
+            description: 'Your story is being reviewed by our team'
+        },
+        'approved': {
+            label: 'Published',
+            icon: '✅',
+            description: 'Your story is live and helping others'
+        },
+        'rejected': {
+            label: 'Not Approved',
+            icon: '❌',
+            description: 'Story did not meet community guidelines'
+        }
+    };
+    
+    return statusMap[status] || statusMap['pending'];
+}
+
+// Show detailed story modal with rejection info
+function showUserStoryDetailModal(story) {
+    const modal = document.getElementById('userStoryDetailModal') || createUserStoryDetailModal();
+    const statusInfo = getStatusInfo(story.status);
+    
+    const content = modal.querySelector('.modal-content');
+    content.innerHTML = `
+        <span class="close" onclick="closeModal('userStoryDetailModal')">&times;</span>
+        
+        <!-- Story Status Banner -->
+        <div class="story-status-banner status-${story.status}">
+            <div class="status-info">
+                <span class="status-badge status-${story.status}">
+                    ${statusInfo.icon} ${statusInfo.label}
+                </span>
+                <p>${statusInfo.description}</p>
+                ${story.status === 'rejected' && story.rejection_reason ? `
+                    <p><strong>Reason:</strong> ${story.rejection_reason}</p>
+                ` : ''}
+            </div>
+            <div class="submission-date">
+                <small>Submitted: ${story.created_at ? new Date(story.created_at).toLocaleDateString() : 'Unknown'}</small>
+                ${story.rejected_at ? `<br><small>Rejected: ${new Date(story.rejected_at).toLocaleDateString()}</small>` : ''}
+                ${story.approved_at ? `<br><small>Approved: ${new Date(story.approved_at).toLocaleDateString()}</small>` : ''}
+            </div>
+        </div>
+        
+        <!-- Story Content -->
+        <div class="story-detail-content">
+            <div class="story-section">
+                <h3>Your Original Submission</h3>
+                
+                <div class="story-field">
+                    <label>Challenge:</label>
+                    <div class="field-content">${story.challenge || 'Not specified'}</div>
+                </div>
+                
+                <div class="story-field">
+                    <label>Your Experience:</label>
+                    <div class="field-content">${story.experience || 'Not provided'}</div>
+                </div>
+                
+                <div class="story-field">
+                    <label>What Helped:</label>
+                    <div class="field-content">${story.solution || 'Not specified'}</div>
+                </div>
+                
+                ${story.advice ? `
+                    <div class="story-field">
+                        <label>Your Advice:</label>
+                        <div class="field-content">${story.advice}</div>
+                    </div>
+                ` : ''}
+            </div>
+            
+            ${story.generated_story ? `
+                <div class="story-section">
+                    <h3>Generated Story Preview</h3>
+                    <div class="generated-story-preview">
+                        ${story.generated_story}
+                    </div>
+                </div>
+            ` : ''}
+            
+            ${story.status === 'approved' && story.approved_at ? `
+                <div class="story-section">
+                    <h3>Publication Details</h3>
+                    <p><strong>Approved:</strong> ${new Date(story.approved_at).toLocaleDateString()}</p>
+                    <p><strong>Approved by:</strong> ${story.approved_by || 'Moderator'}</p>
+                    <p><strong>Status:</strong> Your story is now live and helping other parents in our community!</p>
+                </div>
+            ` : ''}
+
+            ${story.status === 'rejected' ? `
+                <div class="story-section">
+                    <h3>What This Means</h3>
+                    <p>Your story didn't meet our community guidelines this time. You're welcome to revise and submit a new story that focuses on:</p>
+                    <ul>
+                        <li>Recovery strategies and positive outcomes</li>
+                        <li>Supportive, encouraging language</li>
+                        <li>Content appropriate for all community members</li>
+                        <li>Avoiding explicit details about harmful thoughts or behaviors</li>
+                    </ul>
+                    ${story.rejected_by ? `<p><small><strong>Reviewed by:</strong> ${story.rejected_by}</small></p>` : ''}
+                </div>
+            ` : ''}
+        </div>
+        
+        <div class="story-viewer-actions">
+            <button class="btn btn-secondary" onclick="closeModal('userStoryDetailModal')">
+                Close
+            </button>
+            ${story.status === 'approved' ? `
+                <button class="btn btn-primary" onclick="viewPublishedStory('${story.id}')">
+                    View Published Story
+                </button>
+            ` : ''}
+            ${story.status === 'rejected' ? `
+                <button class="btn btn-primary" onclick="startGuidedStory(); closeModal('userStoryDetailModal'); closeModal('myStoriesModal')">
+                    Create New Story
+                </button>
+            ` : ''}
+        </div>
+    `;
+    
+    openModal('userStoryDetailModal');
+}
+
 // Display user stories in the modal
 function displayUserStories() {
     const container = document.getElementById('userStoriesContainer');

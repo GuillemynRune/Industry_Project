@@ -223,6 +223,7 @@ async def get_story_themes_analysis(current_user: dict = Depends(get_current_act
         logger.error(f"Error in themes analysis: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while analyzing themes")
     
+# Update the user stories endpoint to handle both string and ObjectId user_ids
 @router.get("/user/stories")
 async def get_user_stories(
     current_user: dict = Depends(get_current_active_user),
@@ -231,27 +232,38 @@ async def get_user_stories(
 ):
     """Get current user's submitted stories"""
     try:
+        user_id = current_user["id"]
+        
+        # Create query that matches both string and ObjectId formats
+        def create_user_query(user_id_val):
+            query_options = [{"user_id": user_id_val}]
+            # Also try ObjectId if user_id is string
+            try:
+                if isinstance(user_id_val, str):
+                    query_options.append({"user_id": ObjectId(user_id_val)})
+                else:
+                    query_options.append({"user_id": str(user_id_val)})
+            except:
+                pass
+            return {"$or": query_options}
+        
+        user_query = create_user_query(user_id)
+        
         # Get from pending, approved, and rejected collections
         pending_stories = []
         approved_stories = []
         rejected_stories = []
         
         # Pending stories
-        pending_cursor = mongodb.database.pending_stories.find(
-            {"user_id": current_user["id"]}
-        ).sort("created_at", -1).limit(limit)
-        
+        pending_cursor = mongodb.database.pending_stories.find(user_query).sort("created_at", -1).limit(limit)
         async for story in pending_cursor:
             story["id"] = str(story["_id"])
             story["status"] = "pending"
             del story["_id"]
             pending_stories.append(story)
         
-        # Approved stories
-        approved_cursor = mongodb.database.approved_stories.find(
-            {"user_id": current_user["id"]}
-        ).sort("created_at", -1).limit(limit)
-        
+        # Approved stories  
+        approved_cursor = mongodb.database.approved_stories.find(user_query).sort("created_at", -1).limit(limit)
         async for story in approved_cursor:
             story["id"] = str(story["_id"])
             story["status"] = "approved"
@@ -259,10 +271,7 @@ async def get_user_stories(
             approved_stories.append(story)
         
         # Rejected stories
-        rejected_cursor = mongodb.database.rejected_stories.find(
-            {"user_id": current_user["id"]}
-        ).sort("created_at", -1).limit(limit)
-        
+        rejected_cursor = mongodb.database.rejected_stories.find(user_query).sort("created_at", -1).limit(limit)
         async for story in rejected_cursor:
             story["id"] = str(story["_id"])
             story["status"] = "rejected"
@@ -284,4 +293,5 @@ async def get_user_stories(
         
     except Exception as e:
         logger.error(f"Error fetching user stories: {e}")
+        logger.error(f"Full traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail="Error fetching stories")
