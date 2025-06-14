@@ -1,5 +1,5 @@
 // Main JavaScript - Core functionality
-const API_BASE_URL = '/api'; // Changed for Docker nginx proxy
+const API_BASE_URL = 'http://localhost:8000'; // Changed for Docker nginx proxy
 let currentUser = null;
 let authToken = null;
 

@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     password_reset_expire_minutes: int = 60  # 1 hour for password reset
     
     # CORS - using your existing origins
-    allowed_origins: str = "http://localhost:3000"
+    allowed_origins: str = "http://localhost:8080,http://localhost:3000"
     
     # Email Configuration
     smtp_server: str = "smtp.gmail.com"
