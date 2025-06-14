@@ -16,6 +16,9 @@
                     <li><a href="#share">Share</a></li>
                     <li><a href="#stories">Stories</a></li>
                     <li><a href="#support">Support</a></li>
+                    <li id="myStoriesNavItem" style="display: none;">
+                        <a href="javascript:void(0)" onclick="showMyStories()">My Stories</a>
+                    </li>
                 </ul>
                 <div class="nav-controls">
                     <div class="user-section" id="userSection"></div>
@@ -340,11 +343,40 @@
         </div>
     </div>
 
+    <div id="myStoriesModal" class="modal">
+        <div class="modal-content my-stories-modal-content">
+            <span class="close" onclick="closeModal('myStoriesModal')">&times;</span>
+            
+            <div class="my-stories-header">
+                <h2>📚 My Stories</h2>
+                <p>Track your submitted stories and their review status</p>
+                <div class="my-stories-actions">
+                    <button class="btn btn-primary" onclick="startGuidedStory(); closeModal('myStoriesModal')">
+                        ✨ Share New Story
+                    </button>
+                    <button class="btn btn-secondary" onclick="refreshMyStories()">
+                        🔄 Refresh
+                    </button>
+                </div>
+            </div>
+            
+            <div class="my-stories-content">
+                <div id="userStoriesContainer">
+                    <div class="loading-placeholder">
+                        <div class="loading-spinner"></div>
+                        <p>Loading your stories...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="js/main.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/stories.js"></script>
     <script src="js/moderation.js"></script>
     <script src="js/guided-prompts.js"></script>
     <script src="js/speech-recognition.js"></script>
+    <script src="js/user-stories.js"></script>
 </body>
 </html>

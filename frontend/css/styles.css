@@ -2869,7 +2869,7 @@ footer .disclaimer {
     .nav-controls {
         gap: 0.5rem;
     }
-    
+
     .theme-toggle-nav {
         width: 36px;
         height: 36px;
@@ -2909,5 +2909,412 @@ footer .disclaimer {
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+/* Add this to frontend/css/styles.css */
+
+/* My Stories Modal */
+.my-stories-modal-content {
+    max-width: 1000px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 3rem;
+}
+
+.my-stories-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(168, 216, 234, 0.3);
+}
+
+.my-stories-header h2 {
+    color: var(--deep-blue);
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.my-stories-header p {
+    color: var(--text-light);
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.my-stories-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* User Stories Stats */
+.user-stories-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.user-stories-stats .stat-card {
+    background: var(--gradient-card);
+    border-radius: 20px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: var(--shadow-light);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(168, 216, 234, 0.2);
+}
+
+.user-stories-stats .stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-medium);
+}
+
+/* User Stories Grid */
+.user-stories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 2rem;
+}
+
+.user-story-card {
+    background: var(--gradient-card);
+    border-radius: 25px;
+    padding: 2rem;
+    box-shadow: var(--shadow-medium);
+    transition: all 0.4s ease;
+    border-left: 4px solid var(--deep-blue);
+    animation: slideIn 0.6s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.user-story-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at top right, var(--pale-blue) 0%, transparent 60%);
+    opacity: 0.1;
+    pointer-events: none;
+}
+
+.user-story-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-heavy);
+}
+
+/* Status-specific styling */
+.user-story-card.status-pending {
+    border-left-color: #ffc107;
+}
+
+.user-story-card.status-approved {
+    border-left-color: var(--success-green);
+}
+
+.user-story-card.status-rejected {
+    border-left-color: var(--crisis-red);
+}
+
+/* Story Card Header */
+.story-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.story-info h4.story-title {
+    color: var(--deep-blue);
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.story-date {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: var(--shadow-light);
+}
+
+.status-badge.status-pending {
+    background: linear-gradient(45deg, #fff3cd, #ffeaa7);
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status-badge.status-approved {
+    background: linear-gradient(45deg, #d1edff, #a8d8ea);
+    color: #155724;
+    border: 1px solid #a8d8ea;
+}
+
+.status-badge.status-rejected {
+    background: linear-gradient(45deg, #f8d7da, #f5c6cb);
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Story Preview */
+.story-preview {
+    color: var(--text-dark);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* Story Card Footer */
+.story-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    position: relative;
+    z-index: 1;
+}
+
+.status-info small {
+    color: var(--text-light);
+    font-style: italic;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: var(--deep-pink);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    padding: 0.5rem 0;
+    position: relative;
+}
+
+.btn-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--deep-pink);
+    transition: width 0.3s ease;
+}
+
+.btn-link:hover {
+    color: var(--deep-blue);
+    transform: translateX(5px);
+}
+
+.btn-link:hover::after {
+    width: 100%;
+}
+
+/* Story Detail Modal Enhancements */
+.story-status-banner {
+    background: var(--gradient-card);
+    border-radius: 20px;
+    padding: 2rem;
+    margin: 2rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-light);
+    border-left: 4px solid var(--deep-blue);
+}
+
+.story-status-banner.status-pending {
+    border-left-color: #ffc107;
+    background: linear-gradient(135deg, rgba(255, 243, 205, 0.3), rgba(255, 234, 167, 0.1));
+}
+
+.story-status-banner.status-approved {
+    border-left-color: var(--success-green);
+    background: linear-gradient(135deg, rgba(209, 237, 255, 0.3), rgba(168, 216, 234, 0.1));
+}
+
+.story-status-banner.status-rejected {
+    border-left-color: var(--crisis-red);
+    background: linear-gradient(135deg, rgba(248, 215, 218, 0.3), rgba(245, 198, 203, 0.1));
+}
+
+.story-status-banner .status-info {
+    flex: 1;
+}
+
+.story-status-banner .status-badge {
+    margin-bottom: 0.5rem;
+    display: inline-block;
+}
+
+.story-status-banner p {
+    margin: 0;
+    color: var(--text-dark);
+    line-height: 1.4;
+}
+
+.submission-date {
+    text-align: right;
+}
+
+.submission-date small {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+/* Loading States */
+.loading-placeholder {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-light);
+}
+
+.loading-placeholder .loading-spinner {
+    margin: 0 auto 2rem;
+}
+
+/* Dark Mode Support */
+[data-theme="dark"] .user-story-card {
+    background: linear-gradient(135deg, rgba(45, 55, 72, 0.95), rgba(74, 85, 104, 0.3));
+    border: 1px solid rgba(74, 85, 104, 0.3);
+}
+
+[data-theme="dark"] .user-stories-stats .stat-card {
+    background: linear-gradient(135deg, rgba(45, 55, 72, 0.95), rgba(74, 85, 104, 0.3));
+    border: 1px solid rgba(74, 85, 104, 0.3);
+}
+
+[data-theme="dark"] .story-status-banner {
+    background: linear-gradient(135deg, rgba(45, 55, 72, 0.95), rgba(74, 85, 104, 0.3));
+    border: 1px solid rgba(74, 85, 104, 0.3);
+}
+
+[data-theme="dark"] .status-badge.status-pending {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    border-color: rgba(255, 193, 7, 0.3);
+}
+
+[data-theme="dark"] .status-badge.status-approved {
+    background: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+    border-color: rgba(40, 167, 69, 0.3);
+}
+
+[data-theme="dark"] .status-badge.status-rejected {
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    border-color: rgba(220, 53, 69, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .my-stories-modal-content {
+        padding: 2rem;
+        margin: 2% auto;
+    }
+
+    .user-stories-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .user-stories-stats {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
+    }
+
+    .story-card-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .story-status-banner {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .my-stories-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .my-stories-actions .btn {
+        width: 100%;
+        max-width: 250px;
+    }
+}
+
+/* Add/update these styles in frontend/css/styles.css */
+
+/* Navigation fixes */
+.nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+    flex-wrap: nowrap; /* Prevent wrapping */
+    align-items: center;
+}
+
+.nav-links li {
+    white-space: nowrap; /* Prevent text wrapping */
+    flex-shrink: 0; /* Prevent items from shrinking */
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    display: block;
+    padding: 0.5rem 0;
+}
+
+/* Responsive navigation */
+@media (max-width: 1024px) {
+    .nav-links {
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-links {
+        display: none; /* Hide on mobile if needed */
+    }
+    
+    /* Or alternatively, make it scrollable horizontally */
+    .nav-links {
+        display: flex;
+        overflow-x: auto;
+        gap: 1rem;
+        padding: 0 1rem;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    
+    .nav-links::-webkit-scrollbar {
+        display: none;
     }
 }
