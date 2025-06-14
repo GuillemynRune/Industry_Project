@@ -120,30 +120,67 @@ function showUserSection() {
     updateUserSection();
     checkAdminAccess();
 }
+
 function updateUserSection() {
     const userSection = document.getElementById('userSection');
 
     if (currentUser) {
-        addTourLinkIfNeeded();
         userSection.innerHTML = `
-            <div class="user-info">
-                <div class="user-avatar">${currentUser.display_name.charAt(0).toUpperCase()}</div>
-                <span class="user-welcome">Welcome, ${escapeHtml(currentUser.display_name)}</span>
-                <button class="logout-btn" onclick="logout()">Logout</button>
-                <button class="logout-btn" style="margin-left: 0.5rem;" onclick="showDeleteAccountModal()">Delete Account</button>
+            <div class="user-dropdown">
+                <button class="user-menu-btn" onclick="toggleUserMenu()">
+                    <span class="user-avatar">${currentUser.display_name.charAt(0).toUpperCase()}</span>
+                    <span>${escapeHtml(currentUser.display_name)}</span>
+                    <span>▼</span>
+                </button>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-menu-item" onclick="toggleTheme(); closeUserMenu()">
+                        <span id="themeIcon">${document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙'}</span>
+                        <span id="themeText">${document.documentElement.getAttribute('data-theme') === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+                    </button>
+                    <hr style="margin: 0.5rem 0; border: none; border-top: 1px solid rgba(168, 216, 234, 0.3);">
+                    <button class="user-menu-item" onclick="logout(); closeUserMenu()">Logout</button>
+                    <button class="user-menu-item danger" onclick="showDeleteAccountModal(); closeUserMenu()">Delete Account</button>
+                </div>
             </div>
         `;
-        const myStoriesNavItem = document.getElementById('myStoriesNavItem');
-        if (myStoriesNavItem) {
-            myStoriesNavItem.style.display = currentUser ? 'block' : 'none';
-        }
     } else {
-        removeTourLink();
         userSection.innerHTML = `
             <button class="auth-prompt-btn" onclick="openModal('authModal')">Login / Sign Up</button>
         `;
     }
 }
+
+function toggleTheme() {
+    if (typeof themeManager !== 'undefined') {
+        themeManager.toggleTheme();
+        // Update dropdown text
+        const themeIcon = document.getElementById('themeIcon');
+        const themeText = document.getElementById('themeText');
+        if (themeIcon && themeText) {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            themeIcon.textContent = isDark ? '☀️' : '🌙';
+            themeText.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+        }
+    }
+}
+
+function toggleUserMenu() {
+    const dropdown = document.querySelector('.user-dropdown');
+    dropdown.classList.toggle('open');
+}
+
+function closeUserMenu() {
+    const dropdown = document.querySelector('.user-dropdown');
+    dropdown.classList.remove('open');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+    const dropdown = document.querySelector('.user-dropdown');
+    if (dropdown && !dropdown.contains(e.target)) {
+        closeUserMenu();
+    }
+});
 
 function addTourLinkIfNeeded() {
     if (!document.getElementById('tourLink')) {
