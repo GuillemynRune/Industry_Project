@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, Request
 from pydantic import BaseModel
 from typing import Optional
+from bson import ObjectId
 from database.models.story import StoryDatabase
 from database.models.moderation import ModerationDatabase
 from database.utils import CrisisSupport, ContentFilter
@@ -10,6 +11,7 @@ from services.symptom_service import extract_symptoms
 from services.openai_client import query_openai_model, MODELS
 from routers.auth import get_current_active_user
 import logging
+import traceback
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/stories", tags=["stories"])
