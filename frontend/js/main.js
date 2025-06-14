@@ -1,5 +1,5 @@
 // Main JavaScript - Core functionality
-const API_BASE_URL = 'http://localhost:8000'; // Changed for Docker nginx proxy
+const API_BASE_URL = window.location.port === '8080' ? '/api' : 'http://localhost:8000';
 let currentUser = null;
 let authToken = null;
 
@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
 
 // Toast Notification System
 function showToast(message, type = 'success', title = '') {
