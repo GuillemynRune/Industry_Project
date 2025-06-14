@@ -144,10 +144,7 @@ nav {
 .logo {
     font-size: 1.8rem;
     font-weight: bold;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--deep-blue);
     transition: transform 0.3s ease;
 }
 
@@ -174,7 +171,7 @@ nav {
     left: 0;
     width: 0;
     height: 2px;
-    background: var(--gradient-primary);
+    background: var(--deep-blue);
     transition: width 0.3s ease;
 }
 
@@ -192,7 +189,7 @@ nav {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: var(--gradient-primary);
+    background: var(--deep-pink);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -274,13 +271,13 @@ nav {
 }
 
 .btn-primary {
-    background: linear-gradient(45deg, var(--soft-blue), var(--deep-blue));
+    background: var(--deep-blue);
     color: white;
     box-shadow: 0 4px 15px rgba(107, 182, 214, 0.3);
 }
 
 .btn-secondary {
-    background: linear-gradient(45deg, var(--soft-pink), var(--deep-pink));
+    background: var(--deep-pink);
     color: white;
     box-shadow: 0 4px 15px rgba(232, 145, 163, 0.3);
 }
@@ -295,10 +292,7 @@ nav {
 .hero h1 {
     font-size: 3.5rem;
     margin-bottom: 1rem;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--deep-blue);
     animation: float 3s ease-in-out infinite;
 }
 
@@ -371,7 +365,7 @@ nav {
 }
 
 .auth-tab.active {
-    background: var(--gradient-primary);
+    background: var(--deep-blue);
     color: white;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
@@ -401,7 +395,7 @@ nav {
 .share-story-btn {
     padding: 20px 60px;
     font-size: 1.3rem;
-    background: var(--gradient-primary);
+    background: var(--deep-pink);
     color: white;
     border: none;
     border-radius: 35px;
@@ -596,7 +590,7 @@ nav {
 }
 
 .carousel-btn {
-    background: var(--gradient-primary);
+    background: var(--deep-blue);
     color: white;
     border: none;
     border-radius: 50%;
@@ -669,7 +663,7 @@ nav {
 .step-icon {
     width: 80px;
     height: 80px;
-    background: linear-gradient(45deg, var(--soft-blue), var(--deep-blue));
+    background: var(--deep-blue);
     border-radius: 50%;
     margin: 0 auto 1.5rem;
     display: flex;
@@ -682,11 +676,11 @@ nav {
 }
 
 .step-card:nth-child(2) .step-icon {
-    background: linear-gradient(45deg, var(--soft-pink), var(--deep-pink));
+    background: var(--deep-pink);
 }
 
 .step-card:nth-child(3) .step-icon {
-    background: var(--gradient-primary);
+    background: var(--deep-blue);
 }
 
 .step-card:hover .step-icon {
@@ -747,10 +741,7 @@ nav {
     margin-bottom: 1.5rem;
     font-size: 2.8rem;
     text-align: center;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--deep-blue);
     position: relative;
     z-index: 1;
 }
@@ -896,7 +887,7 @@ nav {
 }
 
 .checkbox-group input[type="checkbox"]:checked {
-    background: var(--gradient-primary);
+    background: var(--deep-blue);
     border-color: var(--deep-blue);
     transform: scale(1.05);
 }
@@ -951,7 +942,7 @@ nav {
     left: 50%;
     width: 0;
     height: 2px;
-    background: var(--gradient-primary);
+    background: var(--deep-blue);
     transition: all 0.3s ease;
     transform: translateX(-50%);
 }
@@ -1007,7 +998,7 @@ nav {
     left: 0;
     width: 4px;
     height: 100%;
-    background: var(--gradient-primary);
+    background: var(--deep-blue);
 }
 
 .toast-icon {
@@ -1022,17 +1013,17 @@ nav {
 }
 
 .toast-success .toast-icon {
-    background: linear-gradient(135deg, var(--soft-blue), var(--deep-blue));
+    background: var(--deep-blue);
     color: white;
 }
 
 .toast-error .toast-icon {
-    background: linear-gradient(135deg, var(--soft-pink), var(--deep-pink));
+    background: var(--deep-pink);
     color: white;
 }
 
 .toast-warning .toast-icon {
-    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    background: #ffeaa7;
     color: #856404;
 }
 
@@ -1128,11 +1119,8 @@ nav {
 .stat-number {
     font-size: 2.5rem;
     font-weight: bold;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
     position: relative;
+    color: var(--deep-blue);
     z-index: 1;
 }
 
@@ -1210,7 +1198,7 @@ nav {
 }
 
 .read-more-btn {
-    background: var(--gradient-primary);
+    background: var(--deep-blue);
     color: white;
     border: none;
     padding: 0.8rem 1.5rem;
@@ -1463,7 +1451,7 @@ footer .disclaimer {
     top: 100px;
     right: 20px;
     z-index: 1000;
-    background: var(--gradient-primary);
+    background: var(--deep-pink);
     border: none;
     border-radius: 50%;
     width: 50px;
@@ -1579,7 +1567,7 @@ footer .disclaimer {
 
 .tour-progress-fill {
     height: 100%;
-    background: var(--gradient-primary);
+    background: var(--deep-blue);
     transition: width 0.3s ease;
 }
 
@@ -1599,7 +1587,7 @@ footer .disclaimer {
 }
 
 .tour-btn-primary {
-    background: var(--gradient-primary);
+    background: var(--deep-blue);
     color: white;
 }
 
@@ -1662,7 +1650,7 @@ footer .disclaimer {
 
 .guided-progress-fill {
     height: 100%;
-    background: var(--gradient-primary);
+    background: var(--deep-blue);
     transition: width 0.5s ease;
 }
 
@@ -1776,7 +1764,7 @@ footer .disclaimer {
     justify-content: center;
     width: 48px;
     height: 48px;
-    background: linear-gradient(135deg, var(--soft-blue), var(--deep-blue));
+    background: var(--deep-blue);
     border: none;
     border-radius: 12px;
     color: white;
@@ -2143,7 +2131,7 @@ footer .disclaimer {
 
 /* Dark Mode Support */
 [data-theme="dark"] .speech-mic-btn {
-    background: linear-gradient(135deg, #4299e1, #ed64a6);
+    background: var(--deep-blue);
     box-shadow: 0 4px 20px rgba(66, 153, 225, 0.25);
 }
 
@@ -2152,7 +2140,7 @@ footer .disclaimer {
 }
 
 [data-theme="dark"] .speech-mic-container.listening .speech-mic-btn {
-    background: linear-gradient(135deg, #ed64a6, #f093fb);
+    background: var(--deep-pink);
     box-shadow: 0 12px 40px rgba(237, 100, 166, 0.4);
 }
 
@@ -2160,6 +2148,22 @@ footer .disclaimer {
     background: linear-gradient(135deg, 
         rgba(45, 55, 72, 0.95), 
         rgba(74, 85, 104, 0.95));
+}
+
+[data-theme="dark"] .btn-primary {
+    background: var(--deep-blue);
+}
+
+[data-theme="dark"] .btn-secondary {
+    background: var(--deep-pink) !important;
+}
+
+[data-theme="dark"] .carousel-btn {
+    background: var(--deep-blue) !important;
+}
+
+[data-theme="dark"] .search-bar .btn {
+    background: var(--deep-blue) !important;
 }
 
 /* Responsive Design */
@@ -2209,7 +2213,7 @@ footer .disclaimer {
     align-items: center;
     gap: 0.5rem;
     padding: 12px 20px;
-    background: linear-gradient(135deg, var(--soft-blue), var(--deep-blue));
+    background: var(--deep-blue);
     border: none;
     border-radius: 20px;
     color: white;
@@ -2391,7 +2395,7 @@ footer .disclaimer {
 }
 
 [data-theme="dark"] .btn-primary {
-    background: linear-gradient(45deg, #4299e1, #ed64a6);
+    background: var(--deep-blue);
     color: white;
 }
 
@@ -2401,7 +2405,7 @@ footer .disclaimer {
 }
 
 [data-theme="dark"] .auth-tab.active {
-    background: var(--gradient-primary);
+    background: var(--deep-blue);
     color: white;
 }
 
@@ -2671,8 +2675,6 @@ footer .disclaimer {
         transition: none;
     }
 }
-
-/* Dark Mode Fixes for autofill and notifications */
 
 /* Fix for browser autofilled input fields in dark mode */
 [data-theme="dark"] .form-group input:-webkit-autofill,
