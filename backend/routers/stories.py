@@ -4,6 +4,7 @@ from typing import Optional
 from database.models.story import StoryDatabase
 from database.models.moderation import ModerationDatabase
 from database.utils import CrisisSupport, ContentFilter
+from database.connection import mongodb
 from services.story_service import create_recovery_story_prompt, find_similar_stories, get_story_recommendations, generate_recovery_story
 from services.symptom_service import extract_symptoms
 from services.openai_client import query_openai_model, MODELS
@@ -221,3 +222,53 @@ async def get_story_themes_analysis(current_user: dict = Depends(get_current_act
     except Exception as e:
         logger.error(f"Error in themes analysis: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while analyzing themes")
+    
+@router.get("/user/stories")
+async def get_user_stories(
+    current_user: dict = Depends(get_current_active_user),
+    limit: int = 20,
+    skip: int = 0
+):
+    """Get current user's submitted stories"""
+    try:
+        # Get from both pending and approved collections
+        pending_stories = []
+        approved_stories = []
+        
+        # Pending stories
+        pending_cursor = mongodb.database.pending_stories.find(
+            {"user_id": current_user["id"]}
+        ).sort("created_at", -1).limit(limit)
+        
+        async for story in pending_cursor:
+            story["id"] = str(story["_id"])
+            story["status"] = "pending"
+            del story["_id"]
+            pending_stories.append(story)
+        
+        # Approved stories
+        approved_cursor = mongodb.database.approved_stories.find(
+            {"user_id": current_user["id"]}
+        ).sort("created_at", -1).limit(limit)
+        
+        async for story in approved_cursor:
+            story["id"] = str(story["_id"])
+            story["status"] = "approved"
+            del story["_id"]
+            approved_stories.append(story)
+        
+        # Combine and sort by date
+        all_stories = pending_stories + approved_stories
+        all_stories.sort(key=lambda x: x.get("created_at", ""), reverse=True)
+        
+        return {
+            "success": True,
+            "stories": all_stories[:limit],
+            "total_count": len(all_stories),
+            "pending_count": len(pending_stories),
+            "approved_count": len(approved_stories)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error fetching user stories: {e}")
+        raise HTTPException(status_code=500, detail="Error fetching stories")

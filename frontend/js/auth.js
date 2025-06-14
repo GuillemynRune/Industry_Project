@@ -132,6 +132,10 @@ function updateUserSection() {
                 <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
         `;
+        const myStoriesNavItem = document.getElementById('myStoriesNavItem');
+        if (myStoriesNavItem) {
+            myStoriesNavItem.style.display = currentUser ? 'block' : 'none';
+        }
     } else {
         removeTourLink();
         userSection.innerHTML = `
