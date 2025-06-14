@@ -134,6 +134,26 @@ class UserDatabase:
     
     @staticmethod
     async def delete_user_account(user_id: str) -> bool:
-        """Delete a user account by ID"""
-        result = await mongodb.database.users.delete_one({"_id": ObjectId(user_id)})
-        return result.deleted_count == 1
+        """Delete user and their stories (approved + pending)"""
+        from bson import ObjectId
+        from bson.errors import InvalidId
+
+        try:
+            object_id = ObjectId(user_id)
+        except InvalidId:
+            return False
+
+        # Delete the user
+        user_result = await mongodb.database.users.delete_one({"_id": object_id})
+
+        # Delete their approved stories
+        await mongodb.database.approved_stories.delete_many({
+            "$or": [{"user_id": user_id}, {"user_id": object_id}]
+        })
+
+        # Delete their pending stories
+        await mongodb.database.pending_stories.delete_many({
+            "$or": [{"user_id": user_id}, {"user_id": object_id}]
+        })
+
+        return user_result.deleted_count == 1
