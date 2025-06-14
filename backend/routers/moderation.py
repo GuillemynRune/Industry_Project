@@ -91,25 +91,6 @@ async def approve_story(
         "message": "✅ Story approved and published"
     }
 
-@router.post("/reject/{story_id}")
-async def reject_story(
-    story_id: str,
-    action: RejectAction,
-    current_user: dict = Depends(require_moderator)
-):
-    """Reject story (delete without storing)"""
-    result = await mongodb.database.pending_stories.delete_one({"_id": ObjectId(story_id)})
-    
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Story not found")
-    
-    logger.info(f"Story {story_id} rejected by {current_user['email']}: {action.reason}")
-    
-    return {
-        "success": True,
-        "message": "Story rejected and removed from queue"
-    }
-
 @router.get("/stats")
 async def get_moderation_stats(current_user: dict = Depends(require_moderator)):
     """Get real-time moderation statistics"""
@@ -120,4 +101,35 @@ async def get_moderation_stats(current_user: dict = Depends(require_moderator)):
         "success": True,
         "total_pending": total_pending,
         "total_approved": total_approved
+    }
+
+@router.post("/reject/{story_id}")
+async def reject_story(
+    story_id: str,
+    action: RejectAction,
+    current_user: dict = Depends(require_moderator)
+):
+    """Reject story and move to rejected collection"""
+    story = await mongodb.database.pending_stories.find_one({"_id": ObjectId(story_id)})
+    if not story:
+        raise HTTPException(status_code=404, detail="Story not found")
+
+    # Move to rejected collection with rejection info
+    rejected_story = {
+        **story,
+        "status": "rejected",
+        "rejected_by": current_user["email"],
+        "rejected_at": datetime.utcnow(),
+        "rejection_reason": action.reason or "Does not meet community guidelines"
+    }
+
+    # Insert into rejected collection and remove from pending
+    await mongodb.database.rejected_stories.insert_one(rejected_story)
+    await mongodb.database.pending_stories.delete_one({"_id": ObjectId(story_id)})
+    
+    logger.info(f"Story {story_id} rejected by {current_user['email']}: {action.reason}")
+    
+    return {
+        "success": True,
+        "message": "Story rejected and moved to rejected collection"
     }

@@ -60,6 +60,7 @@ async function loadUserStories() {
 }
 
 // Display user stories in the modal
+// Display user stories in the modal
 function displayUserStories() {
     const container = document.getElementById('userStoriesContainer');
     
@@ -91,12 +92,10 @@ function displayUserStories() {
                 <div class="stat-number">${userStoriesStats.approved}</div>
                 <div class="stat-label">Published</div>
             </div>
-            ${userStoriesStats.rejected > 0 ? `
-                <div class="stat-card">
-                    <div class="stat-number">${userStoriesStats.rejected}</div>
-                    <div class="stat-label">Rejected</div>
-                </div>
-            ` : ''}
+            <div class="stat-card">
+                <div class="stat-number">${userStoriesStats.rejected}</div>
+                <div class="stat-label">Not Approved</div>
+            </div>
         </div>
         
         <!-- Stories Grid -->
@@ -104,6 +103,69 @@ function displayUserStories() {
             ${userStories.map(story => createUserStoryCard(story)).join('')}
         </div>
     `;
+}
+
+// Load user's stories from backend  
+async function loadUserStories() {
+    const container = document.getElementById('userStoriesContainer');
+    
+    // Show loading state
+    container.innerHTML = `
+        <div class="loading-placeholder">
+            <div class="loading-spinner"></div>
+            <p>Loading your stories...</p>
+        </div>
+    `;
+    
+    try {
+        const response = await makeAuthenticatedRequest(`${API_BASE_URL}/stories/user/stories`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            userStories = data.stories || [];
+            userStoriesStats = {
+                total: data.total_count || 0,
+                pending: data.pending_count || 0,
+                approved: data.approved_count || 0,
+                rejected: data.rejected_count || 0  // Now comes from backend
+            };
+            
+            displayUserStories();
+        } else {
+            throw new Error(data.message || 'Failed to load stories');
+        }
+    } catch (error) {
+        console.error('Error loading user stories:', error);
+        showErrorState(container, error.message);
+    }
+}
+
+// Update the status info to include rejection details
+function getStatusInfo(status) {
+    const statusMap = {
+        'pending': {
+            label: 'Pending Review',
+            icon: '⏳',
+            description: 'Your story is being reviewed by our team'
+        },
+        'approved': {
+            label: 'Published',
+            icon: '✅',
+            description: 'Your story is live and helping others'
+        },
+        'rejected': {
+            label: 'Not Approved',
+            icon: '❌',
+            description: 'Story did not meet community guidelines'
+        }
+    };
+    
+    return statusMap[status] || statusMap['pending'];
 }
 
 // Create individual story card
@@ -174,7 +236,7 @@ function viewUserStoryDetail(storyId) {
     showUserStoryDetailModal(story);
 }
 
-// Show detailed story modal
+// Show detailed story modal with rejection info
 function showUserStoryDetailModal(story) {
     const modal = document.getElementById('userStoryDetailModal') || createUserStoryDetailModal();
     const statusInfo = getStatusInfo(story.status);
@@ -190,9 +252,13 @@ function showUserStoryDetailModal(story) {
                     ${statusInfo.icon} ${statusInfo.label}
                 </span>
                 <p>${statusInfo.description}</p>
+                ${story.status === 'rejected' && story.rejection_reason ? `
+                    <p><strong>Reason:</strong> ${story.rejection_reason}</p>
+                ` : ''}
             </div>
             <div class="submission-date">
                 <small>Submitted: ${story.created_at ? new Date(story.created_at).toLocaleDateString() : 'Unknown'}</small>
+                ${story.rejected_at ? `<br><small>Rejected: ${new Date(story.rejected_at).toLocaleDateString()}</small>` : ''}
             </div>
         </div>
         
@@ -240,6 +306,18 @@ function showUserStoryDetailModal(story) {
                     <p><strong>Status:</strong> Your story is now live and helping other parents in our community!</p>
                 </div>
             ` : ''}
+
+            ${story.status === 'rejected' ? `
+                <div class="story-section">
+                    <h3>What This Means</h3>
+                    <p>Your story didn't meet our community guidelines this time. You're welcome to revise and submit a new story that focuses on:</p>
+                    <ul>
+                        <li>Recovery strategies and positive outcomes</li>
+                        <li>Supportive, encouraging language</li>
+                        <li>Content appropriate for all community members</li>
+                    </ul>
+                </div>
+            ` : ''}
         </div>
         
         <div class="story-viewer-actions">
@@ -249,6 +327,11 @@ function showUserStoryDetailModal(story) {
             ${story.status === 'approved' ? `
                 <button class="btn btn-primary" onclick="viewPublishedStory('${story.id}')">
                     View Published Story
+                </button>
+            ` : ''}
+            ${story.status === 'rejected' ? `
+                <button class="btn btn-primary" onclick="startGuidedStory(); closeModal('userStoryDetailModal'); closeModal('myStoriesModal')">
+                    Create New Story
                 </button>
             ` : ''}
         </div>

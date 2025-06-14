@@ -231,9 +231,10 @@ async def get_user_stories(
 ):
     """Get current user's submitted stories"""
     try:
-        # Get from both pending and approved collections
+        # Get from pending, approved, and rejected collections
         pending_stories = []
         approved_stories = []
+        rejected_stories = []
         
         # Pending stories
         pending_cursor = mongodb.database.pending_stories.find(
@@ -257,8 +258,19 @@ async def get_user_stories(
             del story["_id"]
             approved_stories.append(story)
         
+        # Rejected stories
+        rejected_cursor = mongodb.database.rejected_stories.find(
+            {"user_id": current_user["id"]}
+        ).sort("created_at", -1).limit(limit)
+        
+        async for story in rejected_cursor:
+            story["id"] = str(story["_id"])
+            story["status"] = "rejected"
+            del story["_id"]
+            rejected_stories.append(story)
+        
         # Combine and sort by date
-        all_stories = pending_stories + approved_stories
+        all_stories = pending_stories + approved_stories + rejected_stories
         all_stories.sort(key=lambda x: x.get("created_at", ""), reverse=True)
         
         return {
@@ -266,7 +278,8 @@ async def get_user_stories(
             "stories": all_stories[:limit],
             "total_count": len(all_stories),
             "pending_count": len(pending_stories),
-            "approved_count": len(approved_stories)
+            "approved_count": len(approved_stories),
+            "rejected_count": len(rejected_stories)
         }
         
     except Exception as e:
