@@ -73,10 +73,16 @@ class StoryCarousel {
         card.className = 'story-card';
         card.style.animationDelay = `${(index % this.storiesPerSlide) * 0.1}s`;
         
-        const preview = story.generated_story?.substring(0, 200) + '...' || 
-                       story.preview || 
-                       story.experience?.substring(0, 200) + '...' || 
-                       'A recovery story...';
+        // FIX: Properly handle undefined values in preview text
+        let preview = 'A recovery story...'; // Default fallback
+        
+        if (story.generated_story && story.generated_story.trim()) {
+            preview = story.generated_story.substring(0, 200) + '...';
+        } else if (story.preview && story.preview.trim()) {
+            preview = story.preview;
+        } else if (story.experience && story.experience.trim()) {
+            preview = story.experience.substring(0, 200) + '...';
+        }
         
         const title = story.challenge || story.title || 'A Recovery Journey';
         const author = story.author_name || story.author || 'Anonymous';
@@ -166,20 +172,35 @@ class StoryCarousel {
 
 // Story loading functions
 async function loadApprovedStories() {
+    console.log('🔍 Loading approved stories...');
+    
     try {
         const response = await fetch(`${API_BASE_URL}/stories?limit=9&random=true`);
-        const data = await response.json();
+        console.log('📡 API Response status:', response.status);
         
-        if (data.success && data.stories.length > 0) {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('📊 API Response data:', data);
+        
+        if (data.success && data.stories && data.stories.length > 0) {
+            console.log(`✅ Found ${data.stories.length} real stories from database`);
+            console.log('📝 First story sample:', data.stories[0]);
             displayStories(data.stories);
         } else {
+            console.log('⚠️ No real stories found, using samples');
+            console.log('📊 API response:', data);
             displaySampleStories();
         }
     } catch (error) {
-        console.error('Error loading stories:', error);
+        console.error('❌ Error loading stories:', error);
+        console.log('🔄 Falling back to sample stories');
         displaySampleStories();
     }
 }
+
 
 function displayStories(stories) {
     const carousel = document.getElementById('storiesCarousel');
@@ -192,53 +213,92 @@ function displayStories(stories) {
 }
 
 function displaySampleStories() {
+    console.log('🎭 Displaying sample stories');
+    
     const sampleStories = [
         {
+            id: 'sample1',
             title: "Finding Light in Dark Days",
-            preview: "Sarah's journey through the fog of early motherhood, where simple tasks felt mountainous and joy seemed distant. But small moments of connection with her baby became stepping stones back to herself...",
-            author: "Sarah", time: "3 days ago"
+            challenge: "Finding Light in Dark Days",
+            preview: "Sarah's journey through the fog of early motherhood, where simple tasks felt mountainous and joy seemed distant. But small moments of connection with her baby became stepping stones back to herself.",
+            experience: "Sarah's journey through the fog of early motherhood, where simple tasks felt mountainous and joy seemed distant. But small moments of connection with her baby became stepping stones back to herself.",
+            author_name: "Sarah",
+            time: "3 days ago"
         },
         {
-            title: "The Weight of Expectations",
-            preview: "Emma thought she'd feel instant maternal bliss, but instead found herself grieving her old life while trying to love her new reality. Her story of accepting imperfection and finding support...",
-            author: "Emma", time: "1 week ago"
+            id: 'sample2',
+            title: "The Weight of Expectations", 
+            challenge: "The Weight of Expectations",
+            preview: "Emma thought she'd feel instant maternal bliss, but instead found herself grieving her old life while trying to love her new reality. Her story of accepting imperfection and finding support.",
+            experience: "Emma thought she'd feel instant maternal bliss, but instead found herself grieving her old life while trying to love her new reality. Her story of accepting imperfection and finding support.",
+            author_name: "Emma",
+            time: "1 week ago"
         },
         {
+            id: 'sample3',
             title: "Sleepless Nights, Hopeful Days",
-            preview: "When Maria's baby wouldn't sleep, neither could she. The exhaustion felt endless, but connecting with other parents online became her lifeline during those 3 AM feeding sessions...",
-            author: "Maria", time: "2 weeks ago"
+            challenge: "Sleepless Nights, Hopeful Days", 
+            preview: "When Maria's baby wouldn't sleep, neither could she. The exhaustion felt endless, but connecting with other parents online became her lifeline during those 3 AM feeding sessions.",
+            experience: "When Maria's baby wouldn't sleep, neither could she. The exhaustion felt endless, but connecting with other parents online became her lifeline during those 3 AM feeding sessions.",
+            author_name: "Maria",
+            time: "2 weeks ago"
         },
         {
+            id: 'sample4',
             title: "Breaking Through the Silence",
-            preview: "Alex struggled with postpartum anxiety in silence for months, afraid to admit she wasn't enjoying motherhood. Finally opening up to her partner changed everything...",
-            author: "Alex", time: "1 month ago"
+            challenge: "Breaking Through the Silence",
+            preview: "Alex struggled with postpartum anxiety in silence for months, afraid to admit she wasn't enjoying motherhood. Finally opening up to her partner changed everything.",
+            experience: "Alex struggled with postpartum anxiety in silence for months, afraid to admit she wasn't enjoying motherhood. Finally opening up to her partner changed everything.",
+            author_name: "Alex",
+            time: "1 month ago"
         },
         {
+            id: 'sample5',
             title: "From Isolation to Connection",
-            preview: "Living far from family, Jamie felt utterly alone with her newborn. Joining a local parent group seemed impossible at first, but it became her greatest source of strength...",
-            author: "Jamie", time: "2 months ago"
+            challenge: "From Isolation to Connection",
+            preview: "Living far from family, Jamie felt utterly alone with her newborn. Joining a local parent group seemed impossible at first, but it became her greatest source of strength.",
+            experience: "Living far from family, Jamie felt utterly alone with her newborn. Joining a local parent group seemed impossible at first, but it became her greatest source of strength.",
+            author_name: "Jamie", 
+            time: "2 months ago"
         },
         {
+            id: 'sample6',
             title: "Healing One Day at a Time",
-            preview: "Recovery wasn't linear for Kate. Some days were harder than others, but celebrating small victories - a shower, a walk, a genuine smile - helped her rebuild her sense of self...",
-            author: "Kate", time: "3 months ago"
+            challenge: "Healing One Day at a Time",
+            preview: "Recovery wasn't linear for Kate. Some days were harder than others, but celebrating small victories - a shower, a walk, a genuine smile - helped her rebuild her sense of self.",
+            experience: "Recovery wasn't linear for Kate. Some days were harder than others, but celebrating small victories - a shower, a walk, a genuine smile - helped her rebuild her sense of self.",
+            author_name: "Kate",
+            time: "3 months ago"
         },
         {
+            id: 'sample7',
             title: "The Power of Professional Help",
-            preview: "David was hesitant to seek therapy, thinking he should be able to handle everything himself. But working with a counselor gave him tools he never knew he needed...",
-            author: "David", time: "4 months ago"
+            challenge: "The Power of Professional Help",
+            preview: "David was hesitant to seek therapy, thinking he should be able to handle everything himself. But working with a counselor gave him tools he never knew he needed.",
+            experience: "David was hesitant to seek therapy, thinking he should be able to handle everything himself. But working with a counselor gave him tools he never knew he needed.",
+            author_name: "David",
+            time: "4 months ago"
         },
         {
+            id: 'sample8',
             title: "Rebuilding My Identity",
-            preview: "After becoming a mother, Lisa felt like she'd lost herself completely. Through small daily practices and self-compassion, she learned to honor both her old and new selves...",
-            author: "Lisa", time: "5 months ago"
+            challenge: "Rebuilding My Identity",
+            preview: "After becoming a mother, Lisa felt like she'd lost herself completely. Through small daily practices and self-compassion, she learned to honor both her old and new selves.",
+            experience: "After becoming a mother, Lisa felt like she'd lost herself completely. Through small daily practices and self-compassion, she learned to honor both her old and new selves.",
+            author_name: "Lisa",
+            time: "5 months ago"
         },
         {
+            id: 'sample9',
             title: "Finding Strength in Vulnerability",
-            preview: "When Rachel finally shared her struggles with her family, she was surprised by how much support was waiting for her. Sometimes the first step is just saying 'I need help'...",
-            author: "Rachel", time: "6 months ago"
+            challenge: "Finding Strength in Vulnerability", 
+            preview: "When Rachel finally shared her struggles with her family, she was surprised by how much support was waiting for her. Sometimes the first step is just saying 'I need help'.",
+            experience: "When Rachel finally shared her struggles with her family, she was surprised by how much support was waiting for her. Sometimes the first step is just saying 'I need help'.",
+            author_name: "Rachel",
+            time: "6 months ago"
         }
     ];
+    
     displayStories(sampleStories);
 }
 
