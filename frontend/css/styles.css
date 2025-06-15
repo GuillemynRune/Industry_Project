@@ -3438,3 +3438,109 @@ nav {
         justify-content: flex-start;
     }
 }
+
+/* Add these styles to fix dark mode dropdown and improve styling */
+
+/* Dark Mode User Dropdown Fix */
+[data-theme="dark"] .user-menu {
+    background: rgba(45, 55, 72, 0.95) !important;
+    border: 1px solid rgba(74, 85, 104, 0.4) !important;
+    backdrop-filter: blur(15px) !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .user-menu-item {
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .user-menu-item:hover {
+    background: rgba(74, 85, 104, 0.3) !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .user-menu-item.danger {
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .user-menu-item.danger:hover {
+    background: rgba(220, 53, 69, 0.2) !important;
+    color: #fc8181 !important;
+}
+
+/* Enhanced dropdown styling for both themes */
+.user-menu {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(168, 216, 234, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    padding: 0.75rem;
+    min-width: 200px;
+    z-index: 1000;
+    transform: translateY(10px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.user-dropdown.open .user-menu {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.user-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    color: var(--text-dark);
+    text-decoration: none;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.user-menu-item:hover {
+    background: rgba(168, 216, 234, 0.15);
+    transform: translateX(2px);
+}
+
+.user-menu-item.danger:hover {
+    background: rgba(220, 53, 69, 0.1);
+    color: var(--crisis-red);
+}
+
+/* Menu item icons */
+.user-menu-item .menu-icon {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+}
+
+.user-menu-item:hover .menu-icon {
+    opacity: 1;
+}
+
+/* Divider styling */
+.user-menu hr {
+    margin: 0.5rem 0;
+    border: none;
+    border-top: 1px solid rgba(168, 216, 234, 0.3);
+    opacity: 0.6;
+}
+
+[data-theme="dark"] .user-menu hr {
+    border-top-color: rgba(74, 85, 104, 0.4) !important;
+}
