@@ -48,6 +48,11 @@ async def create_indexes():
         # Add indexes for rejected stories collection
         await mongodb.database.rejected_stories.create_index([("user_id", 1), ("created_at", -1)])
         await mongodb.database.rejected_stories.create_index([("status", 1), ("created_at", 1)])
+
+        # Add indexes for saved stories
+        await mongodb.database.saved_stories.create_index([("user_id", 1), ("story_id", 1)], unique=True)
+        await mongodb.database.saved_stories.create_index([("user_id", 1), ("saved_at", -1)])
+        await mongodb.database.saved_stories.create_index([("story_id", 1)])
         
         logger.info("Database indexes created successfully")
     except Exception as e:

@@ -138,6 +138,10 @@ function updateUserSection() {
                         <span class="menu-icon">📚</span>
                         <span>My Stories</span>
                     </button>
+                    <button class="user-menu-item" onclick="showSavedStories(); closeUserMenu()">
+                        <span class="menu-icon">🔖</span>
+                        <span>Saved Stories</span>
+                    </button>
                     <hr>
                     <button class="user-menu-item" onclick="toggleTheme(); closeUserMenu()">
                         <span class="menu-icon" id="themeIcon">${document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙'}</span>

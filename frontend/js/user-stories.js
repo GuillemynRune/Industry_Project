@@ -88,6 +88,9 @@ function showUserStoryDetailModal(story) {
     const modal = document.getElementById('userStoryDetailModal') || createUserStoryDetailModal();
     const statusInfo = getStatusInfo(story.status);
     
+    // Set the story ID on the modal for the save functionality
+    modal.dataset.storyId = story.id;
+    
     const content = modal.querySelector('.modal-content');
     content.innerHTML = `
         <span class="close" onclick="closeModal('userStoryDetailModal')">&times;</span>
@@ -172,10 +175,13 @@ function showUserStoryDetailModal(story) {
         </div>
         
         <div class="story-viewer-actions">
-            <button class="btn btn-secondary" onclick="closeModal('userStoryDetailModal')">
-                Close
-            </button>
             ${story.status === 'approved' ? `
+                <button class="btn btn-secondary save-story-btn" onclick="toggleSaveStory('${story.id}', this)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    Save Story
+                </button>
                 <button class="btn btn-primary" onclick="viewPublishedStory('${story.id}')">
                     View Published Story
                 </button>
@@ -185,10 +191,21 @@ function showUserStoryDetailModal(story) {
                     Create New Story
                 </button>
             ` : ''}
+            <button class="btn btn-secondary" onclick="closeModal('userStoryDetailModal')">
+                Close
+            </button>
         </div>
     `;
     
     openModal('userStoryDetailModal');
+    
+    // Check and update save status for approved stories
+    if (story.status === 'approved') {
+        const saveButton = modal.querySelector('.save-story-btn');
+        if (saveButton) {
+            checkAndUpdateSaveStatus(story.id, saveButton);
+        }
+    }
 }
 
 // Display user stories in the modal

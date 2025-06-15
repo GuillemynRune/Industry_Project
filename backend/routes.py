@@ -38,6 +38,8 @@ def setup_routes(app: FastAPI, settings):
     app.include_router(stories.router)
     app.include_router(moderation.router)
     app.include_router(health.router)
+    from routers.saved_stories import router as saved_stories_router
+    app.include_router(saved_stories_router)
     
     # Backup router
     backup_router = APIRouter(prefix="/admin/backup", tags=["admin"])

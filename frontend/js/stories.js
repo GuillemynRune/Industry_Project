@@ -93,6 +93,7 @@ class StoryCarousel {
             `onclick="viewFullStory('${storyId}', event)"` :
             `onclick="showSampleStoryMessage()"`;
         
+        // Removed save button from here - it will only appear in the story reading modal
         card.innerHTML = `
             <div class="story-title">${title}</div>
             <div class="story-preview">${preview}</div>
@@ -340,7 +341,11 @@ async function viewFullStory(storyId, event) {
 function showFullStoryModal(story) {
     const modal = document.getElementById('fullStoryModal') || createStoryModal('fullStoryModal');
     
+    // Set the story ID on the modal for the save functionality
+    modal.dataset.storyId = story._id || story.id;
+    
     const content = {
+        id: story._id || story.id,
         title: story.challenge || story.title || 'Recovery Story',
         author: story.author_name || story.author || 'Anonymous',
         story: story.generated_story || story.story || 'Story content not available',
@@ -374,11 +379,27 @@ function showFullStoryModal(story) {
             `).join('')}
         </div>
         <div class="story-viewer-actions">
+            ${currentUser ? `
+                <button class="btn btn-secondary save-story-btn" onclick="toggleSaveStory('${content.id}', this)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    Save Story
+                </button>
+            ` : ''}
             <button class="btn btn-secondary" onclick="closeModal('fullStoryModal')">Close Story</button>
         </div>
     `;
 
     openModal('fullStoryModal');
+    
+    // Check and update save status if user is logged in
+    if (currentUser && content.id) {
+        const saveButton = modal.querySelector('.save-story-btn');
+        if (saveButton) {
+            checkAndUpdateSaveStatus(content.id, saveButton);
+        }
+    }
 }
 
 function createStoryModal(modalId) {

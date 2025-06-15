@@ -3544,3 +3544,204 @@ nav {
 [data-theme="dark"] .user-menu hr {
     border-top-color: rgba(74, 85, 104, 0.4) !important;
 }
+
+
+/* Saved Stories Modal Styles */
+.saved-stories-modal-content {
+    max-width: 1000px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 3rem;
+}
+
+.saved-stories-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(168, 216, 234, 0.3);
+}
+
+.saved-stories-header h2 {
+    color: var(--deep-blue);
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.saved-stories-header p {
+    color: var(--text-light);
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.saved-stories-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Saved Stories Stats */
+.saved-stories-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.saved-stories-stats .stat-card {
+    background: var(--gradient-card);
+    border-radius: 20px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: var(--shadow-light);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(168, 216, 234, 0.2);
+}
+
+.saved-stories-stats .stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-medium);
+}
+
+/* Saved Stories Grid */
+.saved-stories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 2rem;
+}
+
+.saved-story-card {
+    background: var(--gradient-card);
+    border-radius: 25px;
+    padding: 2rem;
+    box-shadow: var(--shadow-medium);
+    transition: all 0.4s ease;
+    border-left: 4px solid var(--deep-blue);
+    animation: slideIn 0.6s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.saved-story-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at top right, var(--pale-blue) 0%, transparent 60%);
+    opacity: 0.1;
+    pointer-events: none;
+}
+
+.saved-story-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-heavy);
+}
+
+/* Updated save button styles for modal usage */
+.save-story-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+    background: rgba(168, 216, 234, 0.1);
+    border: 2px solid rgba(168, 216, 234, 0.5);
+    border-radius: 25px;
+    color: var(--deep-blue);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    min-width: 140px;
+}
+
+.save-story-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(168, 216, 234, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.save-story-btn:hover::before {
+    width: 200px;
+    height: 200px;
+}
+
+.save-story-btn:hover {
+    border-color: var(--deep-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(168, 216, 234, 0.3);
+    background: rgba(168, 216, 234, 0.2);
+}
+
+.save-story-btn:active {
+    transform: translateY(0);
+}
+
+.save-story-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Saved state */
+.save-story-btn.saved {
+    background: var(--deep-blue);
+    border-color: var(--deep-blue);
+    color: white;
+    box-shadow: 0 4px 15px rgba(107, 182, 214, 0.4);
+}
+
+.save-story-btn.saved svg {
+    fill: white;
+    stroke: white;
+}
+
+.save-story-btn.saved:hover {
+    background: var(--deep-pink);
+    border-color: var(--deep-pink);
+    box-shadow: 0 6px 20px rgba(232, 145, 163, 0.4);
+}
+
+/* Loading state */
+.save-story-btn .loading-small {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: currentColor;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 8px;
+}
+
+/* Dark mode support */
+[data-theme="dark"] .save-story-btn {
+    background: rgba(66, 153, 225, 0.1);
+    border-color: rgba(66, 153, 225, 0.5);
+    color: #4299e1;
+}
+
+[data-theme="dark"] .save-story-btn:hover {
+    border-color: #4299e1;
+    background: rgba(66, 153, 225, 0.2);
+}
+
+[data-theme="dark"] .save-story-btn.saved {
+    background: #4299e1;
+    border-color: #4299e1;
+}
+
+[data-theme="dark"] .save-story-btn.saved:hover {
+    background: #ed64a6;
+    border-color: #ed64a6;
+}

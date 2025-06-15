@@ -11,5 +11,6 @@ __all__ = [
     'UserDatabase',
     'StoryDatabase',
     'CrisisSupport',
-    'ModerationDatabase'
+    'ModerationDatabase',
+    'SavedStoriesDatabase'
 ]
