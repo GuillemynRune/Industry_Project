@@ -511,34 +511,3 @@ function showErrorState(container, errorMessage) {
         </div>
     `;
 }
-
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-    // Show/hide My Stories nav item based on login status
-    const updateMyStoriesNav = () => {
-        const myStoriesNavItem = document.getElementById('myStoriesNavItem');
-        if (myStoriesNavItem) {
-            myStoriesNavItem.style.display = currentUser ? 'block' : 'none';
-        }
-    };
-    
-    // Initial update
-    updateMyStoriesNav();
-    
-    // Update when auth state changes
-    const originalShowUserSection = window.showUserSection;
-    if (originalShowUserSection) {
-        window.showUserSection = function() {
-            originalShowUserSection();
-            updateMyStoriesNav();
-        };
-    }
-    
-    const originalShowAuthSection = window.showAuthSection;
-    if (originalShowAuthSection) {
-        window.showAuthSection = function() {
-            originalShowAuthSection();
-            updateMyStoriesNav();
-        };
-    }
-});

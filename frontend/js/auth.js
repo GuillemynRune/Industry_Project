@@ -121,6 +121,7 @@ function showUserSection() {
     checkAdminAccess();
 }
 
+// Updated updateUserSection function for auth.js
 function updateUserSection() {
     const userSection = document.getElementById('userSection');
 
@@ -133,13 +134,24 @@ function updateUserSection() {
                     <span>▼</span>
                 </button>
                 <div class="user-menu" id="userMenu">
+                    <button class="user-menu-item" onclick="showMyStories(); closeUserMenu()">
+                        <span class="menu-icon">📚</span>
+                        <span>My Stories</span>
+                    </button>
+                    <hr>
                     <button class="user-menu-item" onclick="toggleTheme(); closeUserMenu()">
-                        <span id="themeIcon">${document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙'}</span>
+                        <span class="menu-icon" id="themeIcon">${document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙'}</span>
                         <span id="themeText">${document.documentElement.getAttribute('data-theme') === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
                     </button>
-                    <hr style="margin: 0.5rem 0; border: none; border-top: 1px solid rgba(168, 216, 234, 0.3);">
-                    <button class="user-menu-item" onclick="logout(); closeUserMenu()">Logout</button>
-                    <button class="user-menu-item danger" onclick="showDeleteAccountModal(); closeUserMenu()">Delete Account</button>
+                    <hr>
+                    <button class="user-menu-item" onclick="logout(); closeUserMenu()">
+                        <span class="menu-icon">🚪</span>
+                        <span>Logout</span>
+                    </button>
+                    <button class="user-menu-item danger" onclick="showDeleteAccountModal(); closeUserMenu()">
+                        <span class="menu-icon">⚠️</span>
+                        <span>Delete Account</span>
+                    </button>
                 </div>
             </div>
         `;
