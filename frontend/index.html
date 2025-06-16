@@ -125,7 +125,12 @@
 
             <!-- Moderation Section -->
             <section class="moderation-section" id="moderationSection" style="display: none;">
-                <h2>Story Moderation</h2>
+                <div class="moderation-header">
+                    <h2>Story Moderation</h2>
+                    <button class="btn btn-secondary moderation-refresh-btn" onclick="refreshModerationStats()">
+                        Refresh
+                    </button>
+                </div>
 
                 <div class="moderation-stats">
                     <div class="stat-card">
@@ -133,14 +138,19 @@
                         <div class="stat-label">Pending Stories</div>
                     </div>
                 </div>
-                <div class="moderation-actions">
-                    <button class="btn btn-secondary" onclick="refreshModerationStats()">
-                        Refresh Count
-                    </button>
-                </div>
 
+                <!-- REMOVE the old moderation-actions div entirely -->
+                
                 <div class="pending-stories-grid" id="pendingStoriesGrid"></div>
             </section>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="container">
+                    <p>&copy; 2023 Postnatal Stories. All rights reserved.</p>
+                    <p>Created with ❤️ for parents everywhere.</p>
+                </div>
+            </footer>
         </div>
     </main>
 
