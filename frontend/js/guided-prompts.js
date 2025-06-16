@@ -116,9 +116,6 @@ class GuidedPrompts {
                             placeholder="${step.placeholder}"
                             rows="6"
                         >${this.formData[step.id] || ''}</textarea>
-                        <div class="character-count">
-                            <span id="charCount">0</span> characters
-                        </div>
                     </div>
                 </div>
                 
@@ -157,16 +154,11 @@ class GuidedPrompts {
         
         // Setup input listeners
         const textarea = document.getElementById(`guided-${step.id}`);
-        const charCount = document.getElementById('charCount');
         
         textarea.addEventListener('input', (e) => {
-            charCount.textContent = e.target.value.length;
             this.formData[step.id] = e.target.value;
         });
-        
-        // Initial character count
-        charCount.textContent = textarea.value.length;
-        
+                
         // Focus on textarea after animation
         setTimeout(() => textarea.focus(), 500);
     }
