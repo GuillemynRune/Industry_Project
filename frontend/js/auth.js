@@ -198,22 +198,6 @@ document.addEventListener('click', (e) => {
     }
 });
 
-function addTourLinkIfNeeded() {
-    if (!document.getElementById('tourLink')) {
-        const navLinks = document.querySelector('.nav-links');
-        const tourLi = document.createElement('li');
-        tourLi.innerHTML = '<a href="javascript:void(0)" id="tourLink" onclick="startTour()">Take Tour</a>';
-        navLinks.appendChild(tourLi);
-    }
-}
-
-function removeTourLink() {
-    const existingTourLink = document.getElementById('tourLink');
-    if (existingTourLink) {
-        existingTourLink.parentElement.remove();
-    }
-}
-
 function switchAuth(type) {
     const forms = { login: 'loginForm', register: 'registerForm' };
     const tabs = { login: 'loginTab', register: 'registerTab' };

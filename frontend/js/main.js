@@ -9,9 +9,6 @@ document.addEventListener('DOMContentLoaded', function() {
     loadApprovedStories();
     
     // Initialize new systems
-    if (typeof InteractiveTour !== 'undefined') {
-        tour = new InteractiveTour();
-    }
     if (typeof GuidedPrompts !== 'undefined') {
         guidedPrompts = new GuidedPrompts();
     }
