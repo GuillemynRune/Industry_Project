@@ -87,7 +87,7 @@ class GuidedPrompts {
         }
         
         this.isActive = true;
-        this.currentStep = 0;
+        this.currentStep = 0;   
         this.formData = {};
         this.showStep();
         openModal('guidedPromptsModal');
@@ -119,13 +119,6 @@ class GuidedPrompts {
                         <div class="character-count">
                             <span id="charCount">0</span> characters
                         </div>
-                    </div>
-                    
-                    <div class="guided-tips">
-                        <h4>💡 Helpful tips:</h4>
-                        <ul>
-                            ${step.tips.map(tip => `<li>${tip}</li>`).join('')}
-                        </ul>
                     </div>
                 </div>
                 
