@@ -4,7 +4,7 @@ from typing import Optional
 from bson import ObjectId
 from database.models.story import StoryDatabase
 from database.models.moderation import ModerationDatabase
-from database.utils import CrisisSupport, ContentFilter
+from database.utils import CrisisSupport
 from database.connection import mongodb
 from services.story_service import create_recovery_story_prompt, find_similar_stories, get_story_recommendations, generate_recovery_story
 from services.symptom_service import extract_symptoms

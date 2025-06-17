@@ -1,4 +1,3 @@
-# backend/database/utils.py
 import logging
 from datetime import datetime
 from typing import Dict, Any, List, Optional
@@ -46,4 +45,24 @@ class CrisisSupport:
             logger.error(f"Error logging crisis interaction: {e}")
             return False
 
-# Removed ContentFilter class entirely
+# class ContentFilter:
+#     """Content filtering and safety utilities"""
+    
+#     CRISIS_KEYWORDS = [
+#         "suicide", "kill myself", "end it all", "can't go on", "no hope",
+#         "want to die", "ending my life", "self harm", "hurt myself"
+#     ]
+    
+#     @staticmethod
+#     def get_risk_assessment(text: str) -> Dict[str, Any]:
+#         """Assess risk level for crisis intervention"""
+#         text_lower = text.lower()
+#         crisis_indicators = [kw for kw in ContentFilter.CRISIS_KEYWORDS if kw in text_lower]
+        
+#         severity = "high" if len(crisis_indicators) > 2 else "medium" if crisis_indicators else "low"
+        
+#         return {
+#             "requires_intervention": len(crisis_indicators) > 0 and severity in ["high", "medium"],
+#             "crisis_indicators": crisis_indicators,
+#             "severity": severity
+#         }
