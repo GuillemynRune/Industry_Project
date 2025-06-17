@@ -11,7 +11,7 @@ from services.symptom_service import extract_symptoms
 from services.openai_client import query_openai_model, MODELS
 from routers.auth import get_current_active_user
 import logging
-import traceback
+import traceback    
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/stories", tags=["stories"])
