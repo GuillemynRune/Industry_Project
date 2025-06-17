@@ -3592,3 +3592,259 @@ nav {
     background: #ed64a6;
     border-color: #ed64a6;
 }
+
+/* Enhanced Save Button Styles for Story Cards - Add this to your styles.css */
+
+.save-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, 
+        rgba(168, 216, 234, 0.15), 
+        rgba(212, 241, 249, 0.08));
+    border: 2px solid rgba(168, 216, 234, 0.4);
+    border-radius: 12px;
+    color: var(--deep-blue);
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 3px 15px rgba(168, 216, 234, 0.2);
+}
+
+.save-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, 
+        rgba(168, 216, 234, 0.1), 
+        rgba(232, 145, 163, 0.05));
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    border-radius: 10px;
+}
+
+.save-btn:hover::before {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.save-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    border-color: var(--deep-blue);
+    box-shadow: 0 6px 25px rgba(168, 216, 234, 0.35);
+    background: linear-gradient(135deg, 
+        rgba(168, 216, 234, 0.2), 
+        rgba(212, 241, 249, 0.12));
+}
+
+.save-btn:active {
+    transform: translateY(0) scale(1.02);
+    transition: all 0.15s ease;
+}
+
+.save-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Saved state with beautiful filled bookmark */
+.save-btn.saved {
+    background: linear-gradient(135deg, 
+        var(--deep-blue), 
+        rgba(107, 182, 214, 0.9));
+    border-color: var(--deep-blue);
+    color: white;
+    box-shadow: 0 4px 20px rgba(107, 182, 214, 0.4);
+}
+
+.save-btn.saved::before {
+    background: linear-gradient(45deg, 
+        rgba(255, 255, 255, 0.2), 
+        rgba(255, 255, 255, 0.1));
+}
+
+.save-btn.saved:hover {
+    background: linear-gradient(135deg, 
+        var(--deep-pink), 
+        rgba(232, 145, 163, 0.9));
+    border-color: var(--deep-pink);
+    box-shadow: 0 6px 25px rgba(232, 145, 163, 0.5);
+    transform: translateY(-3px) scale(1.08);
+}
+
+.save-btn.saved svg {
+    fill: white;
+    stroke: white;
+}
+
+/* Icon styling and animations */
+.save-btn svg {
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    position: relative;
+    z-index: 1;
+}
+
+.save-btn:hover svg {
+    transform: scale(1.1) rotateZ(5deg);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+}
+
+.save-btn.saved:hover svg {
+    transform: scale(1.15) rotateZ(-5deg);
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
+}
+
+/* Pulse animation when saving/unsaving */
+.save-btn.saving {
+    animation: savePulse 1s ease-in-out infinite;
+}
+
+@keyframes savePulse {
+    0%, 100% { 
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% { 
+        transform: scale(1.05);
+        opacity: 0.8;
+    }
+}
+
+/* Success animation when saved */
+.save-btn.save-success {
+    animation: saveSuccess 0.6s ease-out;
+}
+
+@keyframes saveSuccess {
+    0% { 
+        transform: scale(1);
+        box-shadow: 0 4px 20px rgba(107, 182, 214, 0.4);
+    }
+    50% { 
+        transform: scale(1.2);
+        box-shadow: 0 6px 30px rgba(107, 182, 214, 0.6);
+    }
+    100% { 
+        transform: scale(1);
+        box-shadow: 0 4px 20px rgba(107, 182, 214, 0.4);
+    }
+}
+
+/* Bookmark icon specific styling for better visual */
+.save-btn svg path {
+    transition: all 0.3s ease;
+}
+
+.save-btn:not(.saved) svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+}
+
+.save-btn:not(.saved):hover svg {
+    fill: rgba(168, 216, 234, 0.3);
+    stroke: var(--deep-blue);
+}
+
+/* Dark mode support */
+[data-theme="dark"] .save-btn {
+    background: linear-gradient(135deg, 
+        rgba(66, 153, 225, 0.15), 
+        rgba(45, 55, 72, 0.08));
+    border-color: rgba(66, 153, 225, 0.4);
+    color: #4299e1;
+    box-shadow: 0 3px 15px rgba(66, 153, 225, 0.2);
+}
+
+[data-theme="dark"] .save-btn::before {
+    background: linear-gradient(45deg, 
+        rgba(66, 153, 225, 0.1), 
+        rgba(237, 100, 166, 0.05));
+}
+
+[data-theme="dark"] .save-btn:hover {
+    border-color: #4299e1;
+    background: linear-gradient(135deg, 
+        rgba(66, 153, 225, 0.2), 
+        rgba(45, 55, 72, 0.12));
+    box-shadow: 0 6px 25px rgba(66, 153, 225, 0.35);
+}
+
+[data-theme="dark"] .save-btn.saved {
+    background: linear-gradient(135deg, 
+        #4299e1, 
+        rgba(66, 153, 225, 0.9));
+    border-color: #4299e1;
+    box-shadow: 0 4px 20px rgba(66, 153, 225, 0.4);
+}
+
+[data-theme="dark"] .save-btn.saved:hover {
+    background: linear-gradient(135deg, 
+        #ed64a6, 
+        rgba(237, 100, 166, 0.9));
+    border-color: #ed64a6;
+    box-shadow: 0 6px 25px rgba(237, 100, 166, 0.5);
+}
+
+[data-theme="dark"] .save-btn:not(.saved):hover svg {
+    fill: rgba(66, 153, 225, 0.3);
+    stroke: #4299e1;
+}
+
+/* Loading state for when saving */
+.save-btn .loading-small {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: currentColor;
+    animation: spin 1s ease-in-out infinite;
+}
+
+/* Focus states for accessibility */
+.save-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(168, 216, 234, 0.4);
+}
+
+[data-theme="dark"] .save-btn:focus {
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.4);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .save-btn {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .save-btn:hover {
+        transform: translateY(-1px) scale(1.03);
+    }
+    
+    .save-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+/* Story card specific positioning adjustments */
+.story-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.story-actions .save-btn {
+    flex-shrink: 0;
+}
