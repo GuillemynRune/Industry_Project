@@ -122,8 +122,9 @@ function addStoryWithAnimation(story) {
 
 function createCompactStoryCard(story, index) {
     const card = document.createElement('div');
+    const riskLevel = story.risk_level || 'minimal';
     
-    card.className = 'pending-story-card-compact';
+    card.className = `pending-story-card-compact ${riskLevel}-risk`;
     card.dataset.storyId = story._id || story.id;
 
     const storyData = {
@@ -134,12 +135,20 @@ function createCompactStoryCard(story, index) {
         preview: story.experience ? story.experience.substring(0, 150) + '...' : 'No experience details'
     };
 
+    const riskColors = {
+        'high': 'risk-high',
+        'medium': 'risk-medium', 
+        'low': 'risk-low',
+        'minimal': 'risk-minimal'
+    };
+
     card.innerHTML = `
         <div class="story-card-header">
             <div class="story-meta-info">
                 <h4 class="story-title">${storyData.challenge}</h4>
                 <p class="story-author">By ${storyData.author} • ${storyData.date}</p>
             </div>
+            <span class="story-risk-badge ${riskColors[riskLevel]}">${riskLevel.toUpperCase()}</span>
         </div>
         
         <div class="story-preview-text">${storyData.preview}</div>
@@ -290,8 +299,26 @@ function showStoryDetailModal(story) {
         solution: story.solution || 'No solution specified',
         advice: story.advice || 'No advice provided',
         generatedStory: story.generated_story || 'No generated story available',
-        date: story.created_at ? new Date(story.created_at).toLocaleDateString() : 'Unknown date'
+        date: story.created_at ? new Date(story.created_at).toLocaleDateString() : 'Unknown date',
+        riskLevel: story.risk_level || 'minimal',
+        flaggedKeywords: story.flagged_keywords || []
     };
+
+    const riskColors = {
+        'high': 'risk-high',
+        'medium': 'risk-medium',
+        'low': 'risk-low', 
+        'minimal': 'risk-minimal'
+    };
+
+    const flaggedKeywordsSection = storyData.flaggedKeywords.length > 0 ? `
+        <div class="flagged-keywords-section">
+            <h4>🚨 Flagged Keywords</h4>
+            <div class="keyword-tags">
+                ${storyData.flaggedKeywords.map(keyword => `<span class="keyword-tag">${keyword}</span>`).join('')}
+            </div>
+        </div>
+    ` : '';
 
     const sections = [
         { label: 'Experience:', content: storyData.experience },
@@ -307,6 +334,7 @@ function showStoryDetailModal(story) {
                 <h2>${storyData.challenge}</h2>
                 <div class="story-meta">
                     <span>By ${storyData.author} • ${storyData.date}</span>
+                    <span class="story-risk-badge ${riskColors[storyData.riskLevel]}">${storyData.riskLevel.toUpperCase()} RISK</span>
                 </div>
             </div>
         </div>
@@ -326,6 +354,8 @@ function showStoryDetailModal(story) {
                 <h3>Generated Story Preview</h3>
                 <div class="generated-story-preview">${storyData.generatedStory}</div>
             </div>
+
+            ${flaggedKeywordsSection}
         </div>
 
         <div class="story-detail-actions">

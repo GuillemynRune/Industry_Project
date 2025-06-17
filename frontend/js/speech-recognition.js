@@ -118,20 +118,19 @@ class SpeechRecognitionManager {
     }
 
     addMicrophoneButtonsToTextareas() {
-        // Only enhance textareas that are NOT in guided prompts
-        document.querySelectorAll('textarea:not([id^="guided-"])').forEach(textarea => {
+        document.querySelectorAll('textarea').forEach(textarea => {
             this.enhanceTextarea(textarea);
         });
 
-        // Watch for new textareas (excluding guided ones)
+        // Watch for new textareas
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 mutation.addedNodes.forEach((node) => {
                     if (node.nodeType === 1) {
-                        const textareas = node.querySelectorAll ? node.querySelectorAll('textarea:not([id^="guided-"])') : [];
+                        const textareas = node.querySelectorAll ? node.querySelectorAll('textarea') : [];
                         textareas.forEach(textarea => this.enhanceTextarea(textarea));
                         
-                        if (node.tagName === 'TEXTAREA' && !node.id.startsWith('guided-')) {
+                        if (node.tagName === 'TEXTAREA') {
                             this.enhanceTextarea(node);
                         }
                     }

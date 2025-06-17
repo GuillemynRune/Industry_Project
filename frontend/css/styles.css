@@ -1103,7 +1103,7 @@ nav {
     font-size: 2.5rem;
 }
 
-.moderation-refresh-btn { 
+.moderation-refresh-btn {
     padding: 0.8rem 1.5rem;
     font-size: 0.95rem;
     border-radius: 20px;
@@ -1182,6 +1182,10 @@ nav {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
+.pending-story-card-compact.high-risk { border-left-color: var(--crisis-red); }
+.pending-story-card-compact.medium-risk { border-left-color: #ffc107; }
+.pending-story-card-compact.low-risk { border-left-color: var(--success-green); }
+
 .story-card-header {
     display: flex;
     justify-content: space-between;
@@ -1200,6 +1204,19 @@ nav {
     color: var(--text-light);
     font-size: 0.9rem;
 }
+
+.story-risk-badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+}
+
+.risk-high { background: var(--crisis-red); }
+.risk-medium { background: #ffc107; }
+.risk-low { background: var(--success-green); }
+.risk-minimal { background: var(--text-light); }
 
 .story-preview-text {
     color: var(--text-dark);
@@ -1293,24 +1310,27 @@ nav {
     box-shadow: var(--shadow-light);
 }
 
-.guided-nav-center {
-    position: relative;
+.flagged-keywords-section {
+    background: rgba(220, 53, 69, 0.1);
+    border: 2px solid rgba(220, 53, 69, 0.3);
+    border-radius: 18px;
+    padding: 1.5rem;
 }
 
-.guided-speech-btn {
-    position: relative;
-    z-index: 10;
-    white-space: nowrap;
+.keyword-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
-.guided-speech-btn:hover {
-    transform: translateY(-2px) scale(1.02);
-}
-
-.guided-speech-btn.listening {
-    background: linear-gradient(135deg, var(--deep-pink), var(--soft-pink));
-    box-shadow: 0 8px 30px rgba(232, 145, 163, 0.4);
-    animation: none; /* Remove the pulsing animation for better UX */
+.keyword-tag {
+    background: var(--crisis-red);
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    margin: 0.2rem;
+    display: inline-block;
 }
 
 .story-detail-actions, .story-viewer-actions {
