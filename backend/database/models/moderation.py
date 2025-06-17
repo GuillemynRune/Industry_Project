@@ -1,3 +1,4 @@
+# backend/database/models/moderation.py
 import logging
 from datetime import datetime
 from typing import Dict, Any, List, Optional
@@ -38,8 +39,7 @@ class ModerationDatabase:
             "status": "pending_review",
             "created_at": datetime.utcnow(),
             "approved_by": None,
-            "approved_at": None,
-            "risk_level": ModerationDatabase._assess_risk_level(experience, advice)
+            "approved_at": None
         }
         
         result = await mongodb.database.pending_stories.insert_one(story_doc)
@@ -65,18 +65,3 @@ class ModerationDatabase:
             stories.append(story)
         
         return stories
-    
-    @staticmethod
-    def _assess_risk_level(experience: str, advice: str) -> str:
-        """Assess content risk level"""
-        combined_text = f"{experience} {advice}".lower()
-        
-        high_risk = ["suicide", "kill myself", "end it all", "hurt myself", "self harm"]
-        medium_risk = ["hopeless", "can't cope", "giving up", "breaking down", "overwhelmed"]
-        
-        if any(keyword in combined_text for keyword in high_risk):
-            return "high"
-        elif sum(1 for keyword in medium_risk if keyword in combined_text) >= 2:
-            return "medium"
-        else:
-            return "low"

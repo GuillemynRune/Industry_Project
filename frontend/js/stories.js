@@ -516,7 +516,7 @@ function showCrisisResourcesModal(resources) {
     openModal('crisisModal');
 }
 
-// Handle story submission
+// Handle story submission - REMOVED crisis detection
 document.getElementById('shareForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -556,14 +556,9 @@ document.getElementById('shareForm').addEventListener('submit', async function(e
         const data = await response.json();
         
         if (data.success) {
-            if (data.requires_immediate_support) {
-                closeModal('shareModal');
-                showCrisisResourcesModal(data.crisis_resources);
-            } else {
-                showToast('Thank you for sharing your journey! Your story has been submitted and will be reviewed within 24-48 hours before being shared with our community.', 'success', 'Story Submitted!');
-                this.reset();
-                closeModal('shareModal');
-            }
+            showToast('Thank you for sharing your journey! Your story has been submitted and will be reviewed within 24-48 hours before being shared with our community.', 'success', 'Story Submitted!');
+            this.reset();
+            closeModal('shareModal');
         } else {
             showToast(data.message || 'We couldn\'t submit your story right now. Please try again in a moment.', 'error', 'Submission Error');
         }

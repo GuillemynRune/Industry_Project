@@ -1,3 +1,4 @@
+// frontend/js/moderation.js - COMPLETE REMOVAL
 // Enhanced Moderation functionality with pagination and animations
 let currentDisplayedStories = [];
 let totalPendingCount = 0;
@@ -120,11 +121,11 @@ function addStoryWithAnimation(story) {
     }, 500);
 }
 
+// UPDATED: Completely remove risk assessment from story cards
 function createCompactStoryCard(story, index) {
     const card = document.createElement('div');
-    const riskLevel = story.risk_level || 'minimal';
     
-    card.className = `pending-story-card-compact ${riskLevel}-risk`;
+    card.className = 'pending-story-card-compact';
     card.dataset.storyId = story._id || story.id;
 
     const storyData = {
@@ -135,20 +136,12 @@ function createCompactStoryCard(story, index) {
         preview: story.experience ? story.experience.substring(0, 150) + '...' : 'No experience details'
     };
 
-    const riskColors = {
-        'high': 'risk-high',
-        'medium': 'risk-medium', 
-        'low': 'risk-low',
-        'minimal': 'risk-minimal'
-    };
-
     card.innerHTML = `
         <div class="story-card-header">
             <div class="story-meta-info">
                 <h4 class="story-title">${storyData.challenge}</h4>
                 <p class="story-author">By ${storyData.author} • ${storyData.date}</p>
             </div>
-            <span class="story-risk-badge ${riskColors[riskLevel]}">${riskLevel.toUpperCase()}</span>
         </div>
         
         <div class="story-preview-text">${storyData.preview}</div>
@@ -161,6 +154,95 @@ function createCompactStoryCard(story, index) {
     `;
 
     return card;
+}
+
+async function openStoryDetailModal(storyId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/moderation/story/${storyId}`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            showStoryDetailModal(data.story);
+        } else {
+            showToast('Error loading story details', 'error', 'Loading Error');
+        }
+    } catch (error) {
+        console.error('Error loading story details:', error);
+        showToast('Error loading story details: ' + error.message, 'error', 'Loading Error');
+    }
+}
+
+// UPDATED: Completely remove risk assessment from story detail modal
+function showStoryDetailModal(story) {
+    const modal = document.getElementById('storyDetailModal') || createStoryDetailModal();
+    
+    const storyData = {
+        id: story._id || story.id,
+        author: story.author_name || 'Anonymous',
+        challenge: story.challenge || 'No challenge specified',
+        experience: story.experience || 'No experience details',
+        solution: story.solution || 'No solution specified',
+        advice: story.advice || 'No advice provided',
+        generatedStory: story.generated_story || 'No generated story available',
+        date: story.created_at ? new Date(story.created_at).toLocaleDateString() : 'Unknown date'
+        // REMOVED: riskLevel and flaggedKeywords completely
+    };
+
+    const sections = [
+        { label: 'Experience:', content: storyData.experience },
+        { label: 'Solution:', content: storyData.solution },
+        storyData.advice && { label: 'Advice to Others:', content: storyData.advice }
+    ].filter(Boolean);
+
+    modal.querySelector('.modal-content').innerHTML = `
+        <span class="close" onclick="closeModal('storyDetailModal')">&times;</span>
+        
+        <div class="story-detail-header">
+            <div class="story-title-section">
+                <h2>${storyData.challenge}</h2>
+                <div class="story-meta">
+                    <span>By ${storyData.author} • ${storyData.date}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="story-detail-content">
+            <div class="story-section">
+                <h3>Original Submission</h3>
+                ${sections.map(section => `
+                    <div class="story-field">
+                        <label>${section.label}</label>
+                        <div class="field-content">${section.content}</div>
+                    </div>
+                `).join('')}
+            </div>
+
+            <div class="story-section">
+                <h3>Generated Story Preview</h3>
+                <div class="generated-story-preview">${storyData.generatedStory}</div>
+            </div>
+        </div>
+
+        <div class="story-detail-actions">
+            <button class="approve-btn-modern" onclick="moderateStory('${storyData.id}', 'approve')">
+                <span class="btn-icon">✓</span>
+                Approve & Publish
+            </button>
+            <button class="reject-btn-modern" onclick="moderateStory('${storyData.id}', 'reject')">
+                <span class="btn-icon">✗</span>
+                Reject Story
+            </button>
+        </div>
+    `;
+
+    openModal('storyDetailModal');
 }
 
 function updateModerationStats() {
@@ -263,114 +345,6 @@ async function removeStoryWithAnimation(storyId) {
             displayPendingStories([]);
         }
     }, 500);
-}
-
-async function openStoryDetailModal(storyId) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/moderation/story/${storyId}`, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        
-        if (data.success) {
-            showStoryDetailModal(data.story);
-        } else {
-            showToast('Error loading story details', 'error', 'Loading Error');
-        }
-    } catch (error) {
-        console.error('Error loading story details:', error);
-        showToast('Error loading story details: ' + error.message, 'error', 'Loading Error');
-    }
-}
-
-function showStoryDetailModal(story) {
-    const modal = document.getElementById('storyDetailModal') || createStoryDetailModal();
-    
-    const storyData = {
-        id: story._id || story.id,
-        author: story.author_name || 'Anonymous',
-        challenge: story.challenge || 'No challenge specified',
-        experience: story.experience || 'No experience details',
-        solution: story.solution || 'No solution specified',
-        advice: story.advice || 'No advice provided',
-        generatedStory: story.generated_story || 'No generated story available',
-        date: story.created_at ? new Date(story.created_at).toLocaleDateString() : 'Unknown date',
-        riskLevel: story.risk_level || 'minimal',
-        flaggedKeywords: story.flagged_keywords || []
-    };
-
-    const riskColors = {
-        'high': 'risk-high',
-        'medium': 'risk-medium',
-        'low': 'risk-low', 
-        'minimal': 'risk-minimal'
-    };
-
-    const flaggedKeywordsSection = storyData.flaggedKeywords.length > 0 ? `
-        <div class="flagged-keywords-section">
-            <h4>🚨 Flagged Keywords</h4>
-            <div class="keyword-tags">
-                ${storyData.flaggedKeywords.map(keyword => `<span class="keyword-tag">${keyword}</span>`).join('')}
-            </div>
-        </div>
-    ` : '';
-
-    const sections = [
-        { label: 'Experience:', content: storyData.experience },
-        { label: 'Solution:', content: storyData.solution },
-        storyData.advice && { label: 'Advice to Others:', content: storyData.advice }
-    ].filter(Boolean);
-
-    modal.querySelector('.modal-content').innerHTML = `
-        <span class="close" onclick="closeModal('storyDetailModal')">&times;</span>
-        
-        <div class="story-detail-header">
-            <div class="story-title-section">
-                <h2>${storyData.challenge}</h2>
-                <div class="story-meta">
-                    <span>By ${storyData.author} • ${storyData.date}</span>
-                    <span class="story-risk-badge ${riskColors[storyData.riskLevel]}">${storyData.riskLevel.toUpperCase()} RISK</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="story-detail-content">
-            <div class="story-section">
-                <h3>Original Submission</h3>
-                ${sections.map(section => `
-                    <div class="story-field">
-                        <label>${section.label}</label>
-                        <div class="field-content">${section.content}</div>
-                    </div>
-                `).join('')}
-            </div>
-
-            <div class="story-section">
-                <h3>Generated Story Preview</h3>
-                <div class="generated-story-preview">${storyData.generatedStory}</div>
-            </div>
-
-            ${flaggedKeywordsSection}
-        </div>
-
-        <div class="story-detail-actions">
-            <button class="approve-btn-modern" onclick="moderateStory('${storyData.id}', 'approve')">
-                <span class="btn-icon">✓</span>
-                Approve & Publish
-            </button>
-            <button class="reject-btn-modern" onclick="moderateStory('${storyData.id}', 'reject')">
-                <span class="btn-icon">✗</span>
-                Reject Story
-            </button>
-        </div>
-    `;
-
-    openModal('storyDetailModal');
 }
 
 function createStoryDetailModal() {

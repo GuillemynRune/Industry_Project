@@ -236,13 +236,8 @@ class GuidedPrompts {
             const data = await response.json();
             
             if (data.success) {
-                if (data.requires_immediate_support) {
-                    this.close();
-                    showCrisisResourcesModal(data.crisis_resources);
-                } else {
-                    showToast('Thank you for sharing your journey! Your story has been submitted and will be reviewed within 24-48 hours.', 'success', 'Story Submitted!');
-                    this.close();
-                }
+                showToast('Thank you for sharing your journey! Your story has been submitted and will be reviewed within 24-48 hours.', 'success', 'Story Submitted!');
+                this.close();
             } else {
                 showToast(data.message || 'We couldn\'t submit your story right now. Please try again.', 'error', 'Submission Error');
                 this.previousStep(); // Go back to allow editing

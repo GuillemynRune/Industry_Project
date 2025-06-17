@@ -41,8 +41,6 @@ def create_fallback_recovery_story(challenge: str, experience: str, solution: st
     story += "Remember: Recovery is possible. Every small step forward matters, and you're not alone in this journey."
     return story
 
-# REMOVED the local generate_recovery_story function - using the one from story_service instead
-
 @router.post("/submit")
 async def submit_story_for_review(
     request: Request,
@@ -55,28 +53,7 @@ async def submit_story_for_review(
     if not all([story_request.challenge.strip(), story_request.experience.strip(), story_request.solution.strip()]):
         raise HTTPException(status_code=400, detail="Challenge, experience, and solution cannot be empty")
     
-    # Check for crisis content
-    combined_text = f"{story_request.experience} {story_request.advice}"
-    risk_assessment = ContentFilter.get_risk_assessment(combined_text)
-    
-    if risk_assessment["requires_intervention"]:
-        await CrisisSupport.log_crisis_interaction(
-            user_id=current_user["id"],
-            interaction_type="crisis_content_detected"
-        )
-        
-        return {
-            "success": False,
-            "requires_immediate_support": True,
-            "crisis_resources": CrisisSupport.get_crisis_resources(),
-            "message": "We noticed your message indicates you might be in distress. Please reach out for immediate support."
-        }
-    
-    # DEBUG: Check what function we're actually calling
-    logger.info("🔍 DEBUG: About to call generate_recovery_story function")
-    logger.info(f"🔍 DEBUG: Function location: {generate_recovery_story}")
-    
-    # Generate story WITH embedding - now using the correct function from story_service!
+    # Generate story WITH embedding
     logger.info("Generating recovery story with embedding for submission")
     story_result = await generate_recovery_story(
         challenge=story_request.challenge,
@@ -85,10 +62,6 @@ async def submit_story_for_review(
         advice=story_request.advice,
         author_name=story_request.author_name or current_user.get("display_name", "Anonymous")
     )
-    
-    logger.info(f"🔍 DEBUG: Story result keys: {list(story_result.keys())}")
-    logger.info(f"🔍 DEBUG: Story result success: {story_result.get('success')}")
-    logger.info(f"🔍 DEBUG: Story result embedding present: {story_result.get('embedding') is not None}")
     
     if not story_result["success"]:
         raise HTTPException(status_code=500, detail="Failed to generate story")
@@ -106,7 +79,7 @@ async def submit_story_for_review(
         generated_story=story_result["story"],
         model_used=story_result["model_used"],
         key_symptoms=story_result.get("key_symptoms", []),
-        embedding=story_result.get("embedding")  # Pass the embedding here!
+        embedding=story_result.get("embedding")
     )
     
     return {

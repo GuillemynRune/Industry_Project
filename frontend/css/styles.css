@@ -1182,10 +1182,6 @@ nav {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
-.pending-story-card-compact.high-risk { border-left-color: var(--crisis-red); }
-.pending-story-card-compact.medium-risk { border-left-color: #ffc107; }
-.pending-story-card-compact.low-risk { border-left-color: var(--success-green); }
-
 .story-card-header {
     display: flex;
     justify-content: space-between;
@@ -1204,19 +1200,6 @@ nav {
     color: var(--text-light);
     font-size: 0.9rem;
 }
-
-.story-risk-badge {
-    padding: 0.3rem 0.8rem;
-    border-radius: 15px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: white;
-}
-
-.risk-high { background: var(--crisis-red); }
-.risk-medium { background: #ffc107; }
-.risk-low { background: var(--success-green); }
-.risk-minimal { background: var(--text-light); }
 
 .story-preview-text {
     color: var(--text-dark);
@@ -1308,29 +1291,6 @@ nav {
     line-height: 1.7;
     border-left: 4px solid var(--deep-pink);
     box-shadow: var(--shadow-light);
-}
-
-.flagged-keywords-section {
-    background: rgba(220, 53, 69, 0.1);
-    border: 2px solid rgba(220, 53, 69, 0.3);
-    border-radius: 18px;
-    padding: 1.5rem;
-}
-
-.keyword-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
-
-.keyword-tag {
-    background: var(--crisis-red);
-    color: white;
-    padding: 0.4rem 0.8rem;
-    border-radius: 15px;
-    font-size: 0.85rem;
-    margin: 0.2rem;
-    display: inline-block;
 }
 
 .story-detail-actions, .story-viewer-actions {
