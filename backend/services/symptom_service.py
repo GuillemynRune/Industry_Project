@@ -4,7 +4,6 @@ Symptom extraction service using Ollama
 
 import logging
 from typing import List, Dict
-# from .ollama_client import query_ollama_model, MODELS
 from .openai_client import query_openai_model, MODELS
 
 logger = logging.getLogger(__name__)
