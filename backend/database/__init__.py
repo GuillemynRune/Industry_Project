@@ -7,10 +7,7 @@ from .connection import mongodb
 __all__ = [
     'connect_to_mongo',
     'close_mongo_connection',
-    'check_database_health',
     'UserDatabase',
     'StoryDatabase',
     'CrisisSupport',
-    'ModerationDatabase',
-    'SavedStoriesDatabase'
 ]
