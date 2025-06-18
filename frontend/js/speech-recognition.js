@@ -8,6 +8,7 @@ class SpeechRecognitionManager {
         this.analyser = null;
         this.mediaStream = null;
         this.animationId = null;
+        this.volumeRings = [];
         this.transcriptionElement = null; // Add this for live transcription
         this.init();
     }

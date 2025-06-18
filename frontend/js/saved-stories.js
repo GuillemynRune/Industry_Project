@@ -245,6 +245,80 @@ function updateSaveButton(button, isSaved) {
     }
 }
 
+// Add save button to story detail modals instead of cards
+function addSaveButtonToModal(modalContent) {
+    // Skip if already has save button or not logged in
+    if (modalContent.querySelector('.save-story-btn') || !currentUser) return;
+    
+    // Find the story ID from the modal content
+    const storyId = extractStoryIdFromModal(modalContent);
+    if (!storyId) return;
+    
+    // Find the actions section
+    const actionsSection = modalContent.querySelector('.story-viewer-actions, .story-detail-actions');
+    if (!actionsSection) return;
+    
+    // Create save button
+    const saveButton = document.createElement('button');
+    saveButton.className = 'btn btn-secondary save-story-btn';
+    saveButton.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleSaveStory(storyId, saveButton);
+    };
+    saveButton.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+        </svg>
+        Save Story
+    `;
+    
+    // Insert before the close button
+    const closeButton = actionsSection.querySelector('.btn-secondary');
+    if (closeButton) {
+        actionsSection.insertBefore(saveButton, closeButton);
+    } else {
+        actionsSection.insertBefore(saveButton, actionsSection.firstChild);
+    }
+    
+    // Check if story is already saved
+    checkAndUpdateSaveStatus(storyId, saveButton);
+}
+
+// Extract story ID from modal content
+function extractStoryIdFromModal(modalContent) {
+    // Try to find story ID in various ways
+    const modal = modalContent.closest('.modal');
+    if (!modal) return null;
+    
+    // Check if modal has a data attribute
+    if (modal.dataset.storyId) {
+        return modal.dataset.storyId;
+    }
+    
+    // Look for view published story button that might have the ID
+    const viewBtn = modalContent.querySelector('button[onclick*="viewPublishedStory"]');
+    if (viewBtn) {
+        const onclick = viewBtn.getAttribute('onclick');
+        const match = onclick.match(/viewPublishedStory\(['"]([^'"]+)['"]/);
+        return match ? match[1] : null;
+    }
+    
+    // Look for story detail in URL or other indicators
+    // This might need to be enhanced based on your specific implementation
+    return null;
+}
+
+// Extract story ID from read more link
+function extractStoryIdFromLink(link) {
+    const onclick = link.getAttribute('onclick');
+    if (onclick && onclick.includes('viewFullStory')) {
+        const match = onclick.match(/viewFullStory\(['"]([^'"]+)['"]/);
+        return match ? match[1] : null;
+    }
+    return null;
+}
+
 // Check if story is saved and update button state
 async function checkAndUpdateSaveStatus(storyId, button) {
     if (!currentUser) return;

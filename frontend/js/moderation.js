@@ -280,6 +280,26 @@ async function refreshModerationStats() {
     }
 }
 
+async function loadAdditionalStories(count) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/moderation/pending?limit=${count}&offset=${currentDisplayedStories.length}`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.pending_stories.length > 0) {
+                data.pending_stories.forEach(story => {
+                    currentDisplayedStories.push(story);
+                    addStoryWithAnimation(story);
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Error loading additional stories:', error);
+    }
+}
+
 async function removeStoryWithAnimation(storyId) {
     const grid = document.getElementById('pendingStoriesGrid');
     const card = grid.querySelector(`[data-story-id="${storyId}"]`);
