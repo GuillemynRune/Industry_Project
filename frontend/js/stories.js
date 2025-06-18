@@ -1,4 +1,4 @@
-// Stories functionality with carousel
+// Fixed Stories functionality with correct API URL handling
 let storyCarousel = null;
 
 class StoryCarousel {
@@ -171,37 +171,96 @@ class StoryCarousel {
     }
 }
 
-// Story loading functions
+// Debug function to test API connectivity
+function debugApiConnection() {
+    console.log('🔧 Debug: Testing API connection...');
+    console.log('🔧 Current API_BASE_URL:', API_BASE_URL);
+    console.log('🔧 Current window.location:', window.location);
+    console.log('🔧 Current authToken:', authToken ? 'Present' : 'Not present');
+    
+    // Test basic connectivity
+    fetch(`${API_BASE_URL}/health`)
+        .then(response => {
+            console.log('🔧 Health check response:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('🔧 Health check data:', data);
+        })
+        .catch(error => {
+            console.error('🔧 Health check failed:', error);
+        });
+}
+
+// FIXED: Story loading functions with correct URL handling
 async function loadApprovedStories() {
     console.log('🔍 Loading approved stories...');
+    console.log('🌐 API_BASE_URL:', API_BASE_URL);
     
     try {
-        const response = await fetch(`${API_BASE_URL}/stories?limit=9&random=true`);
+        // Add timeout to prevent hanging requests
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        
+        // FIXED: Ensure correct URL construction
+        const apiUrl = `${API_BASE_URL}/stories?limit=9&random=true`;
+        console.log('🔗 Full API URL:', apiUrl);
+        
+        const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                // Only add auth header if token exists
+                ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {})
+            },
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
         console.log('📡 API Response status:', response.status);
+        console.log('📡 API Response headers:', Object.fromEntries(response.headers.entries()));
         
         if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            // Log more details about the error
+            const errorText = await response.text();
+            console.error('❌ Response error details:', errorText);
+            throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
         }
         
         const data = await response.json();
         console.log('📊 API Response data:', data);
         
-        if (data.success && data.stories && data.stories.length > 0) {
+        if (data.success && data.stories && Array.isArray(data.stories) && data.stories.length > 0) {
             console.log(`✅ Found ${data.stories.length} real stories from database`);
             console.log('📝 First story sample:', data.stories[0]);
             displayStories(data.stories);
         } else {
             console.log('⚠️ No real stories found, using samples');
-            console.log('📊 API response:', data);
+            console.log('📊 API response structure:', JSON.stringify(data, null, 2));
             displaySampleStories();
         }
     } catch (error) {
         console.error('❌ Error loading stories:', error);
+        
+        // More specific error handling
+        if (error.name === 'AbortError') {
+            console.error('🕒 Request timed out');
+            showToast('Request timed out. Please check your connection.', 'error', 'Timeout');
+        } else if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+            console.error('🌐 Network connectivity issue');
+            showToast('Connection failed. Please check your internet and try again.', 'error', 'Network Error');
+        } else if (error.message.includes('CORS')) {
+            console.error('🚫 CORS policy issue');
+            showToast('CORS error detected. Please check browser console for details.', 'error', 'CORS Error');
+        } else {
+            console.error('❓ Unknown error type:', error.constructor.name);
+        }
+        
         console.log('🔄 Falling back to sample stories');
         displaySampleStories();
     }
 }
-
 
 function displayStories(stories) {
     const carousel = document.getElementById('storiesCarousel');
@@ -396,7 +455,7 @@ function showFullStoryModal(story) {
     // Check and update save status if user is logged in
     if (currentUser && content.id) {
         const saveButton = modal.querySelector('.save-story-btn');
-        if (saveButton) {
+        if (saveButton && typeof checkAndUpdateSaveStatus === 'function') {
             checkAndUpdateSaveStatus(content.id, saveButton);
         }
     }
@@ -465,7 +524,7 @@ async function searchSimilarStories() {
         }
 
         const data = await response.json();
-        console.log('Search API response:', data);  // Add this line here
+        console.log('Search API response:', data);
         
         if (data.success && data.stories && data.stories.length > 0) {
             // Extract the actual story objects from the response
@@ -569,3 +628,6 @@ document.getElementById('shareForm').addEventListener('submit', async function(e
         submitBtn.disabled = false;
     }
 });
+
+// Make debug function globally available
+window.debugApiConnection = debugApiConnection;

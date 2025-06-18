@@ -1,18 +1,37 @@
-// Main JavaScript - Core functionality
-const API_BASE_URL = window.location.port === '8080' ? '/api' : 'http://localhost:8000';
+// Main JavaScript - Core functionality with FIXED API_BASE_URL
+// FIXED: Ensure API_BASE_URL is correctly set
+const API_BASE_URL = 'http://localhost:8000';
+
+// Debug the API URL immediately
+console.log('🔧 API_BASE_URL Configuration:');
+console.log('🔧 window.location:', window.location);
+console.log('🔧 window.location.port:', window.location.port);
+console.log('🔧 Final API_BASE_URL:', API_BASE_URL);
+
 let currentUser = null;
 let authToken = null;
 
 // Initialize app
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('🚀 App initializing...');
+    console.log('🔧 Confirming API_BASE_URL during init:', API_BASE_URL);
+    
     initializeAuth();
-    loadApprovedStories();
+    
+    // Wait a moment for the backend to be ready, then load stories
+    setTimeout(async () => {
+        await loadApprovedStories();
+    }, 1000);
     
     // Initialize new systems
     if (typeof GuidedPrompts !== 'undefined') {
         guidedPrompts = new GuidedPrompts();
     }
-    themeManager = new ThemeManager();
+    
+    // Initialize theme manager
+    if (typeof ThemeManager !== 'undefined') {
+        themeManager = new ThemeManager();
+    }
 
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
         console.log('Speech recognition not supported - microphone buttons will be hidden');
@@ -35,6 +54,59 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Debug function to test API connectivity - MOVED FROM STORIES.JS
+function debugApiConnection() {
+    console.log('🔧 Debug: Testing API connection...');
+    console.log('🔧 Current API_BASE_URL:', API_BASE_URL);
+    console.log('🔧 Current window.location:', window.location);
+    console.log('🔧 Current authToken:', authToken ? 'Present' : 'Not present');
+    
+    // Test basic connectivity
+    const healthUrl = `${API_BASE_URL}/health`;
+    console.log('🔧 Testing health endpoint:', healthUrl);
+    
+    fetch(healthUrl)
+        .then(response => {
+            console.log('🔧 Health check response:', response.status);
+            console.log('🔧 Health check URL that worked:', response.url);
+            return response.json();
+        })
+        .then(data => {
+            console.log('🔧 Health check data:', data);
+        })
+        .catch(error => {
+            console.error('🔧 Health check failed:', error);
+        });
+}
+
+// Make debug function globally available
+window.debugApiConnection = debugApiConnection;
+
+// Enhanced API health check function
+async function checkApiHealth() {
+    console.log('🏥 Checking API health...');
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/health`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const healthData = await response.json();
+            console.log('✅ API Health Check:', healthData);
+            return true;
+        } else {
+            console.warn('⚠️ API Health Check failed:', response.status);
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ API Health Check error:', error);
+        return false;
+    }
+}
 
 // Toast Notification System
 function showToast(message, type = 'success', title = '') {
