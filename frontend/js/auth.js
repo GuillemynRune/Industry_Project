@@ -123,7 +123,7 @@ function showUserSection() {
 
 // Updated updateUserSection function for auth.js
 function updateUserSection() {
-    const userSection = document.getElementById('userSection');
+    const userSection = document.getElementById('userSection'); 
 
     if (currentUser) {
         userSection.innerHTML = `
@@ -142,12 +142,10 @@ function updateUserSection() {
                         <span class="menu-icon">🔖</span>
                         <span>Saved Stories</span>
                     </button>
-                    <hr>
                     <button class="user-menu-item" onclick="toggleTheme(); closeUserMenu()">
                         <span class="menu-icon" id="themeIcon">${document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙'}</span>
                         <span id="themeText">${document.documentElement.getAttribute('data-theme') === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
                     </button>
-                    <hr>
                     <button class="user-menu-item" onclick="logout(); closeUserMenu()">
                         <span class="menu-icon">🚪</span>
                         <span>Logout</span>

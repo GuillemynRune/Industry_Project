@@ -3360,19 +3360,6 @@ nav {
     opacity: 1;
 }
 
-/* Divider styling */
-.user-menu hr {
-    margin: 0.5rem 0;
-    border: none;
-    border-top: 1px solid rgba(168, 216, 234, 0.3);
-    opacity: 0.6;
-}
-
-[data-theme="dark"] .user-menu hr {
-    border-top-color: rgba(74, 85, 104, 0.4) !important;
-}
-
-
 /* Saved Stories Modal Styles */
 .saved-stories-modal-content {
     max-width: 1000px;
